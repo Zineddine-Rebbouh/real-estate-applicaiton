@@ -49,8 +49,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
-              Your trusted partner in finding the perfect property.
-              Connecting people with their dream homes since 2020.
+              Your trusted partner in finding the perfect property. Connecting
+              people with their dream homes since 2020.
             </p>
           </div>
 
