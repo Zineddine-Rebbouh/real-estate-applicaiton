@@ -1,6 +1,35 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@reference "tailwindcss";
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+}
 
 *,
 *::before,
@@ -87,34 +116,34 @@ body,
 }
 
 .mapboxgl-popup-content {
-  @apply !bg-primary-700;
-  @apply !rounded-lg;
-  @apply !py-2;
-  @apply !px-3;
+  @apply bg-primary;
+  @apply rounded-lg;
+  @apply py-2;
+  @apply px-3;
 }
 
 .mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
-  @apply !border-b-primary-700;
+  @apply border-b-primary;
 }
 
 .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
-  @apply !border-t-primary-700;
+  @apply border-t-primary;
 }
 
 .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
-  @apply !border-r-primary-700;
+  @apply border-r-primary;
 }
 
 .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
-  @apply !border-l-primary-700;
+  @apply border-l-primary;
 }
 
 .marker-popup {
-  @apply bg-primary-700;
+  @apply bg-primary;
   @apply text-white;
   @apply p-0;
   @apply m-0;
-  @apply !flex;
+  @apply flex;
   @apply justify-between;
   @apply items-center;
   @apply gap-3;
@@ -125,7 +154,7 @@ body,
 }
 
 .marker-popup-price {
-  @apply text-sm font-semibold text-primary-200;
+  @apply text-sm font-semibold text-primary/80;
 }
 
 .marker-popup-title {
@@ -134,7 +163,7 @@ body,
 }
 
 .marker-popup-price-unit {
-  @apply text-xs text-primary-500 font-normal;
+  @apply text-xs text-primary/70 font-normal;
 }
 
 /* scrollbar styling */
@@ -147,12 +176,12 @@ body,
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-primary-200;
+  @apply bg-primary/20;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-primary-300;
+  @apply bg-primary/30;
 }
 
 @layer base {
