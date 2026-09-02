@@ -13,6 +13,7 @@ export function CTABanner() {
               src="/landing-call-to-action.jpg"
               alt=""
               fill
+              sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), min(1216px, calc(100vw - 4rem))"
               className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
@@ -25,7 +26,8 @@ export function CTABanner() {
                 Ready to find your dream property?
               </h2>
               <p className="text-base sm:text-lg text-white/90 leading-relaxed mb-8">
-                Join thousands of satisfied clients who found their perfect home with us
+                Join thousands of satisfied clients who found their perfect home
+                with us
               </p>
               <Button size="lg" className="gap-2">
                 Get started

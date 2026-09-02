@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Bed, Layers } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPriceValue } from "@/lib/utils";
@@ -67,8 +67,13 @@ export function PropertyCard({
 
       <CardFooter className="flex items-center justify-between pt-0">
         <p className="text-base font-semibold">{formatPriceValue(price)}</p>
-        <Button variant="outline" size="sm" asChild>
-          <Link href={href}>View details</Link>
+        <Button
+          variant="outline"
+          size="sm"
+          nativeButton={false}
+          render={<Link href={href} />}
+        >
+          View details
         </Button>
       </CardFooter>
     </Card>

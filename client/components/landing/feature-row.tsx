@@ -4,7 +4,8 @@ const features = [
   {
     icon: "/landing-icon-calendar.png",
     title: "Schedule viewings",
-    description: "Book property tours at your convenience with our easy scheduling system",
+    description:
+      "Book property tours at your convenience with our easy scheduling system",
   },
   {
     icon: "/landing-icon-heart.png",
@@ -33,6 +34,7 @@ export function FeatureRow() {
                   src={feature.icon}
                   alt=""
                   fill
+                  sizes="64px"
                   className="object-contain"
                 />
               </div>

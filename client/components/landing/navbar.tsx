@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -47,7 +47,9 @@ export function Navbar() {
               height={32}
               className="w-8 h-8"
             />
-            <span className={`font-semibold text-lg ${scrolled ? "text-foreground" : "text-white"}`}>
+            <span
+              className={`font-semibold text-lg ${scrolled ? "text-foreground" : "text-white"}`}
+            >
               RealEstate
             </span>
           </Link>
@@ -59,7 +61,9 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={`text-sm font-medium transition-colors hover:text-primary ${
-                  scrolled ? "text-foreground" : "text-white/90 hover:text-white"
+                  scrolled
+                    ? "text-foreground"
+                    : "text-white/90 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -70,10 +74,14 @@ export function Navbar() {
           {/* Right Section */}
           <div className="flex items-center gap-4">
             {/* Locale Toggle */}
-            <div className={`hidden sm:flex items-center gap-2 text-sm ${scrolled ? "text-foreground" : "text-white"}`}>
+            <div
+              className={`hidden sm:flex items-center gap-2 text-sm ${scrolled ? "text-foreground" : "text-white"}`}
+            >
               <button className="font-medium">EN</button>
               <span className="text-muted-foreground">/</span>
-              <button className="text-muted-foreground hover:text-foreground transition-colors">PL</button>
+              <button className="text-muted-foreground hover:text-foreground transition-colors">
+                PL
+              </button>
             </div>
 
             {/* User Chip */}
@@ -81,17 +89,23 @@ export function Navbar() {
               <Avatar className="w-8 h-8">
                 <AvatarFallback>WZ</AvatarFallback>
               </Avatar>
-              <span className={`text-sm ${scrolled ? "text-foreground" : "text-white"}`}>
+              <span
+                className={`text-sm ${scrolled ? "text-foreground" : "text-white"}`}
+              >
                 Wroclaw
               </span>
             </div>
 
             {/* Mobile Menu */}
             <Sheet>
-              <SheetTrigger asChild className="lg:hidden">
-                <Button variant="ghost" size="icon">
-                  <Menu className={`h-5 w-5 ${scrolled ? "text-foreground" : "text-white"}`} />
-                </Button>
+              <SheetTrigger
+                render={
+                  <Button variant="ghost" size="icon" className="lg:hidden" />
+                }
+              >
+                <Menu
+                  className={`h-5 w-5 ${scrolled ? "text-foreground" : "text-white"}`}
+                />
               </SheetTrigger>
               <SheetContent>
                 <nav className="flex flex-col gap-6 mt-8">
