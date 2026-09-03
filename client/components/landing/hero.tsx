@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, Search } from "lucide-react";
@@ -11,15 +14,21 @@ const heroFields = [
 ];
 
 export function Hero() {
+  const [selectedImage, setSelectedImage] = useState(0);
+
   return (
     <section className="relative isolate min-h-[760px] overflow-hidden bg-neutral-950 lg:min-h-[92vh]">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/landing-splash.jpg"
-          alt="Hero background"
+          src={
+            selectedImage === 0
+              ? "/landing-splash.jpg"
+              : `/landing-i${selectedImage}.png`
+          }
+          alt="Featured home"
           fill
           priority
-          className="object-cover"
+          className="object-cover transition-opacity duration-500"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,15,24,.92)_0%,rgba(9,15,24,.68)_44%,rgba(9,15,24,.22)_100%)]" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
@@ -72,9 +81,13 @@ export function Hero() {
             Explore the collection
           </span>
           {[1, 2, 3, 4].map((i) => (
-            <div
+            <button
               key={i}
-              className="relative h-16 w-16 overflow-hidden rounded-lg ring-1 ring-white/30 transition-transform hover:-translate-y-1"
+              type="button"
+              onClick={() => setSelectedImage(i)}
+              aria-label={`Show home photo ${i}`}
+              aria-pressed={selectedImage === i}
+              className="relative h-16 w-16 overflow-hidden rounded-lg ring-1 ring-white/30 transition-transform hover:-translate-y-1 aria-pressed:ring-2 aria-pressed:ring-primary"
             >
               <Image
                 src={`/landing-i${i}.png`}
@@ -83,7 +96,7 @@ export function Hero() {
                 height={80}
                 className="object-cover w-full h-full"
               />
-            </div>
+            </button>
           ))}
         </div>
 
