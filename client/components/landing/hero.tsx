@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, Search } from "lucide-react";
@@ -13,13 +13,32 @@ const heroFields = [
   { label: "Budget", fromPlaceholder: "From", toPlaceholder: "To", unit: "€" },
 ];
 
+const HERO_ROTATION_INTERVAL = 6000;
+
 export function Hero() {
   const [selectedImage, setSelectedImage] = useState(0);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setSelectedImage((currentImage) => (currentImage + 1) % 5);
+    }, HERO_ROTATION_INTERVAL);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
 
   return (
     <section className="relative isolate min-h-[760px] overflow-hidden bg-neutral-950 lg:min-h-[92vh]">
       <div className="absolute inset-0 z-0">
         <Image
+          key={selectedImage}
           src={
             selectedImage === 0
               ? "/landing-splash.jpg"
