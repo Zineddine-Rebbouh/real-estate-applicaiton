@@ -191,7 +191,7 @@ export default function SignUpPage() {
           <form
             onSubmit={handleSubmit}
             className={cn(
-              "space-y-6 opacity-100",
+              "auth-form space-y-6 opacity-100",
               mounted &&
                 "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-80",
             )}
