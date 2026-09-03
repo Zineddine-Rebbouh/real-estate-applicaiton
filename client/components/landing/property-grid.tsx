@@ -62,17 +62,28 @@ export function PropertyGrid() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-            Featured flats
-          </h2>
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              The collection
+            </p>
+            <h2 className="font-display text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
+              Homes with room to grow.
+            </h2>
+          </div>
 
           <div className="flex items-center gap-4">
-            <button className="text-sm font-medium text-primary hover:underline">
-              Change properties
-            </button>
+            <a
+              href="#discover"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Refine your search
+            </a>
 
             {/* View Toggle */}
-            <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+            <div
+              className="flex items-center gap-1 rounded-lg bg-muted p-1"
+              aria-label="Choose listing view"
+            >
               <Button
                 variant="ghost"
                 size="icon"
@@ -98,9 +109,15 @@ export function PropertyGrid() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          className={
+            viewMode === "grid"
+              ? "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4"
+              : "grid grid-cols-1 gap-4"
+          }
+        >
           {sampleProperties.map((property) => (
-            <PropertyCard key={property.id} {...property} />
+            <PropertyCard key={property.id} {...property} layout={viewMode} />
           ))}
         </div>
 
