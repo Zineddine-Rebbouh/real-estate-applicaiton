@@ -4,6 +4,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
+import { env } from "./config/env.js";
+import { authRouter } from "./routes/auth.routes.js";
 
 /* conf */
 dotenv.config();
@@ -14,14 +17,16 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
+app.use(cookieParser());
+
+app.use("/api/auth", authRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from server!");
 });
 
 /* server */
-const port = Number(process.env.PORT) || 3002;
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Server running on port ${port}`);
+app.listen(env.PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${env.PORT}`);
 });
