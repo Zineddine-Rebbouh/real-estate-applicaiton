@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { useSignupMutation } from "@/state/api";
+import { useGetMeQuery, useSignupMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
@@ -19,6 +19,7 @@ export default function SignUpPage() {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [mounted, setMounted] = React.useState(false);
   const [signup, { error: signupError }] = useSignupMutation();
+  const { data: currentUser } = useGetMeQuery();
   const router = useRouter();
 
   const nameRef = React.useRef<HTMLInputElement>(null);
@@ -36,6 +37,12 @@ export default function SignUpPage() {
       setMounted(true);
     }
   }, []);
+
+  React.useEffect(() => {
+    if (currentUser) {
+      router.replace("/");
+    }
+  }, [currentUser, router]);
 
   const validateName = (name: string) => {
     if (!name) return "Name is required";

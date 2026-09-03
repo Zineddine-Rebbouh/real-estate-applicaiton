@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { useLoginMutation } from "@/state/api";
+import { useGetMeQuery, useLoginMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
@@ -18,6 +18,7 @@ export default function SignInPage() {
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [mounted, setMounted] = React.useState(false);
   const [login, { error: loginError }] = useLoginMutation();
+  const { data: currentUser } = useGetMeQuery();
   const router = useRouter();
 
   const emailRef = React.useRef<HTMLInputElement>(null);
@@ -33,6 +34,12 @@ export default function SignInPage() {
       setMounted(true);
     }
   }, []);
+
+  React.useEffect(() => {
+    if (currentUser) {
+      router.replace("/");
+    }
+  }, [currentUser, router]);
 
   const validateEmail = (email: string) => {
     if (!email) return "Email is required";
