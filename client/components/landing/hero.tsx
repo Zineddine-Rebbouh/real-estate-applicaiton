@@ -15,12 +15,21 @@ const heroFields = [
 
 const HERO_ROTATION_INTERVAL = 6000;
 
+// Full-screen hero backgrounds must be high-resolution sources; the small
+// /landing-i*.png thumbnails (416px) look blurry when stretched to fill.
+const HERO_IMAGES = [
+  { src: "/landing-splash.jpg", alt: "Featured home with classic architecture" },
+  { src: "/singlelisting-3.jpg", alt: "Modern home exterior" },
+  { src: "/singlelisting-2.jpg", alt: "Bright living room interior" },
+  { src: "/placeholder.jpg", alt: "Contemporary apartment building" },
+];
+
 export function Hero() {
   const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
+      "(prefers-reduced-motion: reduce)",
     ).matches;
 
     if (prefersReducedMotion) {
@@ -28,7 +37,9 @@ export function Hero() {
     }
 
     const intervalId = window.setInterval(() => {
-      setSelectedImage((currentImage) => (currentImage + 1) % 5);
+      setSelectedImage(
+        (currentImage) => (currentImage + 1) % HERO_IMAGES.length,
+      );
     }, HERO_ROTATION_INTERVAL);
 
     return () => window.clearInterval(intervalId);
@@ -39,14 +50,12 @@ export function Hero() {
       <div className="absolute inset-0 z-0">
         <Image
           key={selectedImage}
-          src={
-            selectedImage === 0
-              ? "/landing-splash.jpg"
-              : `/landing-i${selectedImage}.png`
-          }
-          alt="Featured home"
+          src={HERO_IMAGES[selectedImage].src}
+          alt={HERO_IMAGES[selectedImage].alt}
           fill
-          priority
+          preload={selectedImage === 0}
+          quality={90}
+          sizes="100vw"
           className="object-cover transition-opacity duration-500"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,15,24,.92)_0%,rgba(9,15,24,.68)_44%,rgba(9,15,24,.22)_100%)]" />
@@ -99,20 +108,20 @@ export function Hero() {
           <span className="mr-2 max-w-16 text-right text-[10px] font-medium uppercase leading-tight tracking-[0.18em] text-white/60">
             Explore the collection
           </span>
-          {[1, 2, 3, 4].map((i) => (
+          {HERO_IMAGES.slice(1).map((image, index) => (
             <button
-              key={i}
+              key={image.src}
               type="button"
-              onClick={() => setSelectedImage(i)}
-              aria-label={`Show home photo ${i}`}
-              aria-pressed={selectedImage === i}
+              onClick={() => setSelectedImage(index + 1)}
+              aria-label={`Show home photo ${index + 1}`}
+              aria-pressed={selectedImage === index + 1}
               className="relative h-16 w-16 overflow-hidden rounded-lg ring-1 ring-white/30 transition-transform hover:-translate-y-1 aria-pressed:ring-2 aria-pressed:ring-primary"
             >
               <Image
-                src={`/landing-i${i}.png`}
-                alt={`Preview ${i}`}
-                width={80}
-                height={80}
+                src={image.src}
+                alt=""
+                width={160}
+                height={160}
                 className="object-cover w-full h-full"
               />
             </button>

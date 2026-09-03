@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { LogOut, Menu, UserRound } from "lucide-react";
+import { LogOut, Menu, Settings, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -118,7 +118,7 @@ export function Navbar() {
                       className="flex items-center gap-2 rounded px-3 py-2 text-sm hover:bg-muted"
                       href="/settings"
                     >
-                      Settings
+                      <Settings className="size-4" /> Settings
                     </Link>
                     <button
                       className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-muted"
@@ -213,8 +213,9 @@ export function Navbar() {
                         </Link>
                         <Link
                           href="/settings"
-                          className="block text-base font-medium hover:text-primary transition-colors"
+                          className="flex items-center gap-2 text-base font-medium hover:text-primary transition-colors"
                         >
+                          <Settings className="size-4" />
                           Settings
                         </Link>
                         <button
