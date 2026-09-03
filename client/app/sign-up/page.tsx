@@ -1,104 +1,111 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Eye, EyeOff } from "lucide-react"
-import { BlueprintPanel } from "@/components/auth/blueprint-panel"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
+import { BlueprintPanel } from "@/components/auth/blueprint-panel";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export default function SignUpPage() {
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [errors, setErrors] = React.useState<Record<string, string>>({})
-  const [mounted, setMounted] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [mounted, setMounted] = React.useState(false);
 
-  const nameRef = React.useRef<HTMLInputElement>(null)
-  const emailRef = React.useRef<HTMLInputElement>(null)
-  const passwordRef = React.useRef<HTMLInputElement>(null)
-  const confirmPasswordRef = React.useRef<HTMLInputElement>(null)
+  const nameRef = React.useRef<HTMLInputElement>(null);
+  const emailRef = React.useRef<HTMLInputElement>(null);
+  const passwordRef = React.useRef<HTMLInputElement>(null);
+  const confirmPasswordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (!prefersReducedMotion) {
-      setMounted(true)
+      setMounted(true);
     } else {
-      setMounted(true)
+      setMounted(true);
     }
-  }, [])
+  }, []);
 
   const validateName = (name: string) => {
-    if (!name) return "Name is required"
-    if (name.length < 2) return "Name must be at least 2 characters"
-    return ""
-  }
+    if (!name) return "Name is required";
+    if (name.length < 2) return "Name must be at least 2 characters";
+    return "";
+  };
 
   const validateEmail = (email: string) => {
-    if (!email) return "Email is required"
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email address"
-    return ""
-  }
+    if (!email) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "Invalid email address";
+    return "";
+  };
 
   const validatePassword = (password: string) => {
-    if (!password) return "Password is required"
-    if (password.length < 8) return "Password must be at least 8 characters"
+    if (!password) return "Password is required";
+    if (password.length < 8) return "Password must be at least 8 characters";
     if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
-      return "Password must contain uppercase, lowercase, and number"
+      return "Password must contain uppercase, lowercase, and number";
     }
-    return ""
-  }
+    return "";
+  };
 
-  const validateConfirmPassword = (confirmPassword: string, password: string) => {
-    if (!confirmPassword) return "Please confirm your password"
-    if (confirmPassword !== password) return "Passwords do not match"
-    return ""
-  }
+  const validateConfirmPassword = (
+    confirmPassword: string,
+    password: string,
+  ) => {
+    if (!confirmPassword) return "Please confirm your password";
+    if (confirmPassword !== password) return "Passwords do not match";
+    return "";
+  };
 
   const handleBlur = (
     field: "name" | "email" | "password" | "confirmPassword",
     value: string,
-    passwordValue?: string
+    passwordValue?: string,
   ) => {
-    let error = ""
+    let error = "";
     switch (field) {
       case "name":
-        error = validateName(value)
-        break
+        error = validateName(value);
+        break;
       case "email":
-        error = validateEmail(value)
-        break
+        error = validateEmail(value);
+        break;
       case "password":
-        error = validatePassword(value)
-        break
+        error = validatePassword(value);
+        break;
       case "confirmPassword":
-        error = validateConfirmPassword(value, passwordValue || "")
-        break
+        error = validateConfirmPassword(value, passwordValue || "");
+        break;
     }
     setErrors((prev) => ({
       ...prev,
       [field]: error,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget)
-    const name = formData.get("name") as string
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
-    const confirmPassword = formData.get("confirmPassword") as string
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
-    const nameError = validateName(name)
-    const emailError = validateEmail(email)
-    const passwordError = validatePassword(password)
-    const confirmPasswordError = validateConfirmPassword(confirmPassword, password)
+    const nameError = validateName(name);
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+    const confirmPasswordError = validateConfirmPassword(
+      confirmPassword,
+      password,
+    );
 
     if (nameError || emailError || passwordError || confirmPasswordError) {
       setErrors({
@@ -106,28 +113,28 @@ export default function SignUpPage() {
         email: emailError,
         password: passwordError,
         confirmPassword: confirmPasswordError,
-      })
+      });
 
       // Focus first invalid field
       if (nameError) {
-        nameRef.current?.focus()
+        nameRef.current?.focus();
       } else if (emailError) {
-        emailRef.current?.focus()
+        emailRef.current?.focus();
       } else if (passwordError) {
-        passwordRef.current?.focus()
+        passwordRef.current?.focus();
       } else if (confirmPasswordError) {
-        confirmPasswordRef.current?.focus()
+        confirmPasswordRef.current?.focus();
       }
 
-      setIsLoading(false)
-      return
+      setIsLoading(false);
+      return;
     }
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsLoading(false)
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsLoading(false);
     // TODO: Actual registration logic
-  }
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -135,7 +142,7 @@ export default function SignUpPage() {
       <div
         className={cn(
           "flex-1 flex items-center justify-center p-8 bg-background",
-          mounted && "animate-in fade-in slide-in-from-left-4 duration-500"
+          mounted && "animate-in fade-in slide-in-from-left-4 duration-500",
         )}
       >
         <div className="w-full max-w-md space-y-8">
@@ -143,7 +150,8 @@ export default function SignUpPage() {
           <div
             className={cn(
               "opacity-100",
-              mounted && "animate-in fade-in slide-in-from-bottom-2 duration-500"
+              mounted &&
+                "animate-in fade-in slide-in-from-bottom-2 duration-500",
             )}
           >
             <Link
@@ -160,10 +168,12 @@ export default function SignUpPage() {
             className={cn(
               "space-y-4 opacity-100",
               mounted &&
-                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-40"
+                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-40",
             )}
           >
-            <h1 className="font-display text-4xl font-bold tracking-tight leading-tight">Create an account</h1>
+            <h1 className="font-display text-4xl font-bold tracking-tight leading-tight">
+              Create an account
+            </h1>
             <p className="text-lg text-muted-foreground">
               Get started with your property management journey
             </p>
@@ -175,12 +185,15 @@ export default function SignUpPage() {
             className={cn(
               "space-y-6 opacity-100",
               mounted &&
-                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-80"
+                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-80",
             )}
           >
             {/* Name field */}
             <div className="space-y-2.5">
-              <Label htmlFor="name" className="text-base font-semibold text-foreground">
+              <Label
+                htmlFor="name"
+                className="text-base font-semibold text-foreground"
+              >
                 Full name
               </Label>
               <Input
@@ -196,7 +209,11 @@ export default function SignUpPage() {
                 disabled={isLoading}
               />
               {errors.name && (
-                <p id="name-error" className="text-sm text-destructive" role="alert">
+                <p
+                  id="name-error"
+                  className="text-sm text-destructive"
+                  role="alert"
+                >
                   {errors.name}
                 </p>
               )}
@@ -204,7 +221,10 @@ export default function SignUpPage() {
 
             {/* Email field */}
             <div className="space-y-2.5">
-              <Label htmlFor="email" className="text-base font-semibold text-foreground">
+              <Label
+                htmlFor="email"
+                className="text-base font-semibold text-foreground"
+              >
                 Email address
               </Label>
               <Input
@@ -220,7 +240,11 @@ export default function SignUpPage() {
                 disabled={isLoading}
               />
               {errors.email && (
-                <p id="email-error" className="text-sm text-destructive" role="alert">
+                <p
+                  id="email-error"
+                  className="text-sm text-destructive"
+                  role="alert"
+                >
                   {errors.email}
                 </p>
               )}
@@ -228,7 +252,10 @@ export default function SignUpPage() {
 
             {/* Password field */}
             <div className="space-y-2.5">
-              <Label htmlFor="password" className="text-base font-semibold text-foreground">
+              <Label
+                htmlFor="password"
+                className="text-base font-semibold text-foreground"
+              >
                 Password
               </Label>
               <div className="relative">
@@ -272,7 +299,10 @@ export default function SignUpPage() {
 
             {/* Confirm Password field */}
             <div className="space-y-2.5">
-              <Label htmlFor="confirmPassword" className="text-base font-semibold text-foreground">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-base font-semibold text-foreground"
+              >
                 Confirm password
               </Label>
               <div className="relative">
@@ -288,8 +318,8 @@ export default function SignUpPage() {
                   }
                   className="h-12 text-base pr-10"
                   onBlur={(e) => {
-                    const password = passwordRef.current?.value || ""
-                    handleBlur("confirmPassword", e.target.value, password)
+                    const password = passwordRef.current?.value || "";
+                    handleBlur("confirmPassword", e.target.value, password);
                   }}
                   disabled={isLoading}
                 />
@@ -297,7 +327,9 @@ export default function SignUpPage() {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded transition-colors touch-manipulation"
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="size-4" />
@@ -382,11 +414,17 @@ export default function SignUpPage() {
             {/* Terms */}
             <p className="text-sm text-center text-muted-foreground">
               By creating an account, you agree to our{" "}
-              <Link href="/terms" className="underline hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded">
+              <Link
+                href="/terms"
+                className="underline hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+              >
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="underline hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded">
+              <Link
+                href="/privacy"
+                className="underline hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+              >
                 Privacy Policy
               </Link>
             </p>
@@ -397,5 +435,5 @@ export default function SignUpPage() {
       {/* Right side - Blueprint panel */}
       <BlueprintPanel className="hidden lg:block lg:flex-1" />
     </div>
-  )
+  );
 }

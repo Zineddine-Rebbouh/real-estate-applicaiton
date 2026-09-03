@@ -1,88 +1,89 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Eye, EyeOff } from "lucide-react"
-import { BlueprintPanel } from "@/components/auth/blueprint-panel"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
+import { BlueprintPanel } from "@/components/auth/blueprint-panel";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export default function SignInPage() {
-  const [showPassword, setShowPassword] = React.useState(false)
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [errors, setErrors] = React.useState<Record<string, string>>({})
-  const [mounted, setMounted] = React.useState(false)
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
+  const [mounted, setMounted] = React.useState(false);
 
-  const emailRef = React.useRef<HTMLInputElement>(null)
-  const passwordRef = React.useRef<HTMLInputElement>(null)
+  const emailRef = React.useRef<HTMLInputElement>(null);
+  const passwordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)"
-    ).matches
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     if (!prefersReducedMotion) {
-      setMounted(true)
+      setMounted(true);
     } else {
-      setMounted(true)
+      setMounted(true);
     }
-  }, [])
+  }, []);
 
   const validateEmail = (email: string) => {
-    if (!email) return "Email is required"
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Invalid email address"
-    return ""
-  }
+    if (!email) return "Email is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "Invalid email address";
+    return "";
+  };
 
   const validatePassword = (password: string) => {
-    if (!password) return "Password is required"
-    if (password.length < 8) return "Password must be at least 8 characters"
-    return ""
-  }
+    if (!password) return "Password is required";
+    if (password.length < 8) return "Password must be at least 8 characters";
+    return "";
+  };
 
   const handleBlur = (field: "email" | "password", value: string) => {
     const error =
-      field === "email" ? validateEmail(value) : validatePassword(value)
+      field === "email" ? validateEmail(value) : validatePassword(value);
     setErrors((prev) => ({
       ...prev,
       [field]: error,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
-    const formData = new FormData(e.currentTarget)
-    const email = formData.get("email") as string
-    const password = formData.get("password") as string
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
-    const emailError = validateEmail(email)
-    const passwordError = validatePassword(password)
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
 
     if (emailError || passwordError) {
       setErrors({
         email: emailError,
         password: passwordError,
-      })
+      });
 
       // Focus first invalid field
       if (emailError) {
-        emailRef.current?.focus()
+        emailRef.current?.focus();
       } else if (passwordError) {
-        passwordRef.current?.focus()
+        passwordRef.current?.focus();
       }
 
-      setIsLoading(false)
-      return
+      setIsLoading(false);
+      return;
     }
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setIsLoading(false)
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsLoading(false);
     // TODO: Actual authentication logic
-  }
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -90,7 +91,7 @@ export default function SignInPage() {
       <div
         className={cn(
           "flex-1 flex items-center justify-center p-8 bg-background",
-          mounted && "animate-in fade-in slide-in-from-left-4 duration-500"
+          mounted && "animate-in fade-in slide-in-from-left-4 duration-500",
         )}
       >
         <div className="w-full max-w-md space-y-8">
@@ -98,7 +99,8 @@ export default function SignInPage() {
           <div
             className={cn(
               "opacity-100",
-              mounted && "animate-in fade-in slide-in-from-bottom-2 duration-500"
+              mounted &&
+                "animate-in fade-in slide-in-from-bottom-2 duration-500",
             )}
           >
             <Link
@@ -115,10 +117,12 @@ export default function SignInPage() {
             className={cn(
               "space-y-4 opacity-100",
               mounted &&
-                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-40"
+                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-40",
             )}
           >
-            <h1 className="font-display text-4xl font-bold tracking-tight leading-tight">Welcome back</h1>
+            <h1 className="font-display text-4xl font-bold tracking-tight leading-tight">
+              Welcome back
+            </h1>
             <p className="text-lg text-muted-foreground">
               Sign in to your account to continue
             </p>
@@ -130,12 +134,15 @@ export default function SignInPage() {
             className={cn(
               "space-y-6 opacity-100",
               mounted &&
-                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-80"
+                "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-80",
             )}
           >
             {/* Email field */}
             <div className="space-y-2.5">
-              <Label htmlFor="email" className="text-base font-semibold text-foreground">
+              <Label
+                htmlFor="email"
+                className="text-base font-semibold text-foreground"
+              >
                 Email address
               </Label>
               <Input
@@ -151,7 +158,11 @@ export default function SignInPage() {
                 disabled={isLoading}
               />
               {errors.email && (
-                <p id="email-error" className="text-sm text-destructive" role="alert">
+                <p
+                  id="email-error"
+                  className="text-sm text-destructive"
+                  role="alert"
+                >
                   {errors.email}
                 </p>
               )}
@@ -160,7 +171,10 @@ export default function SignInPage() {
             {/* Password field */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-base font-semibold text-foreground">
+                <Label
+                  htmlFor="password"
+                  className="text-base font-semibold text-foreground"
+                >
                   Password
                 </Label>
                 <Link
@@ -277,5 +291,5 @@ export default function SignInPage() {
       {/* Right side - Blueprint panel */}
       <BlueprintPanel className="hidden lg:block lg:flex-1" />
     </div>
-  )
+  );
 }
