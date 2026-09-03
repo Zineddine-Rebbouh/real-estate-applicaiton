@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
+import StoreProvider from "@/state/redux";
+import { AuthBootstrap } from "@/components/auth/auth-bootstrap";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,7 +44,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           media="(prefers-color-scheme: dark)"
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <StoreProvider>
+          <AuthBootstrap>{children}</AuthBootstrap>
+        </StoreProvider>
+      </body>
     </html>
   );
 }

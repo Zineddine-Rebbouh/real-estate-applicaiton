@@ -8,12 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useLoginMutation } from "@/state/api";
+import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [mounted, setMounted] = React.useState(false);
+  const [login, { error: loginError }] = useLoginMutation();
+  const router = useRouter();
 
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
@@ -38,7 +42,6 @@ export default function SignInPage() {
 
   const validatePassword = (password: string) => {
     if (!password) return "Password is required";
-    if (password.length < 8) return "Password must be at least 8 characters";
     return "";
   };
 
@@ -79,10 +82,14 @@ export default function SignInPage() {
       return;
     }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // TODO: Actual authentication logic
+    try {
+      await login({ email, password }).unwrap();
+      router.push("/");
+    } catch {
+      setErrors({ form: "Invalid email or password" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -177,12 +184,13 @@ export default function SignInPage() {
                 >
                   Password
                 </Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-base font-medium text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+                <span
+                  className="text-base font-medium text-muted-foreground/60"
+                  title="Coming soon"
                 >
-                  Forgot password?
-                </Link>
+                  Forgot password?{" "}
+                  <span className="text-xs">(Coming soon)</span>
+                </span>
               </div>
               <div className="relative">
                 <Input
@@ -232,6 +240,11 @@ export default function SignInPage() {
             >
               {isLoading ? "Signing in…" : "Sign in"}
             </Button>
+            {(errors.form || loginError) && (
+              <p className="text-sm text-destructive" role="alert">
+                {errors.form || "Unable to sign in. Please try again."}
+              </p>
+            )}
 
             {/* Divider */}
             <div className="relative">

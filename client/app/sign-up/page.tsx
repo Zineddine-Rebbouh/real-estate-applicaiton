@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { useSignupMutation } from "@/state/api";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -15,6 +17,8 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [errors, setErrors] = React.useState<Record<string, string>>({});
   const [mounted, setMounted] = React.useState(false);
+  const [signup, { error: signupError }] = useSignupMutation();
+  const router = useRouter();
 
   const nameRef = React.useRef<HTMLInputElement>(null);
   const emailRef = React.useRef<HTMLInputElement>(null);
@@ -130,10 +134,14 @@ export default function SignUpPage() {
       return;
     }
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // TODO: Actual registration logic
+    try {
+      await signup({ name, email, password }).unwrap();
+      router.push("/");
+    } catch {
+      setErrors({ form: "Unable to create your account. Please try again." });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -358,6 +366,12 @@ export default function SignUpPage() {
             >
               {isLoading ? "Creating account…" : "Create account"}
             </Button>
+            {(errors.form || signupError) && (
+              <p className="text-sm text-destructive" role="alert">
+                {errors.form ||
+                  "Unable to create your account. Please try again."}
+              </p>
+            )}
 
             {/* Divider */}
             <div className="relative">

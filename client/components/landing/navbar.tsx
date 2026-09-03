@@ -3,9 +3,12 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { LogOut, Menu, UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useGetMeQuery, useLogoutMutation } from "@/state/api";
+import { useRouter } from "next/navigation";
 
 const navLinks = [
   { label: "Start", href: "#" },
@@ -18,6 +21,24 @@ const navLinks = [
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const { data } = useGetMeQuery();
+  const [logout] = useLogoutMutation();
+  const router = useRouter();
+  const user = data?.user;
+  const initials = user?.name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+    } finally {
+      router.push("/");
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,25 +95,64 @@ export function Navbar() {
           <div className="flex items-center gap-4">
             {/* Auth Buttons */}
             <div className="hidden sm:flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                nativeButton={false}
-                render={<Link href="/sign-in" />}
-                className={
-                  scrolled ? "text-foreground" : "text-white hover:text-white"
-                }
-              >
-                Log in
-              </Button>
-              <Button
-                size="sm"
-                nativeButton={false}
-                render={<Link href="/sign-up" />}
-                className="text-sm font-medium"
-              >
-                Sign up
-              </Button>
+              {user ? (
+                <details className="relative">
+                  <summary className="flex cursor-pointer list-none items-center gap-2">
+                    <Avatar size="sm">
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <span
+                      className={scrolled ? "text-foreground" : "text-white"}
+                    >
+                      {user.name}
+                    </span>
+                  </summary>
+                  <div className="absolute right-0 mt-3 w-44 rounded-md border border-border bg-background p-1 text-foreground shadow-lg">
+                    <Link
+                      className="flex items-center gap-2 rounded px-3 py-2 text-sm hover:bg-muted"
+                      href="/profile"
+                    >
+                      <UserRound className="size-4" /> Profile
+                    </Link>
+                    <Link
+                      className="flex items-center gap-2 rounded px-3 py-2 text-sm hover:bg-muted"
+                      href="/settings"
+                    >
+                      Settings
+                    </Link>
+                    <button
+                      className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="size-4" /> Logout
+                    </button>
+                  </div>
+                </details>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    nativeButton={false}
+                    render={<Link href="/sign-in" />}
+                    className={
+                      scrolled
+                        ? "text-foreground"
+                        : "text-white hover:text-white"
+                    }
+                  >
+                    Log in
+                  </Button>
+                  <Button
+                    size="sm"
+                    nativeButton={false}
+                    render={<Link href="/sign-up" />}
+                    className="text-sm font-medium"
+                  >
+                    Sign up
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Locale Toggle - Hidden when not logged in */}
@@ -143,18 +203,43 @@ export function Navbar() {
 
                   {/* Mobile Auth Links */}
                   <div className="pt-6 border-t border-border space-y-3">
-                    <Link
-                      href="/sign-in"
-                      className="block text-base font-medium hover:text-primary transition-colors"
-                    >
-                      Log in
-                    </Link>
-                    <Link
-                      href="/sign-up"
-                      className="block text-base font-medium text-primary hover:underline"
-                    >
-                      Sign up
-                    </Link>
+                    {user ? (
+                      <>
+                        <Link
+                          href="/profile"
+                          className="block text-base font-medium hover:text-primary transition-colors"
+                        >
+                          Profile
+                        </Link>
+                        <Link
+                          href="/settings"
+                          className="block text-base font-medium hover:text-primary transition-colors"
+                        >
+                          Settings
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="block text-base font-medium hover:text-primary transition-colors"
+                        >
+                          Logout
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          href="/sign-in"
+                          className="block text-base font-medium hover:text-primary transition-colors"
+                        >
+                          Log in
+                        </Link>
+                        <Link
+                          href="/sign-up"
+                          className="block text-base font-medium text-primary hover:underline"
+                        >
+                          Sign up
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </nav>
               </SheetContent>
