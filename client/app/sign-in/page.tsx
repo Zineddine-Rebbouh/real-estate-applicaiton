@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { BlueprintPanel } from "@/components/auth/blueprint-panel";
@@ -112,10 +113,16 @@ export default function SignInPage() {
           >
             <Link
               href="/"
-              className="inline-flex items-center text-2xl font-bold tracking-tight"
+              className="inline-flex items-center gap-2 font-display text-2xl font-bold tracking-tight"
             >
-              <span className="text-primary">Estate</span>
-              <span className="text-foreground">Flow</span>
+              <Image
+                src="/logo.svg"
+                alt="RealEstate"
+                width={32}
+                height={32}
+                className="h-8 w-8 brightness-0"
+              />
+              <span className="text-foreground">RealEstate</span>
             </Link>
           </div>
 
