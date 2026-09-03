@@ -39,18 +39,16 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image
                 src="/logo.svg"
-                alt="Logo"
+                alt="Habitat"
                 width={32}
                 height={32}
                 className="w-8 h-8"
               />
-              <span className="font-semibold text-lg text-white">
-                RealEstate
-              </span>
+              <span className="font-semibold text-lg text-white">Habitat</span>
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
-              Your trusted partner in finding the perfect property. Connecting
-              people with their dream homes since 2020.
+              A considered way to find the place you&apos;ll build your everyday
+              life around.
             </p>
           </div>
 
@@ -109,7 +107,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-neutral-500">
-            © 2026 RealEstate. All rights reserved.
+            © 2026 Habitat. All rights reserved.
           </p>
 
           <div className="flex items-center gap-6">

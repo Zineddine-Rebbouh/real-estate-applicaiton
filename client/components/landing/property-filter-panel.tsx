@@ -27,7 +27,9 @@ export function PropertyFilterPanel({
   variant = "inline",
   className,
 }: PropertyFilterPanelProps) {
-  const [values, setValues] = useState<Record<string, { from: string; to: string }>>({});
+  const [values, setValues] = useState<
+    Record<string, { from: string; to: string }>
+  >({});
 
   const handleSearch = () => {
     onSearch?.(values);
@@ -46,31 +48,36 @@ export function PropertyFilterPanel({
   return (
     <div
       className={cn(
-        "bg-card rounded-2xl shadow-lg p-6 lg:p-8 ring-1 ring-foreground/10",
-        className
+        variant === "hero"
+          ? "rounded-xl bg-white/96 p-4 shadow-2xl shadow-black/20 ring-1 ring-white/40 sm:p-5"
+          : "rounded-2xl bg-card p-6 shadow-lg ring-1 ring-foreground/10 lg:p-8",
+        className,
       )}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:items-end">
         {fields.map((field) => (
-          <div key={field.label} className="flex flex-col gap-1.5">
-            <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <div key={field.label} className="flex flex-col gap-2">
+            <Label className="text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
               {field.label}
+              {field.unit ? ` (${field.unit})` : ""}
             </Label>
             <div className="flex items-center gap-2">
               <Input
                 type="number"
                 placeholder={field.fromPlaceholder}
                 value={values[field.label]?.from || ""}
-                onChange={(e) => updateField(field.label, "from", e.target.value)}
-                className="h-9"
+                onChange={(e) =>
+                  updateField(field.label, "from", e.target.value)
+                }
+                className="h-10 bg-background text-sm"
               />
-              <span className="text-xs text-muted-foreground">to</span>
+              <span className="text-sm text-muted-foreground">to</span>
               <Input
                 type="number"
                 placeholder={field.toPlaceholder}
                 value={values[field.label]?.to || ""}
                 onChange={(e) => updateField(field.label, "to", e.target.value)}
-                className="h-9"
+                className="h-10 bg-background text-sm"
               />
             </div>
           </div>
@@ -79,10 +86,10 @@ export function PropertyFilterPanel({
 
       <Button
         size="lg"
-        className="mt-6 w-full sm:w-auto"
+        className="mt-5 h-10 w-full gap-2 text-sm font-semibold sm:col-span-2 lg:col-span-1 lg:mt-0"
         onClick={handleSearch}
       >
-        <Search className="h-4 w-4 mr-2" />
+        <Search className="h-4 w-4" />
         Search
       </Button>
     </div>

@@ -15,6 +15,7 @@ export type PropertyCardProps = {
   price: number;
   status?: "available" | "sold" | "pending";
   href: string;
+  layout?: "grid" | "list";
 };
 
 export function PropertyCard({
@@ -26,6 +27,7 @@ export function PropertyCard({
   price,
   status = "available",
   href,
+  layout = "grid",
 }: PropertyCardProps) {
   const statusConfig = {
     available: { label: "Ready to sell", variant: "success" as const },
@@ -36,8 +38,12 @@ export function PropertyCard({
   const currentStatus = statusConfig[status];
 
   return (
-    <Card className="group overflow-hidden transition-all hover:shadow-md hover:ring-foreground/20">
-      <div className="relative aspect-[4/3] overflow-hidden">
+    <Card
+      className={`group overflow-hidden transition-all hover:shadow-md hover:ring-foreground/20 ${layout === "list" ? "sm:grid sm:grid-cols-[minmax(180px,280px)_1fr]" : ""}`}
+    >
+      <div
+        className={`relative overflow-hidden ${layout === "list" ? "min-h-[220px]" : "aspect-4/3"}`}
+      >
         <Image
           src={image}
           alt={title}
@@ -50,32 +56,43 @@ export function PropertyCard({
         </div>
       </div>
 
-      <CardHeader className="space-y-2">
-        <h3 className="text-base font-medium">{title}</h3>
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <Layers className="h-4 w-4" />
-            <span>{totalArea}m²</span>
+      <div className={layout === "list" ? "flex flex-col justify-between" : ""}>
+        <CardHeader className="space-y-2">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="mb-1 text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                Wrocław
+              </p>
+              <h3 className="text-base font-medium">{title}</h3>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5">
-            <Bed className="h-4 w-4" />
-            <span>{bedrooms} bed</span>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <Layers className="h-4 w-4" />
+              <span>{totalArea}m²</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Bed className="h-4 w-4" />
+              <span>{bedrooms} bed</span>
+            </div>
+            <span>Floor {floor}</span>
           </div>
-          <span>Floor {floor}</span>
-        </div>
-      </CardHeader>
+        </CardHeader>
 
-      <CardFooter className="flex items-center justify-between pt-0">
-        <p className="text-base font-semibold">{formatPriceValue(price)}</p>
-        <Button
-          variant="outline"
-          size="sm"
-          nativeButton={false}
-          render={<Link href={href} />}
-        >
-          View details
-        </Button>
-      </CardFooter>
+        <CardFooter className="flex items-center justify-between pt-0">
+          <p className="text-base sm:text-lg font-semibold">
+            {formatPriceValue(price)}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            nativeButton={false}
+            render={<Link href={href} />}
+          >
+            View details
+          </Button>
+        </CardFooter>
+      </div>
     </Card>
   );
 }

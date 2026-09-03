@@ -15,8 +15,8 @@ export default function HomePage() {
       <Navbar />
       <main>
         <Hero />
-        <FeaturedListing />
         <DiscoverSection />
+        <FeaturedListing />
         <PropertyGrid />
         <Gallery />
         <FeatureRow />

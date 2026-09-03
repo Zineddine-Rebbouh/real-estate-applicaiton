@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const navLinks = [
   { label: "Start", href: "#" },
@@ -37,18 +36,18 @@ export function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-18">
+        <div className="flex h-[72px] items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.svg"
-              alt="Logo"
+              alt="Habitat"
               width={32}
               height={32}
               className="w-8 h-8"
             />
             <span
-              className={`font-semibold text-lg ${scrolled ? "text-foreground" : "text-white"}`}
+              className={`font-display font-semibold text-lg ${scrolled ? "text-foreground" : "text-white"}`}
             >
               RealEstate
             </span>
@@ -73,19 +72,42 @@ export function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center gap-4">
-            {/* Locale Toggle */}
-            <div
-              className={`hidden sm:flex items-center gap-2 text-sm ${scrolled ? "text-foreground" : "text-white"}`}
+            {/* Auth Buttons */}
+            <div className="hidden sm:flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/sign-in" />}
+                className={
+                  scrolled ? "text-foreground" : "text-white hover:text-white"
+                }
+              >
+                Log in
+              </Button>
+              <Button
+                size="sm"
+                nativeButton={false}
+                render={<Link href="/sign-up" />}
+                className="text-sm font-medium"
+              >
+                Sign up
+              </Button>
+            </div>
+
+            {/* Locale Toggle - Hidden when not logged in */}
+            {/* <div
+              className={`hidden md:flex items-center gap-2 text-sm ${scrolled ? "text-foreground" : "text-white"}`}
             >
               <button className="font-medium">EN</button>
               <span className="text-muted-foreground">/</span>
               <button className="text-muted-foreground hover:text-foreground transition-colors">
                 PL
               </button>
-            </div>
+            </div> */}
 
-            {/* User Chip */}
-            <div className="hidden md:flex items-center gap-2">
+            {/* User Chip - Hidden when not logged in */}
+            {/* <div className="hidden md:flex items-center gap-2">
               <Avatar className="w-8 h-8">
                 <AvatarFallback>WZ</AvatarFallback>
               </Avatar>
@@ -94,7 +116,7 @@ export function Navbar() {
               >
                 Wroclaw
               </span>
-            </div>
+            </div> */}
 
             {/* Mobile Menu */}
             <Sheet>
@@ -118,6 +140,22 @@ export function Navbar() {
                       {link.label}
                     </Link>
                   ))}
+
+                  {/* Mobile Auth Links */}
+                  <div className="pt-6 border-t border-border space-y-3">
+                    <Link
+                      href="/sign-in"
+                      className="block text-base font-medium hover:text-primary transition-colors"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="block text-base font-medium text-primary hover:underline"
+                    >
+                      Sign up
+                    </Link>
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
