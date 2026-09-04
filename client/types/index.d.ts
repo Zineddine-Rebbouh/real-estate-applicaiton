@@ -118,7 +118,7 @@ declare global {
   }
 
   interface NavbarProps {
-    isDashboard: boolean;
+    isDashboard?: boolean;
   }
 
   interface AppSidebarProps {
