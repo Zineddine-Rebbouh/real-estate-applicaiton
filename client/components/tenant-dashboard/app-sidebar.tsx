@@ -4,13 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  CompassIcon,
   ChevronsUpDownIcon,
   FileTextIcon,
   HeartIcon,
   HouseIcon,
   LayoutDashboardIcon,
+  CreditCardIcon,
   LogOutIcon,
   SettingsIcon,
+  UserRoundIcon,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -27,18 +30,61 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
+  SidebarCollapseButton,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useGetMeQuery, useLogoutMutation } from "@/state/api";
 
 const navItems = [
-  { title: "Overview", href: "/overview", icon: LayoutDashboardIcon },
-  { title: "Applications", href: "/applications", icon: FileTextIcon },
-  { title: "Residence", href: "/residence", icon: HouseIcon },
-  { title: "Favorites", href: "/favorites", icon: HeartIcon },
+  {
+    title: "Overview",
+    href: "/overview",
+    icon: LayoutDashboardIcon,
+    badge: null,
+  },
+  {
+    title: "Applications",
+    href: "/applications",
+    icon: FileTextIcon,
+    badge: "2",
+  },
+  {
+    title: "Residence",
+    href: "/residence",
+    icon: HouseIcon,
+    badge: null,
+  },
+  // {
+  //   title: "Billing",
+  //   href: "/billing",
+  //   icon: ReceiptTextIcon,
+  //   badge: null,
+  // },
+  {
+    title: "Favorites",
+    href: "/favorites",
+    icon: HeartIcon,
+    badge: "6",
+  },
+  {
+    title: "Billing History",
+    href: "/billing",
+    icon: FileTextIcon,
+    badge: null,
+  },
+  {
+    title: "Payment Methods",
+    href: "/payment-methods",
+    icon: CreditCardIcon,
+    badge: null,
+  },
 ] as const;
 
 export function AppSidebar() {
@@ -46,115 +92,201 @@ export function AppSidebar() {
   const router = useRouter();
   const { data } = useGetMeQuery();
   const [logout] = useLogoutMutation();
+  const { isMobile, setOpenMobile } = useSidebar();
   const user = data?.user;
 
   const initials = user?.name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+    ? user.name
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "TN";
 
   const handleSignOut = async () => {
     try {
       await logout().unwrap();
     } finally {
+      if (isMobile) setOpenMobile(false);
       router.push("/");
     }
   };
 
-  // Sits below the fixed full-width dashboard navbar (h-[72px])
+  const handleNavClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   return (
     <Sidebar
-      className="top-[72px]! h-[calc(100svh-72px)] border-r border-border [--sidebar-width:15rem]"
+      collapsible="icon"
+      className="top-[72px]! h-[calc(100svh-72px)] border-r border-border bg-sidebar [--sidebar-width:16rem]"
     >
-      {/* Exit hatch back to the public listings/landing page */}
-      {/* <SidebarHeader>
-        <SidebarMenu className="gap-1.5">
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              render={<Link href="/" />}
-              tooltip="Browse Properties"
-            >
+      {/* Sidebar Header with quick link to public search */}
+      {/* <SidebarHeader className="border-b border-sidebar-border px-4 py-3">
+        <div className="flex items-center justify-between">
+          <Link
+            href="/"
+            onClick={handleNavClick}
+            className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+          >
+            <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
               <Image
                 src="/logo.svg"
-                alt="Habitat"
-                width={32}
-                height={32}
-                className="size-8 shrink-0 brightness-0 dark:invert"
+                alt="Habitat logo"
+                width={20}
+                height={20}
+                className="size-5 invert"
               />
-              <span className="text-sm font-semibold leading-tight">
-                Browse Properties
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">
+                Habitat Rentals
               </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+              <span className="text-[11px] font-medium text-muted-foreground">
+                Tenant Portal
+              </span>
+            </div>
+          </Link>
+        </div>
       </SidebarHeader> */}
 
-      <SidebarContent>
+      <SidebarContent className="px-2 py-3 group-data-[collapsible=icon]:pt-14">
         <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1.5">
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    render={<Link href={item.href} />}
-                    isActive={pathname === item.href}
-                    tooltip={item.title}
-                    className="relative mx-1 w-[calc(100%-0.5rem)] gap-3 rounded-lg px-3 py-2.5 font-normal text-muted-foreground data-active:bg-muted data-active:text-foreground data-active:font-medium data-active:before:absolute data-active:before:inset-y-2 data-active:before:left-0 data-active:before:w-0.5 data-active:before:rounded-full data-active:before:bg-primary [&_svg]:size-5 [&_svg]:text-muted-foreground data-active:[&_svg]:text-foreground"
-                  >
-                    <item.icon className="size-5" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+          <SidebarGroupLabel className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
+            Navigation
+          </SidebarGroupLabel>
+          <SidebarGroupContent className="mt-1">
+            <SidebarMenu className="gap-1">
+              {navItems.map((item) => {
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/overview" && pathname.startsWith(item.href));
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      render={
+                        <Link href={item.href} onClick={handleNavClick} />
+                      }
+                      isActive={isActive}
+                      tooltip={item.title}
+                      className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
+                    >
+                      <item.icon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
+                      <span className="flex-1 truncate">{item.title}</span>
+                      {item.badge && (
+                        <SidebarMenuBadge className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary group-data-active:bg-primary group-data-active:text-primary-foreground">
+                          {item.badge}
+                        </SidebarMenuBadge>
+                      )}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
+            Explore
+          </SidebarGroupLabel>
+          <SidebarGroupContent className="mt-1">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href="/" onClick={handleNavClick} />}
+                  tooltip="Find More Rentals"
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                >
+                  <CompassIcon className="size-4.5 shrink-0 text-muted-foreground" />
+                  <span>Browse Listings</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      {/* <SidebarFooter>
-        <SidebarMenu className="gap-1.5">
+      {/* User Profile & Account Actions in Footer */}
+      {/* <SidebarFooter className="border-t border-sidebar-border p-3">
+        <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
                   <SidebarMenuButton
                     size="lg"
-                    className="aria-expanded:bg-sidebar-accent aria-expanded:text-sidebar-accent-foreground"
+                    className="w-full justify-between rounded-lg p-2 text-left hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-popup-open:bg-sidebar-accent"
                   />
                 }
               >
-                <Avatar className="size-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left leading-tight">
-                  <span className="truncate text-sm font-medium">
-                    {user?.name}
-                  </span>
-                  <span className="truncate text-xs text-muted-foreground">
-                    {user?.email}
-                  </span>
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <Avatar className="size-8 rounded-lg border border-border">
+                    <AvatarFallback className="rounded-lg bg-primary/10 text-xs font-semibold text-primary">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left leading-tight min-w-0">
+                    <span className="truncate text-xs font-semibold text-sidebar-foreground">
+                      {user?.name ?? "Verified Tenant"}
+                    </span>
+                    <span className="truncate text-[11px] text-muted-foreground">
+                      {user?.email ?? "tenant@habitat.com"}
+                    </span>
+                  </div>
                 </div>
-                <ChevronsUpDownIcon className="ml-auto size-4" />
+                <ChevronsUpDownIcon className="size-4 shrink-0 text-muted-foreground" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start" className="min-w-56">
-                <DropdownMenuItem render={<Link href="/settings" />}>
-                  <SettingsIcon />
-                  Settings
+              <DropdownMenuContent
+                side="top"
+                align="start"
+                className="w-56 rounded-xl p-1.5 shadow-lg"
+              >
+                <DropdownMenuItem
+                  onClick={handleNavClick}
+                  render={
+                    <Link
+                      href="/overview"
+                      className="flex items-center gap-2"
+                    />
+                  }
+                >
+                  <UserRoundIcon className="size-4" />
+                  <span>Dashboard Overview</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleNavClick}
+                  render={
+                    <Link
+                      href="/settings"
+                      className="flex items-center gap-2"
+                    />
+                  }
+                >
+                  <SettingsIcon className="size-4" />
+                  <span>Account Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-                  <LogOutIcon />
-                  Sign out
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 text-destructive focus:bg-destructive/10 focus:text-destructive"
+                >
+                  <LogOutIcon className="size-4" />
+                  <span>Sign out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter> */}
+
+      <SidebarRail />
+      <SidebarCollapseButton className="absolute top-3 right-2" />
     </Sidebar>
   );
 }
