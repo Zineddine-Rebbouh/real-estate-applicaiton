@@ -48,6 +48,7 @@ export function PropertyCard({
           src={image}
           alt={title}
           fill
+          quality={90}
           className="object-cover transition-transform group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />

@@ -14,6 +14,7 @@ export function CTABanner() {
               src="/landing-call-to-action.jpg"
               alt=""
               fill
+              quality={90}
               sizes="(max-width: 640px) calc(100vw - 2rem), (max-width: 1024px) calc(100vw - 3rem), min(1216px, calc(100vw - 4rem))"
               className="object-cover"
             />

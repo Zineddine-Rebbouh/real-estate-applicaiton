@@ -1,9 +1,9 @@
 import Image from "next/image";
 
 const galleryImages = [
-  { src: "/landing-i5.png", alt: "Modern living room" },
-  { src: "/landing-i6.png", alt: "Luxury bedroom" },
-  { src: "/landing-i7.png", alt: "Contemporary kitchen" },
+  { src: "/gallery-living-room.jpg", alt: "Modern living room" },
+  { src: "/gallery-bedroom.jpg", alt: "Luxury bedroom" },
+  { src: "/gallery-kitchen.jpg", alt: "Contemporary kitchen" },
 ];
 
 export function Gallery() {
@@ -35,6 +35,7 @@ export function Gallery() {
                 src={image.src}
                 alt={image.alt}
                 fill
+                quality={90}
                 className="object-cover"
                 sizes="(max-width: 640px) 100vw, 33vw"
               />

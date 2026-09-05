@@ -10,7 +10,7 @@ const sampleListing = {
   address: "Wrocław, ul. Złota 66",
   numberOfFlats: 54,
   totalArea: 960,
-  imageSrc: "/landing-i1.png",
+  imageSrc: "/featured-listing.jpg",
 };
 
 export function FeaturedListing() {
@@ -83,6 +83,7 @@ export function FeaturedListing() {
               src={sampleListing.imageSrc}
               alt={sampleListing.title}
               fill
+              quality={90}
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />

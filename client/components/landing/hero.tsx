@@ -18,7 +18,10 @@ const HERO_ROTATION_INTERVAL = 6000;
 // Full-screen hero backgrounds must be high-resolution sources; the small
 // /landing-i*.png thumbnails (416px) look blurry when stretched to fill.
 const HERO_IMAGES = [
-  { src: "/landing-splash.jpg", alt: "Featured home with classic architecture" },
+  {
+    src: "/landing-splash.jpg",
+    alt: "Featured home with classic architecture",
+  },
   { src: "/singlelisting-3.jpg", alt: "Modern home exterior" },
   { src: "/singlelisting-2.jpg", alt: "Bright living room interior" },
   { src: "/placeholder.jpg", alt: "Contemporary apartment building" },

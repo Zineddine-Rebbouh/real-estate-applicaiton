@@ -40,7 +40,7 @@
 // //       </div>
 
 // //       Content
-// //       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+// //       <div className="relative z-10 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
 // //         <div className="max-w-2xl mb-10">
 // //           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
 // //             Your search, refined

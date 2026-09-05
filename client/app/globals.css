@@ -44,9 +44,8 @@ body,
 .app {
   height: 100%;
   width: 100%;
-  @apply text-sm;
-  @apply bg-white;
-  @apply dark:bg-black;
+  @apply text-base;
+  @apply bg-background;
 }
 
 @layer base {
@@ -194,19 +193,38 @@ body,
   }
 }
 
+.dashboard-shell {
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+[data-collapsible="icon"] [data-sidebar="menu-button"] > span {
+  display: none;
+}
+
+[data-collapsible="icon"] [data-sidebar="menu-button"] {
+  justify-content: center;
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+[data-collapsible="icon"] [data-sidebar="content"],
+[data-collapsible="icon"] [data-sidebar="group"] {
+  padding-inline: 0;
+}
+
 .auth-form input {
-  background-color: white;
-  color: #111827;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-size: 1.125rem;
 }
 
 .auth-form input:-webkit-autofill,
 .auth-form input:-webkit-autofill:hover,
 .auth-form input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #111827;
-  -webkit-box-shadow: 0 0 0 1000px white inset;
-  box-shadow: 0 0 0 1000px white inset;
-  caret-color: #111827;
+  -webkit-text-fill-color: hsl(var(--foreground));
+  -webkit-box-shadow: 0 0 0 1000px hsl(var(--background)) inset;
+  box-shadow: 0 0 0 1000px hsl(var(--background)) inset;
+  caret-color: hsl(var(--foreground));
 }
 
 /* Amplify UI Overrides */

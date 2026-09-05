@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 const sampleProperties = [
   {
     id: 1,
-    image: "/landing-i1.png",
+    image: "/property-small-flat.jpg",
     title: "Small Flat",
     totalArea: 45,
     bedrooms: 1,
@@ -20,7 +20,7 @@ const sampleProperties = [
   },
   {
     id: 2,
-    image: "/landing-i2.png",
+    image: "/property-large-flat.jpg",
     title: "Large Flat",
     totalArea: 120,
     bedrooms: 3,
@@ -31,7 +31,7 @@ const sampleProperties = [
   },
   {
     id: 3,
-    image: "/landing-i3.png",
+    image: "/property-medium-flat.jpg",
     title: "Medium Flat",
     totalArea: 75,
     bedrooms: 2,
@@ -42,7 +42,7 @@ const sampleProperties = [
   },
   {
     id: 4,
-    image: "/landing-i4.png",
+    image: "/property-studio.jpg",
     title: "Studio",
     totalArea: 35,
     bedrooms: 1,
