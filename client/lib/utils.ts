@@ -10,13 +10,20 @@ export function formatEnumString(str: string) {
   return str.replace(/([A-Z])/g, " $1").trim();
 }
 
-export function formatPriceValue(value: number | null, isMin: boolean) {
-  if (value === null || value === 0)
+export function formatPriceValue(value: number | null, isMin?: boolean) {
+  if (value === null || value === 0) {
+    if (isMin === undefined) return "Price on request";
     return isMin ? "Any Min Price" : "Any Max Price";
+  }
   if (value >= 1000) {
     const kValue = value / 1000;
-    return isMin ? `$${kValue}k+` : `<$${kValue}k`;
+    const kDisplay = Number.isInteger(kValue)
+      ? `${kValue}k`
+      : `${kValue.toFixed(1)}k`;
+    if (isMin === undefined) return `$${kDisplay}`;
+    return isMin ? `$${kDisplay}+` : `<$${kDisplay}`;
   }
+  if (isMin === undefined) return `$${value}`;
   return isMin ? `$${value}+` : `<$${value}`;
 }
 
@@ -57,9 +64,12 @@ export const withToast = async <T>(
 };
 
 export const createNewUserInDatabase = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   idToken: any,
   userRole: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetchWithBQ: any
 ) => {
   const createEndpoint =
