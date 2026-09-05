@@ -124,12 +124,12 @@ export default function SignInPage() {
             >
               <Image
                 src="/logo.svg"
-                alt="RealEstate"
+                alt="Habitat"
                 width={32}
                 height={32}
                 className="h-8 w-8 brightness-0"
               />
-              <span className="text-foreground">RealEstate</span>
+              <span className="text-foreground">Habitat</span>
             </Link>
           </div>
 

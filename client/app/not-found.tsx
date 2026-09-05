@@ -17,7 +17,7 @@ export default function NotFound() {
         >
           <Image src="/logo.svg" alt="Habitat" width={32} height={32} />
           <span className="font-display text-lg font-semibold text-foreground">
-            RealEstate
+            Habitat
           </span>
         </Link> */}
 

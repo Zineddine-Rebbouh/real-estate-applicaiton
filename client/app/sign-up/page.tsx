@@ -153,11 +153,11 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Left side - Form */}
       <div
         className={cn(
-          "flex-1 flex items-center justify-center p-8 bg-background",
+          "flex min-h-screen flex-1 items-start justify-start overflow-y-auto bg-background px-5 py-10 sm:px-8 sm:py-12 lg:items-center lg:justify-center lg:px-12 lg:py-16 xl:px-20",
           mounted && "animate-in fade-in slide-in-from-left-4 duration-500",
         )}
       >
@@ -176,12 +176,12 @@ export default function SignUpPage() {
             >
               <Image
                 src="/logo.svg"
-                alt="RealEstate"
+                alt="Habitat"
                 width={32}
                 height={32}
                 className="h-8 w-8 brightness-0"
               />
-              <span className="text-foreground">RealEstate</span>
+              <span className="text-foreground">Habitat</span>
             </Link>
           </div>
 
@@ -291,14 +291,14 @@ export default function SignUpPage() {
                   aria-describedby={
                     errors.password ? "password-error" : undefined
                   }
-                  className="h-12 text-base pr-10"
+                  className="h-12 pr-12 text-base"
                   onBlur={(e) => handleBlur("password", e.target.value)}
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded transition-colors touch-manipulation"
+                  className="absolute right-1 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-manipulation"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -338,7 +338,7 @@ export default function SignUpPage() {
                   aria-describedby={
                     errors.confirmPassword ? "confirmPassword-error" : undefined
                   }
-                  className="h-12 text-base pr-10"
+                  className="h-12 pr-12 text-base"
                   onBlur={(e) => {
                     const password = passwordRef.current?.value || "";
                     handleBlur("confirmPassword", e.target.value, password);
@@ -348,7 +348,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded transition-colors touch-manipulation"
+                  className="absolute right-1 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-manipulation"
                   aria-label={
                     showConfirmPassword ? "Hide password" : "Show password"
                   }
