@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Building2Icon,
   CheckCircle2Icon,
@@ -42,13 +43,15 @@ import {
 const ITEMS_PER_PAGE = 8;
 
 export default function BrowseRentalsPage() {
+  const router = useRouter();
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
   const [sortBy, setSortBy] = useState<BrowseSortOption>("popular");
   const [viewMode, setViewMode] = useState<BrowseViewMode>("grid");
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showSkeletonDemo, setShowSkeletonDemo] = useState(false);
+
 
   const handleFilterChange = (newFilters: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...newFilters }));
@@ -228,6 +231,12 @@ export default function BrowseRentalsPage() {
 
   const activeCityName = filters.locationQuery.trim() || "Wrocław";
 
+  // Simulate loading for skeleton demo
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-full bg-muted/30 pb-16">
       {/* 1. Page Header matching Overview page typography */}
@@ -276,7 +285,7 @@ export default function BrowseRentalsPage() {
                 size="sm"
                 className="text-xs h-9 min-h-[44px] gap-1.5"
                 render={
-                  <Link href="/explore" className="flex items-center gap-1.5" />
+                  <Link href="/tenant/explore" className="flex items-center gap-1.5" />
                 }
               >
                 <MapIcon className="size-3.5 text-primary" />
@@ -380,7 +389,7 @@ export default function BrowseRentalsPage() {
               No listings match your filters
             </h2>
             <p className="mt-1.5 max-w-md text-sm text-muted-foreground">
-              We couldn't find any rentals matching your exact search criteria.
+              We couldn&apos;t find any rentals matching your exact search criteria.
               Try expanding your price range, choosing different bedroom
               options, or resetting your filters.
             </p>
@@ -422,7 +431,7 @@ export default function BrowseRentalsPage() {
                   showCarousel={true}
                   onClickPin={() => {
                     // Navigate to map view focused on this property
-                    window.location.href = `/explore`;
+                    router.push(`/tenant/explore`);
                   }}
                 />
               ))}

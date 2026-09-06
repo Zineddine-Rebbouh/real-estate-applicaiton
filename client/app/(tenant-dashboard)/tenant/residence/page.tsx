@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -6,6 +8,7 @@ import {
   HouseIcon,
   MapPinIcon,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -80,10 +83,8 @@ function LeaseDates({ residence }: { residence: Residence }) {
 function LeaseActions({ compact = false }: { compact?: boolean }) {
   return (
     <div className={`flex flex-wrap gap-2 ${compact ? "border-t pt-4" : ""}`}>
-      <Button variant="outline" size="sm">
-        View Lease
-      </Button>
-      <Button variant="outline" size="sm">
+      <Button variant="outline" size="sm" onClick={() => toast.success("View Lease clicked")}>View Lease</Button>
+      <Button variant="outline" size="sm" onClick={() => toast.success("Download Agreement clicked")}>
         <DownloadIcon /> Download Agreement
       </Button>
     </div>

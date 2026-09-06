@@ -128,7 +128,7 @@ export default function OverviewPage() {
               variant="outline"
               size="sm"
               render={
-                <Link href="/explore" className="flex items-center gap-1.5" />
+                <Link href="/tenant/explore" className="flex items-center gap-1.5" />
               }
             >
               <SearchIcon className="size-3.5" />
@@ -166,7 +166,7 @@ export default function OverviewPage() {
             </button>
 
             <Link
-              href="/residence"
+              href="/tenant/residence"
               className="flex items-center gap-3 rounded-xl border border-border/70 bg-card p-3.5 text-left shadow-2xs transition-all hover:border-primary/40 hover:shadow-xs"
             >
               <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600">
@@ -183,7 +183,7 @@ export default function OverviewPage() {
             </Link>
 
             <Link
-              href="/applications"
+              href="/tenant/applications"
               className="flex items-center gap-3 rounded-xl border border-border/70 bg-card p-3.5 text-left shadow-2xs transition-all hover:border-primary/40 hover:shadow-xs"
             >
               <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600">
@@ -200,7 +200,7 @@ export default function OverviewPage() {
             </Link>
 
             <Link
-              href="/favorites"
+              href="/tenant/favorites"
               className="flex items-center gap-3 rounded-xl border border-border/70 bg-card p-3.5 text-left shadow-2xs transition-all hover:border-primary/40 hover:shadow-xs"
             >
               <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-rose-500/10 text-rose-600">
@@ -241,7 +241,7 @@ export default function OverviewPage() {
                   Across 3 total submitted homes
                 </p>
                 <Link
-                  href="/applications"
+                  href="/tenant/applications"
                   className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                 >
                   View status <ArrowRightIcon className="size-3" />
@@ -305,7 +305,7 @@ export default function OverviewPage() {
                   Through September 2027
                 </p>
                 <Link
-                  href="/residence"
+                  href="/tenant/residence"
                   className="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
                 >
                   Lease details <ArrowRightIcon className="size-3" />
@@ -336,7 +336,7 @@ export default function OverviewPage() {
                 size="sm"
                 render={
                   <Link
-                    href="/applications"
+                    href="/tenant/applications"
                     className="flex items-center gap-1 text-xs"
                   />
                 }
@@ -362,7 +362,7 @@ export default function OverviewPage() {
                       />
                       <div className="min-w-0">
                         <Link
-                          href="/applications"
+                          href="/tenant/applications"
                           className="truncate font-semibold text-sm hover:text-primary transition-colors block"
                         >
                           {application.property}
@@ -389,7 +389,7 @@ export default function OverviewPage() {
                       <Button
                         variant="ghost"
                         size="xs"
-                        render={<Link href="/applications" />}
+                        render={<Link href="/tenant/applications" />}
                         className="text-[11px] text-muted-foreground hover:text-foreground"
                       >
                         Details
@@ -465,7 +465,7 @@ export default function OverviewPage() {
                   size="sm"
                   render={
                     <Link
-                      href="/residence"
+                      href="/tenant/residence"
                       className="flex items-center justify-center gap-1.5"
                     />
                   }
@@ -478,7 +478,7 @@ export default function OverviewPage() {
                   size="sm"
                   render={
                     <Link
-                      href="/residence"
+                      href="/tenant/residence"
                       className="flex items-center justify-center gap-1.5"
                     />
                   }

@@ -11,7 +11,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { useGetMeQuery } from "@/state/api";
 import { Button } from "@/components/ui/button";
 
-export default function TenantDashboardLayout({
+export default function ManagerDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -31,13 +31,13 @@ export default function TenantDashboardLayout({
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
           <Loader2Icon className="size-8 animate-spin text-primary" />
-          <p className="text-xs text-muted-foreground">Loading Tenant Portal…</p>
+          <p className="text-xs text-muted-foreground">Loading Manager Portal…</p>
         </div>
       </div>
     );
   }
 
-  if (user && user.role !== "TENANT") {
+  if (user && user.role !== "MANAGER") {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background p-6 text-center">
         <div className="flex size-14 items-center justify-center rounded-2xl bg-destructive/10 text-destructive mb-4">
@@ -45,10 +45,10 @@ export default function TenantDashboardLayout({
         </div>
         <h1 className="text-xl font-bold text-foreground">Access Restricted</h1>
         <p className="mt-2 text-sm text-muted-foreground max-w-sm">
-          You are currently signed in with a Manager account. The Tenant Dashboard is only accessible to tenants.
+          You are currently signed in with a Tenant account. The Manager Dashboard is only accessible to verified Property Managers.
         </p>
         <div className="mt-6 flex gap-3">
-          <Button onClick={() => router.push("/manager/overview")}>Go to Manager Dashboard</Button>
+          <Button onClick={() => router.push("/tenant/overview")}>Go to Tenant Dashboard</Button>
           <Button variant="outline" onClick={() => router.push("/")}>Back to Home</Button>
         </div>
       </div>
@@ -57,11 +57,8 @@ export default function TenantDashboardLayout({
 
   return (
     <SidebarProvider>
-      {/* Full-width navbar across the top of the viewport (fixed); the
-          sidebar starts below it via top-[72px] in AppSidebar, and the
-          content is offset with pt-[72px]. */}
       <Navbar isDashboard />
-      <AppSidebar />
+      <AppSidebar userType="manager" />
       <SidebarInset className="dashboard-shell min-h-[calc(100svh-72px)] bg-muted/30 pt-[72px]">
         {children}
       </SidebarInset>
@@ -69,3 +66,4 @@ export default function TenantDashboardLayout({
     </SidebarProvider>
   );
 }
+
