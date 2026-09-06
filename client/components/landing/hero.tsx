@@ -12,11 +12,7 @@ const heroFields = [
   { label: "Bedrooms", fromPlaceholder: "Any", toPlaceholder: "Any" },
   { label: "Budget", fromPlaceholder: "From", toPlaceholder: "To", unit: "€" },
 ];
-
 const HERO_ROTATION_INTERVAL = 6000;
-
-// Full-screen hero backgrounds must be high-resolution sources; the small
-// /landing-i*.png thumbnails (416px) look blurry when stretched to fill.
 const HERO_IMAGES = [
   {
     src: "/landing-splash.jpg",
@@ -29,27 +25,19 @@ const HERO_IMAGES = [
 
 export function Hero() {
   const [selectedImage, setSelectedImage] = useState(0);
-
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (prefersReducedMotion) {
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setSelectedImage(
-        (currentImage) => (currentImage + 1) % HERO_IMAGES.length,
-      );
-    }, HERO_ROTATION_INTERVAL);
-
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const intervalId = window.setInterval(
+      () =>
+        setSelectedImage(
+          (currentImage) => (currentImage + 1) % HERO_IMAGES.length,
+        ),
+      HERO_ROTATION_INTERVAL,
+    );
     return () => window.clearInterval(intervalId);
   }, []);
-
   return (
-    <section className="relative isolate min-h-[760px] overflow-hidden bg-neutral-950 lg:min-h-[92vh]">
+    <section id="home" className="relative isolate min-h-[760px] overflow-hidden bg-neutral-950 lg:min-h-[92vh]">
       <div className="absolute inset-0 z-0">
         <Image
           key={selectedImage}
@@ -64,24 +52,22 @@ export function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,15,24,.92)_0%,rgba(9,15,24,.68)_44%,rgba(9,15,24,.22)_100%)]" />
         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/20" />
       </div>
-
       <div className="relative z-10 mx-auto flex min-h-[760px] max-w-7xl items-center px-4 pb-24 pt-28 sm:px-6 lg:min-h-[92vh] lg:px-8 lg:pb-28">
         <div className="max-w-3xl">
           <p className="mb-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-            <span className="h-px w-8 bg-primary" />A better way to live
+            {/* A better way to live */}
           </p>
           <h1 className="max-w-2xl font-display text-5xl font-medium leading-[0.98] tracking-[-0.03em] text-white sm:text-6xl lg:text-8xl">
             Find a place worth coming home to.
           </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/80 sm:text-lg">
+          <p className="mt-6 max-w-xl text-4xl leading-relaxed text-white/80 sm:text-lg">
             Thoughtfully selected homes, apartments, and spaces for the next
             chapter of your life.
           </p>
-
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button
               size="lg"
-              className="h-11 gap-2 px-5 text-sm font-semibold"
+              className="h-11 gap-2 rounded-none bg-[var(--brass)] px-5 text-sm font-semibold text-white hover:bg-[#9c7027]"
               nativeButton={false}
               render={<Link href="#listings" />}
             >
@@ -99,14 +85,12 @@ export function Hero() {
               <ArrowDown className="h-4 w-4" />
             </Button>
           </div>
-
           <PropertyFilterPanel
             fields={heroFields}
             variant="hero"
-            className="mt-10 max-w-4xl"
+            className="mt-14 max-w-4xl"
           />
         </div>
-
         <div className="absolute bottom-8 right-8 hidden items-end gap-2 lg:flex">
           <span className="mr-2 max-w-16 text-right text-[10px] font-medium uppercase leading-tight tracking-[0.18em] text-white/60">
             Explore the collection
@@ -125,13 +109,12 @@ export function Hero() {
                 alt=""
                 width={160}
                 height={160}
-                className="object-cover w-full h-full"
+                className="h-full w-full object-cover"
               />
             </button>
           ))}
         </div>
-
-        <div className="absolute bottom-8 left-4 hidden items-center gap-2 text-xs text-white/60 sm:flex lg:left-8">
+        <div className="absolute bottom-10 left-4 hidden items-center gap-2 py-2 text-xs text-white/60 sm:flex lg:left-8">
           <Search className="h-3.5 w-3.5" />
           <span>1,240 homes currently available</span>
         </div>

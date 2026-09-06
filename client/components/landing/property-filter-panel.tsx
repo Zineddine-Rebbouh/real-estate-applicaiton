@@ -54,7 +54,7 @@ export function PropertyFilterPanel({
         className,
       )}
     >
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:items-end">
+      <div className="grid grid-cols-1 mb-4 gap-5 sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:items-end">
         {fields.map((field) => (
           <div key={field.label} className="flex flex-col gap-2">
             <Label className="text-xs font-semibold uppercase tracking-[0.12em] text-foreground">
@@ -86,7 +86,7 @@ export function PropertyFilterPanel({
 
       <Button
         size="lg"
-        className="mt-5 h-10 w-full gap-2 text-sm font-semibold sm:col-span-2 lg:col-span-1 lg:mt-0"
+        className="mt-5 h-10 w-full gap-2 rounded-none bg-[var(--brass)] text-sm font-semibold text-white hover:bg-[#9c7027] sm:col-span-2 lg:col-span-1 lg:mt-0"
         onClick={handleSearch}
       >
         <Search className="h-4 w-4" />
