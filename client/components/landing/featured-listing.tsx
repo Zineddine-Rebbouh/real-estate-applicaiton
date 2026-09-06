@@ -1,96 +1,83 @@
 import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
-import { ArrowUpRight, Home, Maximize } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-const sampleListing = {
-  status: "Ready to sell",
-  title: "Real Estate Title",
-  address: "Wrocław, ul. Złota 66",
-  numberOfFlats: 54,
-  totalArea: 960,
-  imageSrc: "/featured-listing.jpg",
-};
-
 export function FeaturedListing() {
   return (
-    <section className="bg-background py-16 lg:py-24" id="about">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 flex items-end justify-between gap-6">
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              This week&apos;s highlight
-            </p>
-            <h2 className="font-display text-3xl font-medium tracking-tight sm:text-4xl">
-              A home with a point of view.
-            </h2>
+    <section className="bg-[var(--paper)] py-20 sm:py-28" id="about">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1.15fr_.85fr] lg:px-10">
+        <div className="relative min-h-[440px] overflow-hidden bg-[var(--blueprint)]">
+          <Image
+            src="/featured-listing.jpg"
+            alt="Sunlit apartment overlooking Fort Greene Park"
+            fill
+            sizes="(max-width: 1024px) 100vw, 55vw"
+            className="object-cover"
+          />
+          <div className="absolute bottom-0 left-0 border-r border-t border-[var(--blueprint-line)] bg-[var(--blueprint)]/90 px-5 py-4 text-xs text-white">
+            <span className="text-[var(--blueprint-line)]">N</span> &nbsp;
+            Park-facing windows
           </div>
-          <span className="hidden text-sm text-muted-foreground sm:block">
-            01 / 04 curated residences
-          </span>
         </div>
-        <div className="grid grid-cols-1 items-stretch gap-10 lg:grid-cols-[0.72fr_1.28fr]">
-          <div className="flex flex-col justify-between space-y-8">
-            <Badge variant="success">{sampleListing.status}</Badge>
-
-            <div className="space-y-4">
-              <h3 className="font-display text-2xl font-medium leading-tight tracking-tight sm:text-3xl">
-                {sampleListing.title}
-              </h3>
-              <p className="text-base text-muted-foreground">
-                {sampleListing.address}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              className="mt-2 gap-2"
-              nativeButton={false}
-              render={<Link href="#listings" />}
+        <div className="flex flex-col justify-center py-4 lg:pl-8">
+          <p className="mb-5 text-sm text-[var(--stone)]">
+            Featured home / Fort Greene
+          </p>
+          <h2 className="font-display text-4xl font-semibold leading-none tracking-[-.04em] sm:text-5xl">
+            A home with a point of view.
+          </h2>
+          <p className="mt-6 max-w-md leading-7 text-[var(--stone)]">
+            On a calm, tree-lined block near the park, this corner two-bedroom
+            catches morning light in every room and has enough kitchen counter
+            space for Sunday dinner.
+          </p>
+          <div className="relative mt-9 border-y border-[var(--blueprint-line)]/70 py-5">
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 210 76"
+              className="absolute -right-2 -top-1 h-20 w-52 text-[var(--blueprint-line)]"
             >
-              View residence <ArrowUpRight className="h-4 w-4" />
-            </Button>
-
-            <div className="grid grid-cols-2 gap-4 border-t border-border pt-6">
+              <path
+                d="M4 10h114v22h70v34H72V47H4Z M35 10v37m83-15v34m35-34v34"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+              <path
+                d="M4 4h184M4 1v7m184-7v7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            </svg>
+            <div className="grid max-w-sm grid-cols-3 gap-4 text-sm">
               <div>
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                  <Home className="h-5 w-5 text-foreground" />
-                </div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Number of flats
-                </p>
-                <p className="mt-1 text-lg font-semibold">
-                  {sampleListing.numberOfFlats}
-                </p>
+                <span className="block text-xs text-[var(--stone)]">Beds</span>
+                <strong>2</strong>
               </div>
-
               <div>
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                  <Maximize className="h-5 w-5 text-foreground" />
-                </div>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Total area
-                </p>
-                <p className="mt-1 text-lg font-semibold">
-                  {sampleListing.totalArea}m²
-                </p>
+                <span className="block text-xs text-[var(--stone)]">Baths</span>
+                <strong>1</strong>
+              </div>
+              <div>
+                <span className="block text-xs text-[var(--stone)]">
+                  Interior
+                </span>
+                <strong>842 sqft</strong>
               </div>
             </div>
           </div>
-
-          <div className="relative min-h-[360px] overflow-hidden rounded-2xl bg-muted ring-1 ring-foreground/10 sm:min-h-[460px]">
-            <Image
-              src={sampleListing.imageSrc}
-              alt={sampleListing.title}
-              fill
-              quality={90}
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            <div className="absolute bottom-4 left-4 bg-white p-4 rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
-              <p className="text-sm font-medium">{sampleListing.title}</p>
-              <p className="text-xs text-muted-foreground">{sampleListing.address}</p>
-            </div>
+          <div className="mt-7 flex items-center justify-between">
+            <p className="font-display text-2xl">
+              $3,150{" "}
+              <span className="font-sans text-sm text-[var(--stone)]">
+                / month
+              </span>
+            </p>
+            <Link
+              href="/tenant/rentals"
+              className="border-b border-[var(--brass)] pb-1 text-sm font-semibold text-[var(--ink)] hover:text-[var(--brass)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--brass)]"
+            >
+              See this home
+            </Link>
           </div>
         </div>
       </div>

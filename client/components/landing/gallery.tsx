@@ -1,43 +1,49 @@
 import Image from "next/image";
-
-const galleryImages = [
-  { src: "/gallery-living-room.jpg", alt: "Modern living room" },
-  { src: "/gallery-bedroom.jpg", alt: "Luxury bedroom" },
-  { src: "/gallery-kitchen.jpg", alt: "Contemporary kitchen" },
+const spaces = [
+  {
+    src: "/gallery-living-room.jpg",
+    alt: "Living room with warm afternoon light",
+    cl: "sm:col-span-7 sm:row-span-2 min-h-[360px]",
+  },
+  {
+    src: "/gallery-kitchen.jpg",
+    alt: "Bright kitchen",
+    cl: "sm:col-span-5 min-h-[220px]",
+  },
+  {
+    src: "/gallery-bedroom.jpg",
+    alt: "Quiet bedroom",
+    cl: "sm:col-span-5 min-h-[220px]",
+  },
 ];
-
-export function Gallery() {
+export function SpacesGallery() {
   return (
-    <section className="bg-background py-16 lg:py-24" id="gallery">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-              Inside the collection
-            </p>
-            <h2 className="font-display text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
-              Spaces that make room for living.
-            </h2>
-          </div>
-          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-            A glimpse into the details, textures, and light behind our most
-            loved homes.
+    <section
+      className="bg-[var(--blueprint)] py-20 text-white sm:py-28"
+      id="gallery"
+    >
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div className="mb-10 grid gap-6 sm:grid-cols-[1fr_.65fr]">
+          <h2 className="font-display max-w-xl text-4xl font-semibold leading-none tracking-[-.04em] sm:text-5xl">
+            Spaces that make room for living.
+          </h2>
+          <p className="self-end leading-7 text-white/70">
+            Light, storage, a table where friends can stay awhile. The details
+            are part of the home not an afterthought.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
-          {galleryImages.map((image, index) => (
+        <div className="grid gap-4 sm:grid-cols-12 sm:grid-rows-2">
+          {spaces.map((space) => (
             <div
-              key={index}
-              className={`relative overflow-hidden rounded-xl ring-1 ring-foreground/10 transition-all hover:ring-foreground/20 ${index === 1 ? "sm:col-span-6 sm:aspect-square" : "sm:col-span-3 sm:aspect-3/4"}`}
+              key={space.src}
+              className={`relative overflow-hidden ${space.cl}`}
             >
               <Image
-                src={image.src}
-                alt={image.alt}
+                src={space.src}
+                alt={space.alt}
                 fill
-                quality={90}
+                sizes="(max-width: 640px) 100vw, 60vw"
                 className="object-cover"
-                sizes="(max-width: 640px) 100vw, 33vw"
               />
             </div>
           ))}

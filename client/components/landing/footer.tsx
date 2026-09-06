@@ -9,7 +9,7 @@ const footerLinks = {
     { label: "Blog", href: "#" },
   ],
   resources: [
-    { label: "Documentation", href: "#" },
+    { label: "Browse homes", href: "/tenant/rentals" },
     { label: "Help Center", href: "#" },
     { label: "Community", href: "#" },
     { label: "Contact", href: "#" },
@@ -30,7 +30,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-neutral-950 text-neutral-300" id="contact">
+    <footer className="bg-[var(--ink)] text-white/70" id="contact">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Logo & Description */}
@@ -41,8 +41,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
-              A considered way to find the place you&apos;ll build your everyday
-              life around.
+              A considered way to find the place you&apos;ll build your everyday life around.
             </p>
           </div>
 
@@ -65,7 +64,7 @@ export function Footer() {
 
           {/* Resources Links */}
           <div>
-            <h3 className="text-sm font-semibold text-white mb-4">Resources</h3>
+            <h3 className="text-sm font-semibold text-white mb-4">Product</h3>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
