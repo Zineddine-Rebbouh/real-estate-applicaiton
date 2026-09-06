@@ -6,19 +6,267 @@ datasource db {
   provider = "postgresql"
 }
 
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
 enum Role {
   TENANT
   MANAGER
 }
 
+enum PropertyType {
+  Rooms
+  Tinyhouse
+  Apartment
+  Villa
+  Townhouse
+  Cottage
+}
+
+enum AmenityEnum {
+  WasherDryer
+  AirConditioning
+  Dishwasher
+  HighSpeedInternet
+  HardwoodFloors
+  WalkInClosets
+  Microwave
+  Refrigerator
+  Pool
+  Gym
+  Parking
+  PetsAllowed
+  WiFi
+}
+
+enum HighlightEnum {
+  HighSpeedInternetAccess
+  WasherDryer
+  AirConditioning
+  Heating
+  SmokeFree
+  CableReady
+  SatelliteTV
+  DoubleVanities
+  TubShower
+  Intercom
+  SprinklerSystem
+  RecentlyRenovated
+  CloseToTransit
+  GreatView
+  QuietNeighborhood
+}
+
+enum ApplicationStatus {
+  Pending
+  Approved
+  Denied
+}
+
+enum PaymentStatus {
+  Pending
+  Paid
+  PartiallyPaid
+  Overdue
+}
+
+// ---------------------------------------------------------------------------
+// Auth / identity
+// ---------------------------------------------------------------------------
+
 model User {
-  id                  String   @id @default(uuid()) @db.Uuid
-  email               String   @unique
-  passwordHash        String
-  name                String
-  role                Role     @default(TENANT)
-  refreshTokenVersion Int      @default(0)
+  id                      String   @id @default(uuid()) @db.Uuid
+  email                   String   @unique
+  passwordHash            String
+  name                    String
+  role                    Role     @default(TENANT)
+  refreshTokenVersion     Int      @default(0)
   currentRefreshTokenHash String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  // Profile rows — at most one of these exists per User
+  manager Manager?
+  tenant  Tenant?
+}
+
+// ---------------------------------------------------------------------------
+// Role profiles
+//
+// Manager and Tenant extend User rather than duplicating auth fields.
+// Each profile is 1:1 with User (enforced by @unique on userId).
+// Auth concerns stay in User; domain concerns live in the profile models.
+// ---------------------------------------------------------------------------
+
+model Manager {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @unique @db.Uuid
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  properties Property[]
+}
+
+model Tenant {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @unique @db.Uuid
+  phoneNumber String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leases       Lease[]
+  applications Application[]
+  favorites    Favorite[]
+}
+
+// ---------------------------------------------------------------------------
+// Property
+//
+// Location fields are embedded (no separate Location table) — every property
+// query also needs the address and they are strictly 1:1 with no sharing.
+//
+// Money fields use Decimal (PostgreSQL NUMERIC) to avoid floating-point drift.
+//
+// Amenities and highlights are stored as enum arrays — always fetched whole,
+// the set of valid values is fixed, so a junction table adds no value.
+// ---------------------------------------------------------------------------
+
+model Property {
+  id                String        @id @default(uuid()) @db.Uuid
+  managerId         String        @db.Uuid
+
+  // Core listing fields
+  name              String
+  description       String
+  pricePerMonth     Decimal       @db.Decimal(10, 2)
+  securityDeposit   Decimal       @db.Decimal(10, 2)
+  applicationFee    Decimal       @db.Decimal(10, 2)
+  photoUrls         String[]
+  amenities         AmenityEnum[]
+  highlights        HighlightEnum[]
+  isPetsAllowed     Boolean       @default(false)
+  isParkingIncluded Boolean       @default(false)
+  beds              Int
+  baths             Int
+  squareFeet        Int
+  propertyType      PropertyType
+  postedDate        DateTime      @default(now())
+
+  // Review aggregates — denormalized for query performance
+  averageRating     Float?
+  numberOfReviews   Int           @default(0)
+
+  // Availability
+  availableFrom     DateTime?
+
+  // Embedded location (replaces the old separate Location table)
+  address           String
+  city              String
+  state             String
+  country           String
+  postalCode        String
+
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  manager           Manager       @relation(fields: [managerId], references: [id])
+  leases            Lease[]
+  applications      Application[]
+  favorites         Favorite[]
+}
+
+// ---------------------------------------------------------------------------
+// Lease
+// ---------------------------------------------------------------------------
+
+model Lease {
+  id         String   @id @default(uuid()) @db.Uuid
+  propertyId String   @db.Uuid
+  tenantId   String   @db.Uuid
+  startDate  DateTime
+  endDate    DateTime
+  rent       Decimal  @db.Decimal(10, 2)
+  deposit    Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  property     Property      @relation(fields: [propertyId], references: [id])
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  payments     Payment[]
+  applications Application[]
+}
+
+// ---------------------------------------------------------------------------
+// Application
+//
+// Contact fields (name, email, phoneNumber) are intentionally denormalized:
+// an application is a point-in-time snapshot of what was submitted.
+// Changing a tenant profile later must not retroactively alter applications.
+// ---------------------------------------------------------------------------
+
+model Application {
+  id              String            @id @default(uuid()) @db.Uuid
+  propertyId      String            @db.Uuid
+  tenantId        String            @db.Uuid
+  leaseId         String?           @db.Uuid
+  applicationDate DateTime          @default(now())
+  status          ApplicationStatus @default(Pending)
+
+  // Snapshot of applicant contact info at submission time
+  name            String
+  email           String
+  phoneNumber     String
+  message         String?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  property        Property          @relation(fields: [propertyId], references: [id])
+  tenant          Tenant            @relation(fields: [tenantId], references: [id])
+  lease           Lease?            @relation(fields: [leaseId], references: [id])
+}
+
+// ---------------------------------------------------------------------------
+// Payment
+//
+// Linked to a Lease (not directly to Property or Tenant) because a payment
+// is always made against a specific lease agreement.
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id            String        @id @default(uuid()) @db.Uuid
+  leaseId       String        @db.Uuid
+  amountDue     Decimal       @db.Decimal(10, 2)
+  amountPaid    Decimal       @db.Decimal(10, 2)
+  dueDate       DateTime
+  paymentDate   DateTime?
+  paymentStatus PaymentStatus @default(Pending)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  lease         Lease         @relation(fields: [leaseId], references: [id])
+}
+
+// ---------------------------------------------------------------------------
+// Favorite
+//
+// Explicit join table (not implicit Prisma m2m) so we can store createdAt —
+// needed to sort a tenant's favorites list by when they were saved.
+// @@unique prevents double-favoriting the same property.
+// ---------------------------------------------------------------------------
+
+model Favorite {
+  id         String   @id @default(uuid()) @db.Uuid
+  tenantId   String   @db.Uuid
+  propertyId String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, propertyId])
 }
