@@ -9,6 +9,7 @@ export const signupSchema = z.object({
     .max(254)
     .transform((value) => value.toLowerCase()),
   password: z.string().min(8).max(128),
+  role: z.enum(["TENANT", "MANAGER"]).default("TENANT").optional(),
 });
 
 export const loginSchema = z.object({

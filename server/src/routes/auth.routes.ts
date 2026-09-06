@@ -11,6 +11,7 @@ import {
   me,
   refresh,
   signup,
+  updateMe,
 } from "../controllers/auth.controller.js";
 
 export const authRouter = Router();
@@ -19,3 +20,4 @@ authRouter.post("/login", loginRateLimiter, login);
 authRouter.post("/logout", logout);
 authRouter.post("/refresh", refreshRateLimiter, refresh);
 authRouter.get("/me", authenticate, me);
+authRouter.patch("/me", authenticate, updateMe);

@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import type { AuthenticatedRequest } from "./authenticate.js";
+import { prisma } from "../lib/prisma.js";
 
 export function authorize(...roles: Array<"TENANT" | "MANAGER">) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -9,4 +10,15 @@ export function authorize(...roles: Array<"TENANT" | "MANAGER">) {
     }
     next();
   };
+}
+
+export async function getOrCreateManager(userId: string) {
+  const existing = await prisma.manager.findUnique({
+    where: { userId },
+  });
+  if (existing) return existing;
+
+  return await prisma.manager.create({
+    data: { userId },
+  });
 }
