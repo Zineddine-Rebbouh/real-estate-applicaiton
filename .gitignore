@@ -1,0 +1,5 @@
+# crash dumps
+bash.exe.stackdump
+
+# local AI assistant settings (machine-specific permissions)
+.claude/settings.local.json
