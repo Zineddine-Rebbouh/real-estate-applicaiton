@@ -149,4 +149,19 @@
       "connect": { "id": 15 }
     }
   }
+  { "id": "ff000000-0000-0000-0000-000000000001", "leaseId": "dd000000-0000-0000-0000-000000000001", "amountDue": 1500.00, "amountPaid": 1500.00, "dueDate": "2023-07-01T00:00:00Z", "paymentDate": "2023-06-28T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000002", "leaseId": "dd000000-0000-0000-0000-000000000002", "amountDue": 1800.00, "amountPaid": 0.00,    "dueDate": "2023-08-01T00:00:00Z", "paymentDate": "2023-07-28T00:00:00Z", "paymentStatus": "Pending" },
+  { "id": "ff000000-0000-0000-0000-000000000003", "leaseId": "dd000000-0000-0000-0000-000000000003", "amountDue": 2200.00, "amountPaid": 2200.00, "dueDate": "2023-09-01T00:00:00Z", "paymentDate": "2023-08-30T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000004", "leaseId": "dd000000-0000-0000-0000-000000000004", "amountDue": 1700.00, "amountPaid": 1700.00, "dueDate": "2023-07-15T00:00:00Z", "paymentDate": "2023-07-14T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000005", "leaseId": "dd000000-0000-0000-0000-000000000005", "amountDue": 2000.00, "amountPaid": 0.00,    "dueDate": "2023-08-15T00:00:00Z", "paymentDate": "2023-08-14T00:00:00Z", "paymentStatus": "Pending" },
+  { "id": "ff000000-0000-0000-0000-000000000006", "leaseId": "dd000000-0000-0000-0000-000000000006", "amountDue": 2400.00, "amountPaid": 2400.00, "dueDate": "2023-09-15T00:00:00Z", "paymentDate": "2023-09-14T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000007", "leaseId": "dd000000-0000-0000-0000-000000000007", "amountDue": 2200.00, "amountPaid": 1100.00, "dueDate": "2023-10-01T00:00:00Z", "paymentDate": "2023-09-25T00:00:00Z", "paymentStatus": "PartiallyPaid" },
+  { "id": "ff000000-0000-0000-0000-000000000008", "leaseId": "dd000000-0000-0000-0000-000000000008", "amountDue": 5000.00, "amountPaid": 5000.00, "dueDate": "2023-08-01T00:00:00Z", "paymentDate": "2023-07-30T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000009", "leaseId": "dd000000-0000-0000-0000-000000000009", "amountDue": 3000.00, "amountPaid": 1500.00, "dueDate": "2023-11-01T00:00:00Z", "paymentDate": "2023-10-25T00:00:00Z", "paymentStatus": "PartiallyPaid" },
+  { "id": "ff000000-0000-0000-0000-000000000010", "leaseId": "dd000000-0000-0000-0000-000000000010", "amountDue": 2000.00, "amountPaid": 2000.00, "dueDate": "2023-08-15T00:00:00Z", "paymentDate": "2023-08-10T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000011", "leaseId": "dd000000-0000-0000-0000-000000000011", "amountDue": 1000.00, "amountPaid": 0.00,    "dueDate": "2023-09-01T00:00:00Z", "paymentDate": "2023-08-30T00:00:00Z", "paymentStatus": "Pending" },
+  { "id": "ff000000-0000-0000-0000-000000000012", "leaseId": "dd000000-0000-0000-0000-000000000012", "amountDue": 1800.00, "amountPaid": 1800.00, "dueDate": "2023-10-01T00:00:00Z", "paymentDate": "2023-09-28T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000013", "leaseId": "dd000000-0000-0000-0000-000000000013", "amountDue": 900.00,  "amountPaid": 450.00,  "dueDate": "2023-09-15T00:00:00Z", "paymentDate": "2023-09-10T00:00:00Z", "paymentStatus": "PartiallyPaid" },
+  { "id": "ff000000-0000-0000-0000-000000000014", "leaseId": "dd000000-0000-0000-0000-000000000014", "amountDue": 1500.00, "amountPaid": 1500.00, "dueDate": "2023-09-01T00:00:00Z", "paymentDate": "2023-08-30T00:00:00Z", "paymentStatus": "Paid" },
+  { "id": "ff000000-0000-0000-0000-000000000015", "leaseId": "dd000000-0000-0000-0000-000000000015", "amountDue": 2500.00, "amountPaid": 2500.00, "dueDate": "2023-10-01T00:00:00Z", "paymentDate": "2023-09-28T00:00:00Z", "paymentStatus": "Paid" }
 ]

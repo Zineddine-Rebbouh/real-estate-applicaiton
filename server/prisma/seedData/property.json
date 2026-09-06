@@ -1,6 +1,8 @@
 [
   {
     "id": 1,
+    "id": "cc000000-0000-0000-0000-000000000001",
+    "managerId": "aa000000-0000-0000-0000-000000000001",
     "name": "Sunny Downtown Apartment",
     "description": "A beautiful apartment in the heart of downtown with plenty of natural light.",
     "pricePerMonth": 1500.0,
@@ -10,6 +12,10 @@
       "https://example.com/apartment1_1.jpg",
       "https://example.com/apartment1_2.jpg"
     ],
+    "pricePerMonth": 1500.00,
+    "securityDeposit": 1500.00,
+    "applicationFee": 50.00,
+    "photoUrls": ["https://example.com/apartment1_1.jpg", "https://example.com/apartment1_2.jpg"],
     "amenities": ["AirConditioning", "WasherDryer", "Parking"],
     "highlights": ["HighSpeedInternetAccess", "CloseToTransit"],
     "isPetsAllowed": true,
@@ -23,9 +29,17 @@
     "numberOfReviews": 10,
     "locationId": 1,
     "managerCognitoId": "010be580-60a1-70ae-780e-18a6fd94ad32"
+    "address": "123 Colorado Blvd",
+    "city": "Pasadena",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "91105",
+    "coordinates": "POINT(-118.144516 34.147785)"
   },
   {
     "id": 2,
+    "id": "cc000000-0000-0000-0000-000000000002",
+    "managerId": "aa000000-0000-0000-0000-000000000002",
     "name": "Cozy Beach House",
     "description": "A charming beach house with stunning ocean views.",
     "pricePerMonth": 2000.0,
@@ -35,6 +49,10 @@
       "https://example.com/beachhouse1.jpg",
       "https://example.com/beachhouse2.jpg"
     ],
+    "pricePerMonth": 2000.00,
+    "securityDeposit": 2000.00,
+    "applicationFee": 75.00,
+    "photoUrls": ["https://example.com/beachhouse1.jpg", "https://example.com/beachhouse2.jpg"],
     "amenities": ["AirConditioning", "WasherDryer", "Parking", "Pool"],
     "highlights": ["GreatView", "CloseToTransit"],
     "isPetsAllowed": true,
@@ -48,9 +66,17 @@
     "numberOfReviews": 5,
     "locationId": 2,
     "managerCognitoId": "us-east-2:23456789-90ab-cdef-1234-567890abcdef"
+    "address": "456 Ocean Ave",
+    "city": "Santa Monica",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "90401",
+    "coordinates": "POINT(-118.496513 34.013654)"
   },
   {
     "id": 3,
+    "id": "cc000000-0000-0000-0000-000000000003",
+    "managerId": "aa000000-0000-0000-0000-000000000003",
     "name": "Modern City Loft",
     "description": "Sleek and stylish loft in the heart of the city.",
     "pricePerMonth": 2200.0,
@@ -60,6 +86,10 @@
       "https://example.com/cityloft1.jpg",
       "https://example.com/cityloft2.jpg"
     ],
+    "pricePerMonth": 2200.00,
+    "securityDeposit": 2200.00,
+    "applicationFee": 60.00,
+    "photoUrls": ["https://example.com/cityloft1.jpg", "https://example.com/cityloft2.jpg"],
     "amenities": ["AirConditioning", "WasherDryer", "Gym"],
     "highlights": ["HighSpeedInternetAccess", "CloseToTransit"],
     "isPetsAllowed": true,
@@ -73,9 +103,17 @@
     "numberOfReviews": 8,
     "locationId": 3,
     "managerCognitoId": "us-east-2:34567890-90ab-cdef-1234-567890abcdef"
+    "address": "789 Hollywood Way",
+    "city": "Burbank",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "91505",
+    "coordinates": "POINT(-118.328661 34.180839)"
   },
   {
     "id": 4,
+    "id": "cc000000-0000-0000-0000-000000000004",
+    "managerId": "aa000000-0000-0000-0000-000000000004",
     "name": "Spacious Family Home",
     "description": "Large family home with a beautiful backyard and modern amenities.",
     "pricePerMonth": 2500.0,
@@ -85,6 +123,10 @@
       "https://example.com/familyhome1.jpg",
       "https://example.com/familyhome2.jpg"
     ],
+    "pricePerMonth": 2500.00,
+    "securityDeposit": 2500.00,
+    "applicationFee": 80.00,
+    "photoUrls": ["https://example.com/familyhome1.jpg", "https://example.com/familyhome2.jpg"],
     "amenities": ["AirConditioning", "WasherDryer", "Parking", "Dishwasher"],
     "highlights": ["QuietNeighborhood"],
     "isPetsAllowed": true,
@@ -98,9 +140,17 @@
     "numberOfReviews": 12,
     "locationId": 4,
     "managerCognitoId": "us-east-2:45678901-90ab-cdef-1234-567890abcdef"
+    "address": "101 Pine Ave",
+    "city": "Long Beach",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "90802",
+    "coordinates": "POINT(-118.192604 33.766720)"
   },
   {
     "id": 5,
+    "id": "cc000000-0000-0000-0000-000000000005",
+    "managerId": "aa000000-0000-0000-0000-000000000005",
     "name": "Luxury Penthouse",
     "description": "Stunning penthouse with panoramic city views and high-end finishes.",
     "pricePerMonth": 5000.0,
@@ -110,6 +160,10 @@
       "https://example.com/penthouse1.jpg",
       "https://example.com/penthouse2.jpg"
     ],
+    "pricePerMonth": 5000.00,
+    "securityDeposit": 5000.00,
+    "applicationFee": 100.00,
+    "photoUrls": ["https://example.com/penthouse1.jpg", "https://example.com/penthouse2.jpg"],
     "amenities": ["AirConditioning", "WasherDryer", "Gym", "Pool"],
     "highlights": ["GreatView"],
     "isPetsAllowed": true,
@@ -123,9 +177,17 @@
     "numberOfReviews": 15,
     "locationId": 5,
     "managerCognitoId": "us-east-2:56789012-90ab-cdef-1234-567890abcdef"
+    "address": "555 Manhattan Ave",
+    "city": "New York",
+    "state": "NY",
+    "country": "United States",
+    "postalCode": "10001",
+    "coordinates": "POINT(-74.005941 40.712784)"
   },
   {
     "id": 6,
+    "id": "cc000000-0000-0000-0000-000000000006",
+    "managerId": "aa000000-0000-0000-0000-000000000006",
     "name": "Cozy Studio Apartment",
     "description": "Efficient studio apartment perfect for students or young professionals.",
     "pricePerMonth": 1200.0,
@@ -135,6 +197,10 @@
       "https://example.com/studio1.jpg",
       "https://example.com/studio2.jpg"
     ],
+    "pricePerMonth": 1200.00,
+    "securityDeposit": 1200.00,
+    "applicationFee": 40.00,
+    "photoUrls": ["https://example.com/studio1.jpg", "https://example.com/studio2.jpg"],
     "amenities": ["AirConditioning", "HighSpeedInternet"],
     "highlights": ["CloseToTransit"],
     "isPetsAllowed": true,
@@ -148,9 +214,17 @@
     "numberOfReviews": 6,
     "locationId": 6,
     "managerCognitoId": "us-east-2:67890123-90ab-cdef-1234-567890abcdef"
+    "address": "888 Malibu Road",
+    "city": "Malibu",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "90265",
+    "coordinates": "POINT(-118.774518 34.025922)"
   },
   {
     "id": 7,
+    "id": "cc000000-0000-0000-0000-000000000007",
+    "managerId": "aa000000-0000-0000-0000-000000000007",
     "name": "Historic Brownstone",
     "description": "Charming brownstone with original features and modern updates.",
     "pricePerMonth": 3000.0,
@@ -160,6 +234,10 @@
       "https://example.com/brownstone1.jpg",
       "https://example.com/brownstone2.jpg"
     ],
+    "pricePerMonth": 3000.00,
+    "securityDeposit": 3000.00,
+    "applicationFee": 70.00,
+    "photoUrls": ["https://example.com/brownstone1.jpg", "https://example.com/brownstone2.jpg"],
     "amenities": ["AirConditioning", "WasherDryer", "HighSpeedInternet"],
     "highlights": ["RecentlyRenovated"],
     "isPetsAllowed": true,
@@ -173,9 +251,17 @@
     "numberOfReviews": 9,
     "locationId": 7,
     "managerCognitoId": "us-east-2:78901234-90ab-cdef-1234-567890abcdef"
+    "address": "777 Brand Blvd",
+    "city": "Glendale",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "91203",
+    "coordinates": "POINT(-118.254708 34.142508)"
   },
   {
     "id": 8,
+    "id": "cc000000-0000-0000-0000-000000000008",
+    "managerId": "aa000000-0000-0000-0000-000000000008",
     "name": "Urban Micro-Apartment",
     "description": "Compact and efficient living space in the heart of the city.",
     "pricePerMonth": 1000.0,
@@ -185,6 +271,10 @@
       "https://example.com/micro1.jpg",
       "https://example.com/micro2.jpg"
     ],
+    "pricePerMonth": 1000.00,
+    "securityDeposit": 1000.00,
+    "applicationFee": 30.00,
+    "photoUrls": ["https://example.com/micro1.jpg", "https://example.com/micro2.jpg"],
     "amenities": ["AirConditioning", "HighSpeedInternet"],
     "highlights": ["CloseToTransit"],
     "isPetsAllowed": true,
@@ -198,9 +288,17 @@
     "numberOfReviews": 7,
     "locationId": 8,
     "managerCognitoId": "us-east-2:89012345-90ab-cdef-1234-567890abcdef"
+    "address": "555 Torrance Blvd",
+    "city": "Torrance",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "90503",
+    "coordinates": "POINT(-118.352575 33.835849)"
   },
   {
     "id": 9,
+    "id": "cc000000-0000-0000-0000-000000000009",
+    "managerId": "aa000000-0000-0000-0000-000000000009",
     "name": "Mountain View Cabin",
     "description": "Rustic cabin with breathtaking mountain views and modern amenities.",
     "pricePerMonth": 1800.0,
@@ -210,6 +308,10 @@
       "https://example.com/cabin1.jpg",
       "https://example.com/cabin2.jpg"
     ],
+    "pricePerMonth": 1800.00,
+    "securityDeposit": 1800.00,
+    "applicationFee": 60.00,
+    "photoUrls": ["https://example.com/cabin1.jpg", "https://example.com/cabin2.jpg"],
     "amenities": ["WasherDryer", "AirConditioning"],
     "highlights": ["GreatView", "QuietNeighborhood"],
     "isPetsAllowed": true,
@@ -223,9 +325,17 @@
     "numberOfReviews": 11,
     "locationId": 9,
     "managerCognitoId": "us-east-2:90123456-90ab-cdef-1234-567890abcdef"
+    "address": "1234 Ocean Dr",
+    "city": "Miami",
+    "state": "FL",
+    "country": "United States",
+    "postalCode": "33139",
+    "coordinates": "POINT(-80.130045 25.782551)"
   },
   {
     "id": 10,
+    "id": "cc000000-0000-0000-0000-000000000010",
+    "managerId": "aa000000-0000-0000-0000-000000000010",
     "name": "Eco-Friendly Tiny House",
     "description": "Sustainable living in a compact, well-designed tiny house.",
     "pricePerMonth": 900.0,
@@ -235,6 +345,10 @@
       "https://example.com/tinyhouse1.jpg",
       "https://example.com/tinyhouse2.jpg"
     ],
+    "pricePerMonth": 900.00,
+    "securityDeposit": 900.00,
+    "applicationFee": 35.00,
+    "photoUrls": ["https://example.com/tinyhouse1.jpg", "https://example.com/tinyhouse2.jpg"],
     "amenities": ["WasherDryer", "AirConditioning", "HighSpeedInternet"],
     "highlights": ["SmokeFree"],
     "isPetsAllowed": true,
@@ -248,5 +362,11 @@
     "numberOfReviews": 8,
     "locationId": 10,
     "managerCognitoId": "us-east-2:01234567-90ab-cdef-1234-567890abcdef"
+    "address": "789 Rodeo Dr",
+    "city": "Beverly Hills",
+    "state": "CA",
+    "country": "United States",
+    "postalCode": "90210",
+    "coordinates": "POINT(-118.400356 34.073620)"
   }
 ]
