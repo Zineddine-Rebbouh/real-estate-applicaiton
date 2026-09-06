@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Globe, MessageCircle, Send, Briefcase } from "lucide-react";
 
@@ -37,14 +36,8 @@ export function Footer() {
           {/* Logo & Description */}
           <div className="col-span-2 lg:col-span-2">
             <Link href="/" className="mb-4 inline-flex">
-              <span className="relative block h-10 w-[150px] overflow-hidden rounded-sm bg-white">
-                <Image
-                  src="/logo-habitat.png"
-                  alt="Habitat"
-                  width={240}
-                  height={240}
-                  className="absolute -left-[45px] -top-[102px] max-w-none"
-                />
+              <span className="font-display text-2xl font-bold tracking-tight text-white">
+                Habitat
               </span>
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">

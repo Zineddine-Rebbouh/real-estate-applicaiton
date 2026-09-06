@@ -12,6 +12,7 @@ const sampleProperties = [
   {
     id: 1,
     image: "/property-small-flat.jpg",
+    images: ["/property-small-flat.jpg", "/property-small-flat-2.jpg"],
     title: "Small Flat",
     totalArea: 45,
     bedrooms: 1,
@@ -25,6 +26,7 @@ const sampleProperties = [
   {
     id: 2,
     image: "/property-large-flat.jpg",
+    images: ["/property-large-flat.jpg", "/property-large-flat-2.jpg"],
     title: "Large Flat",
     totalArea: 120,
     bedrooms: 3,
@@ -38,6 +40,7 @@ const sampleProperties = [
   {
     id: 3,
     image: "/property-medium-flat.jpg",
+    images: ["/property-medium-flat.jpg"],
     title: "Medium Flat",
     totalArea: 75,
     bedrooms: 2,
@@ -51,6 +54,7 @@ const sampleProperties = [
   {
     id: 4,
     image: "/property-studio.jpg",
+    images: ["/property-studio.jpg"],
     title: "Studio",
     totalArea: 35,
     bedrooms: 1,

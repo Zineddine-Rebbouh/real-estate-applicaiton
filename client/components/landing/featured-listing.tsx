@@ -87,6 +87,10 @@ export function FeaturedListing() {
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
+            <div className="absolute bottom-4 left-4 bg-white p-4 rounded-lg shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+              <p className="text-sm font-medium">{sampleListing.title}</p>
+              <p className="text-xs text-muted-foreground">{sampleListing.address}</p>
+            </div>
           </div>
         </div>
       </div>

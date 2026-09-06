@@ -5,9 +5,11 @@ import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPriceValue } from "@/lib/utils";
+import { ImageCarousel } from "./ImageCarousel";
 
 export type PropertyCardProps = {
   image: string;
+  images?: string[];
   title: string;
   totalArea: number;
   bedrooms: number;
@@ -20,6 +22,7 @@ export type PropertyCardProps = {
 
 export function PropertyCard({
   image,
+  images,
   title,
   totalArea,
   bedrooms,
@@ -39,7 +42,7 @@ export function PropertyCard({
 
   return (
     <Card
-      className={`group overflow-hidden transition-all hover:shadow-md hover:ring-foreground/20 ${layout === "list" ? "sm:grid sm:grid-cols-[minmax(180px,280px)_1fr]" : ""}`}
+      className={`group overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 hover:ring-foreground/20 ${layout === "list" ? "sm:grid sm:grid-cols-[minmax(180px,280px)_1fr]" : ""}`}
     >
       <div
         className={`relative overflow-hidden ${layout === "list" ? "min-h-[220px]" : "aspect-4/3"}`}
@@ -52,6 +55,7 @@ export function PropertyCard({
           className="object-cover transition-transform group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
         />
+        <ImageCarousel images={images?.length ? images : [image]} alt={title} />
         <div className="absolute top-3 right-3">
           <Badge variant={currentStatus.variant}>{currentStatus.label}</Badge>
         </div>
