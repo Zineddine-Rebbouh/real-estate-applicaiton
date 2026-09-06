@@ -4,6 +4,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  --ink: #0F1B2E;
+  --blueprint: #1E3A5F;
+  --blueprint-line: #8FB4D9;
+  --paper: #F5F1E8;
+  --brass: #B8862E;
+  --stone: #6B7280;
   --font-display: var(--font-display);
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
@@ -192,8 +198,13 @@ body,
   }
   body {
     @apply bg-background text-foreground;
+    background: var(--paper);
+    color: var(--ink);
   }
 }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 
 .dashboard-shell {
   font-family: var(--font-geist-sans), sans-serif;
