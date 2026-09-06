@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { BlueprintPanel } from "@/components/auth/blueprint-panel";
@@ -30,8 +29,12 @@ export default function SignInPage() {
   }, []);
 
   React.useEffect(() => {
-    if (currentUser) {
-      router.replace("/");
+    if (currentUser?.user) {
+      router.replace(
+        currentUser.user.role === "MANAGER"
+          ? "/manager/overview"
+          : "/tenant/overview",
+      );
     }
   }, [currentUser, router]);
 
@@ -85,8 +88,10 @@ export default function SignInPage() {
     }
 
     try {
-      await login({ email, password }).unwrap();
-      router.push("/");
+      const res = await login({ email, password }).unwrap();
+      router.push(
+        res.user.role === "MANAGER" ? "/manager/overview" : "/tenant/overview",
+      );
     } catch {
       setErrors({ form: "Invalid email or password" });
     } finally {
@@ -116,14 +121,7 @@ export default function SignInPage() {
               href="/"
               className="inline-flex items-center gap-2 font-display text-2xl font-bold tracking-tight"
             >
-              <Image
-                src="/logo.svg"
-                alt="Habitat"
-                width={32}
-                height={32}
-                className="h-8 w-8 brightness-0"
-              />
-              <span className="text-foreground">Habitat</span>
+              Habitat
             </Link>
           </div>
 

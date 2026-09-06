@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  CompassIcon,
   FileTextIcon,
   HeartIcon,
   HouseIcon,
   LayoutDashboardIcon,
   CreditCardIcon,
+  Building2Icon,
+  CompassIcon,
   MapIcon,
 } from "lucide-react";
 
@@ -27,52 +28,90 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const navItems = [
+
+export interface AppSidebarProps {
+  userType?: "manager" | "tenant";
+}
+
+const tenantNavItems = [
   {
     title: "Overview",
-    href: "/overview",
+    href: "/tenant/overview",
     icon: LayoutDashboardIcon,
     badge: null,
   },
   {
+    title: "Browse Rentals",
+    href: "/tenant/rentals",
+    icon: CompassIcon,
+    badge: null,
+  },
+  {
+    title: "Map Search",
+    href: "/tenant/explore",
+    icon: MapIcon,
+    badge: null,
+  },
+  {
     title: "Applications",
-    href: "/applications",
+    href: "/tenant/applications",
     icon: FileTextIcon,
     badge: "2",
   },
   {
     title: "Residence",
-    href: "/residence",
+    href: "/tenant/residence",
     icon: HouseIcon,
     badge: null,
   },
-  // {
-  //   title: "Billing",
-  //   href: "/billing",
-  //   icon: ReceiptTextIcon,
-  //   badge: null,
-  // },
   {
     title: "Favorites",
-    href: "/favorites",
+    href: "/tenant/favorites",
     icon: HeartIcon,
     badge: "6",
   },
   {
     title: "Billing History",
-    href: "/billing",
+    href: "/tenant/billing",
     icon: FileTextIcon,
     badge: null,
   },
   {
     title: "Payment Methods",
-    href: "/payment-methods",
+    href: "/tenant/payment-methods",
     icon: CreditCardIcon,
     badge: null,
   },
 ] as const;
 
-export function AppSidebar() {
+const managerNavItems = [
+  {
+    title: "Overview",
+    href: "/manager/overview",
+    icon: LayoutDashboardIcon,
+    badge: null,
+  },
+  {
+    title: "Properties",
+    href: "/manager/properties",
+    icon: Building2Icon,
+    badge: null,
+  },
+  {
+    title: "Applications",
+    href: "/manager/applications",
+    icon: FileTextIcon,
+    badge: null,
+  },
+  {
+    title: "Leases",
+    href: "/manager/leases",
+    icon: CreditCardIcon,
+    badge: null,
+  },
+] as const;
+
+export function AppSidebar({ userType = "tenant" }: AppSidebarProps = {}) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -82,90 +121,28 @@ export function AppSidebar() {
     }
   };
 
+  const navItems = userType === "manager" ? managerNavItems : tenantNavItems;
+
   return (
     <Sidebar
       collapsible="icon"
       className="top-[72px]! h-[calc(100svh-72px)] border-r border-border bg-sidebar [--sidebar-width:16rem]"
     >
-      {/* Sidebar Header with quick link to public search */}
-      {/* <SidebarHeader className="border-b border-sidebar-border px-4 py-3">
-        <div className="flex items-center justify-between">
-          <Link
-            href="/"
-            onClick={handleNavClick}
-            className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
-          >
-            <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
-              <Image
-                src="/logo.svg"
-                alt="Habitat logo"
-                width={20}
-                height={20}
-                className="size-5 invert"
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold tracking-tight text-sidebar-foreground">
-                Habitat Rentals
-              </span>
-              <span className="text-[11px] font-medium text-muted-foreground">
-                Tenant Portal
-              </span>
-            </div>
-          </Link>
-        </div>
-      </SidebarHeader> */}
-
       <SidebarContent className="px-2 py-3 group-data-[collapsible=icon]:pt-14">
-        <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
-            Explore
-          </SidebarGroupLabel>
-          <SidebarGroupContent className="mt-1">
-            <SidebarMenu className="gap-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  render={<Link href="/rentals" onClick={handleNavClick} />}
-                  isActive={
-                    pathname === "/rentals" || pathname.startsWith("/rentals")
-                  }
-                  tooltip="Browse Verified Listings"
-                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
-                >
-                  <CompassIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
-                  <span className="flex-1 truncate">Browse Listings</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  render={<Link href="/explore" onClick={handleNavClick} />}
-                  isActive={
-                    pathname === "/explore" || pathname.startsWith("/explore")
-                  }
-                  tooltip="Interactive Map Search"
-                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
-                >
-                  <MapIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
-                  <span className="flex-1 truncate">Map Search</span>
-                  <SidebarMenuBadge className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary group-data-active:bg-primary group-data-active:text-primary-foreground">
-                    Live
-                  </SidebarMenuBadge>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
-            Navigation
+            {userType === "manager" ? "Management" : "Navigation"}
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-1">
             <SidebarMenu className="gap-1">
               {navItems.map((item) => {
                 const isActive =
                   pathname === item.href ||
-                  (item.href !== "/overview" && pathname.startsWith(item.href));
+                  (item.href !== "/tenant/overview" &&
+                    item.href !== "/manager/overview" &&
+                    pathname.startsWith(item.href));
 
                 return (
                   <SidebarMenuItem key={item.href}>
@@ -232,7 +209,7 @@ export function AppSidebar() {
                   onClick={handleNavClick}
                   render={
                     <Link
-                      href="/overview"
+                      href="/tenant/overview"
                       className="flex items-center gap-2"
                     />
                   }

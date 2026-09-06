@@ -84,7 +84,7 @@ export function RentalCard({
       <div
         className={`relative shrink-0 overflow-hidden bg-muted select-none ${isList ? "aspect-[16/9] w-full sm:aspect-auto sm:w-64 md:w-72 sm:min-h-[220px]" : "aspect-[16/9] w-full"}`}
       >
-        <Link href={`/rentals/${property.id}`} className="absolute inset-0 z-0">
+        <Link href={`/tenant/rentals/${property.id}`} className="absolute inset-0 z-0">
           <Image
             src={images[currentImageIdx]}
             alt={`${property.title} - photo ${currentImageIdx + 1}`}
@@ -189,7 +189,7 @@ export function RentalCard({
             <div className="min-w-0 flex-1">
               <h3 className="text-sm font-semibold leading-snug text-foreground group-hover:text-primary overflow-hidden line-clamp-2">
                 <Link
-                  href={`/rentals/${property.id}`}
+                  href={`/tenant/rentals/${property.id}`}
                   className="hover:underline"
                 >
                   {property.title}

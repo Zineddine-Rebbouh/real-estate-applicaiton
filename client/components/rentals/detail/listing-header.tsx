@@ -49,7 +49,7 @@ export function ListingHeader({
       <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 flex-wrap">
           <Link
-            href="/rentals"
+            href="/tenant/rentals"
             className="flex items-center gap-1 font-medium transition-colors hover:text-foreground"
           >
             <ArrowLeftIcon className="size-3" />

@@ -557,7 +557,7 @@ export function BrowseFilterBar({
             {/* Map link button — always links to /explore (never a local viewMode state) */}
             {/* Map link button — always links to /explore */}
             <Link
-              href="/explore"
+              href="/tenant/explore"
               title="Map Search View"
               aria-label="Switch to Map Search View"
               className="flex h-8 items-center gap-1.5 rounded-md px-2.5 text-xs font-medium transition-colors hover:text-foreground"

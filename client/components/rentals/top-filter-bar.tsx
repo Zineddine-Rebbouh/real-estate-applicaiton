@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -111,40 +110,16 @@ export function TopFilterBar({
       className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-border bg-card/95 px-4 backdrop-blur-md transition-colors sm:px-6"
     >
       <div className="flex items-center gap-2.5 overflow-x-auto py-2 scrollbar-none sm:gap-3 flex-1 min-w-0 mr-3">
-        {/* Brand Home Link */}
-        <Link
-          href="/"
-          className="flex items-center gap-2 mr-1 shrink-0 group"
-          title="Return to Home"
-        >
-          <Image
-            src="/logo.svg"
-            alt="Logo"
-            width={28}
-            height={28}
-            className="size-7 transition-transform group-hover:scale-105"
-          />
-          {/* <span className="font-bold text-sm tracking-tight text-foreground hidden xl:inline">
-            Chata
-          </span> */}
-        </Link>
         {/* Brand Home Link (standalone mode only) */}
         {!hideBrandLogo && (
           <Link
             href="/"
-            className="flex items-center gap-2 mr-1 shrink-0 group"
+            className="flex items-center mr-1 shrink-0 group"
             title="Return to Home"
           >
-            <Image
-              src="/logo.svg"
-              alt="Logo"
-              width={28}
-              height={28}
-              className="size-7 transition-transform group-hover:scale-105"
-            />
-            {/* <span className="font-bold text-sm tracking-tight text-foreground hidden xl:inline">
-              Chata
-            </span> */}
+            <span className="font-display text-xl font-bold tracking-tight text-foreground">
+              Habitat
+            </span>
           </Link>
         )}
 
@@ -517,7 +492,7 @@ export function TopFilterBar({
         {/* View Toggle Control on far right */}
         <div className="flex items-center rounded-lg border border-border bg-muted/40 p-0.5 text-muted-foreground">
           <Link
-            href="/rentals"
+            href="/tenant/rentals"
             title="Grid View (Browse Listings)"
             className="flex h-8 items-center gap-1 rounded-md px-2.5 text-xs font-medium transition-colors hover:text-foreground"
           >

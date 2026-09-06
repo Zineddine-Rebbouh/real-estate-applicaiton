@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { BlueprintPanel } from "@/components/auth/blueprint-panel";
@@ -13,6 +12,7 @@ import { useGetMeQuery, useSignupMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const [role, setRole] = React.useState<"TENANT" | "MANAGER">("TENANT");
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -33,8 +33,12 @@ export default function SignUpPage() {
   }, []);
 
   React.useEffect(() => {
-    if (currentUser) {
-      router.replace("/");
+    if (currentUser?.user) {
+      router.replace(
+        currentUser.user.role === "MANAGER"
+          ? "/manager/overview"
+          : "/tenant/overview",
+      );
     }
   }, [currentUser, router]);
 
@@ -137,8 +141,10 @@ export default function SignUpPage() {
     }
 
     try {
-      await signup({ name, email, password }).unwrap();
-      router.push("/");
+      const res = await signup({ name, email, password, role }).unwrap();
+      router.push(
+        res.user.role === "MANAGER" ? "/manager/overview" : "/tenant/overview",
+      );
     } catch {
       setErrors({ form: "Unable to create your account. Please try again." });
     } finally {
@@ -151,11 +157,11 @@ export default function SignUpPage() {
       {/* Left side - Form */}
       <div
         className={cn(
-          "flex min-h-screen flex-1 items-start justify-start overflow-y-auto bg-background px-5 py-10 sm:px-8 sm:py-12 lg:items-center lg:justify-center lg:px-12 lg:py-16 xl:px-20",
+          "flex min-h-screen flex-1 items-start justify-center overflow-y-auto bg-background px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-8 xl:px-20",
           mounted && "animate-in fade-in slide-in-from-left-4 duration-500",
         )}
       >
-        <div className="w-full max-w-md space-y-8">
+        <div className="m-auto w-full max-w-md space-y-5">
           {/* Logo */}
           <div
             className={cn(
@@ -168,29 +174,22 @@ export default function SignUpPage() {
               href="/"
               className="inline-flex items-center gap-2 font-display text-2xl font-bold tracking-tight"
             >
-              <Image
-                src="/logo.svg"
-                alt="Habitat"
-                width={32}
-                height={32}
-                className="h-8 w-8 brightness-0"
-              />
-              <span className="text-foreground">Habitat</span>
+              Habitat
             </Link>
           </div>
 
           {/* Heading */}
           <div
             className={cn(
-              "space-y-4 opacity-100",
+              "space-y-1.5 opacity-100",
               mounted &&
                 "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-40",
             )}
           >
-            <h1 className="font-display text-4xl font-bold tracking-tight leading-tight">
+            <h1 className="font-display text-2xl font-bold tracking-tight leading-tight sm:text-3xl">
               Create an account
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Get started with your property management journey
             </p>
           </div>
@@ -199,16 +198,16 @@ export default function SignUpPage() {
           <form
             onSubmit={handleSubmit}
             className={cn(
-              "auth-form space-y-6 opacity-100",
+              "auth-form space-y-4 opacity-100",
               mounted &&
                 "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-80",
             )}
           >
             {/* Name field */}
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="name"
-                className="text-base font-semibold text-foreground"
+                className="text-sm font-semibold text-foreground"
               >
                 Full name
               </Label>
@@ -220,7 +219,7 @@ export default function SignUpPage() {
                 autoComplete="name"
                 aria-invalid={!!errors.name}
                 aria-describedby={errors.name ? "name-error" : undefined}
-                className="h-12 text-base"
+                className="h-10 text-sm"
                 onBlur={(e) => handleBlur("name", e.target.value)}
                 disabled={isLoading}
               />
@@ -236,10 +235,10 @@ export default function SignUpPage() {
             </div>
 
             {/* Email field */}
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="email"
-                className="text-base font-semibold text-foreground"
+                className="text-sm font-semibold text-foreground"
               >
                 Email address
               </Label>
@@ -251,7 +250,7 @@ export default function SignUpPage() {
                 autoComplete="email"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
-                className="h-12 text-base"
+                className="h-10 text-sm"
                 onBlur={(e) => handleBlur("email", e.target.value)}
                 disabled={isLoading}
               />
@@ -266,11 +265,42 @@ export default function SignUpPage() {
               )}
             </div>
 
+            {/* Role selection */}
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="role"
+                className="text-sm font-semibold text-foreground"
+              >
+                Choose role
+              </Label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="TENANT"
+                    checked={role === "TENANT"}
+                    onChange={() => setRole("TENANT")}
+                  />
+                  Tenant
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="MANAGER"
+                    checked={role === "MANAGER"}
+                    onChange={() => setRole("MANAGER")}
+                  />
+                  Manager
+                </label>
+              </div>
+            </div>
             {/* Password field */}
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="password"
-                className="text-base font-semibold text-foreground"
+                className="text-sm font-semibold text-foreground"
               >
                 Password
               </Label>
@@ -285,14 +315,14 @@ export default function SignUpPage() {
                   aria-describedby={
                     errors.password ? "password-error" : undefined
                   }
-                  className="h-12 pr-12 text-base"
+                  className="h-10 pr-10 text-sm"
                   onBlur={(e) => handleBlur("password", e.target.value)}
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-1 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-manipulation"
+                  className="absolute right-1 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-manipulation"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -314,10 +344,10 @@ export default function SignUpPage() {
             </div>
 
             {/* Confirm Password field */}
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="confirmPassword"
-                className="text-base font-semibold text-foreground"
+                className="text-sm font-semibold text-foreground"
               >
                 Confirm password
               </Label>
@@ -332,7 +362,7 @@ export default function SignUpPage() {
                   aria-describedby={
                     errors.confirmPassword ? "confirmPassword-error" : undefined
                   }
-                  className="h-12 pr-12 text-base"
+                  className="h-10 pr-10 text-sm"
                   onBlur={(e) => {
                     const password = passwordRef.current?.value || "";
                     handleBlur("confirmPassword", e.target.value, password);
@@ -342,7 +372,7 @@ export default function SignUpPage() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-1 top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-manipulation"
+                  className="absolute right-1 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-manipulation"
                   aria-label={
                     showConfirmPassword ? "Hide password" : "Show password"
                   }
@@ -368,7 +398,7 @@ export default function SignUpPage() {
             {/* Submit button */}
             <Button
               type="submit"
-              className="w-full h-12 text-base font-semibold touch-manipulation"
+              className="w-full h-10 text-sm font-semibold touch-manipulation"
               disabled={isLoading}
               size="lg"
             >
@@ -397,7 +427,7 @@ export default function SignUpPage() {
             <Button
               type="button"
               variant="outline"
-              className="w-full h-12 text-base font-medium touch-manipulation"
+              className="w-full h-10 text-sm font-medium touch-manipulation"
               disabled={isLoading}
               size="lg"
             >
@@ -423,11 +453,11 @@ export default function SignUpPage() {
             </Button>
 
             {/* Sign in link */}
-            <p className="text-center text-base text-muted-foreground">
+            <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
               <Link
                 href="/sign-in"
-                className="font-semibold text-base text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+                className="font-semibold text-sm text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
               >
                 Sign in
               </Link>

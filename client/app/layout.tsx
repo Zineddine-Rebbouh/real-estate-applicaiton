@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/state/redux";
 import { AuthBootstrap } from "@/components/auth/auth-bootstrap";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
       style={{ colorScheme: "light dark" }}
     >
@@ -45,9 +47,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <StoreProvider>
-          <AuthBootstrap>{children}</AuthBootstrap>
-        </StoreProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <StoreProvider>
+            <AuthBootstrap>{children}</AuthBootstrap>
+          </StoreProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
