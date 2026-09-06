@@ -124,7 +124,13 @@ export default function OverviewPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              render={
+                <Link href="/explore" className="flex items-center gap-1.5" />
+              }
+            >
               <SearchIcon className="size-3.5" />
               <span>Explore Rentals</span>
             </Button>

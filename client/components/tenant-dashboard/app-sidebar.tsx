@@ -1,37 +1,23 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   CompassIcon,
-  ChevronsUpDownIcon,
   FileTextIcon,
   HeartIcon,
   HouseIcon,
   LayoutDashboardIcon,
   CreditCardIcon,
-  LogOutIcon,
-  SettingsIcon,
-  UserRoundIcon,
+  MapIcon,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuBadge,
   SidebarMenuButton,
@@ -40,7 +26,6 @@ import {
   SidebarCollapseButton,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useGetMeQuery, useLogoutMutation } from "@/state/api";
 
 const navItems = [
   {
@@ -89,29 +74,7 @@ const navItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { data } = useGetMeQuery();
-  const [logout] = useLogoutMutation();
   const { isMobile, setOpenMobile } = useSidebar();
-  const user = data?.user;
-
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((part) => part[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "TN";
-
-  const handleSignOut = async () => {
-    try {
-      await logout().unwrap();
-    } finally {
-      if (isMobile) setOpenMobile(false);
-      router.push("/");
-    }
-  };
 
   const handleNavClick = () => {
     if (isMobile) {
@@ -195,15 +158,37 @@ export function AppSidebar() {
             Explore
           </SidebarGroupLabel>
           <SidebarGroupContent className="mt-1">
-            <SidebarMenu>
+            <SidebarMenu className="gap-1">
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  render={<Link href="/" onClick={handleNavClick} />}
-                  tooltip="Find More Rentals"
-                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  render={<Link href="/explore" onClick={handleNavClick} />}
+                  isActive={
+                    pathname === "/explore" ||
+                    pathname.startsWith("/explore")
+                  }
+                  tooltip="Interactive Map Search"
+                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
                 >
-                  <CompassIcon className="size-4.5 shrink-0 text-muted-foreground" />
-                  <span>Browse Listings</span>
+                  <MapIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
+                  <span className="flex-1 truncate">Map Search</span>
+                  <SidebarMenuBadge className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary group-data-active:bg-primary group-data-active:text-primary-foreground">
+                    Live
+                  </SidebarMenuBadge>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href="/rentals" onClick={handleNavClick} />}
+                  isActive={
+                    pathname === "/rentals" ||
+                    pathname.startsWith("/rentals")
+                  }
+                  tooltip="Browse Verified Listings"
+                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
+                >
+                  <CompassIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
+                  <span className="flex-1 truncate">Browse Listings</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

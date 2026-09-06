@@ -171,12 +171,6 @@ export default function FavoritesPage() {
   const [isApplying, setIsApplying] = useState(false);
 
   // Compute metrics
-  const avgRent = useMemo(() => {
-    if (favorites.length === 0) return 0;
-    const sum = favorites.reduce((acc, curr) => acc + curr.priceNum, 0);
-    return Math.round(sum / favorites.length);
-  }, [favorites]);
-
   const filteredProperties = useMemo(() => {
     return favorites
       .filter((property) => {
