@@ -32,11 +32,11 @@ export interface NavbarProps {
 }
 
 const navLinks = [
-  { label: "Start", href: "#" },
+  { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
-  { label: "Listings", href: "/tenant/rentals" },
-  { label: "Features", href: "#features" },
-  { label: "Gallery", href: "#gallery" },
+  { label: "Spaces", href: "#gallery" },
+  { label: "Care", href: "#features" },
+  { label: "How it works", href: "#how-it-works" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -71,9 +71,7 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
   };
 
   // Browse/map entry points are tenant-only; hide Listings link for managers.
-  const visibleNavLinks = isManager
-    ? navLinks.filter((link) => link.href !== "/tenant/rentals")
-    : navLinks;
+  const visibleNavLinks = isManager ? navLinks : navLinks;
 
   // The dashboard header is always solid; the landing header is transparent
   // over the hero until the user scrolls.
@@ -354,15 +352,15 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
                             : "text-white hover:text-white"
                       }
                     >
-                      Log in
+                      Sign in
                     </Button>
                     <Button
                       size="sm"
                       nativeButton={false}
                       render={<Link href="/sign-up" />}
-                      className="text-sm font-medium"
+                      className="rounded-none bg-[var(--brass)] text-sm font-medium text-white hover:bg-[#9c7027]"
                     >
-                      Sign up
+                      Get started
                     </Button>
                   </>
                 )}
