@@ -29,7 +29,7 @@ export function Gallery() {
           {galleryImages.map((image, index) => (
             <div
               key={index}
-              className={`relative overflow-hidden rounded-xl ring-1 ring-foreground/10 transition-all hover:ring-foreground/20 ${index === 1 ? "sm:col-span-6 sm:aspect-[1/1]" : "sm:col-span-3 sm:aspect-[3/4]"}`}
+              className={`relative overflow-hidden rounded-xl ring-1 ring-foreground/10 transition-all hover:ring-foreground/20 ${index === 1 ? "sm:col-span-6 sm:aspect-square" : "sm:col-span-3 sm:aspect-3/4"}`}
             >
               <Image
                 src={image.src}

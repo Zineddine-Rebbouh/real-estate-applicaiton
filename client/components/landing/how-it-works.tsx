@@ -54,7 +54,7 @@ export function HowItWorks() {
                 </span>
               </div>
 
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden ring-1 ring-foreground/10">
+              <div className="relative aspect-4/3 rounded-xl overflow-hidden ring-1 ring-foreground/10">
                 <Image
                   src={step.image}
                   alt={step.title}

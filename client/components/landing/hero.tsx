@@ -62,7 +62,7 @@ export function Hero() {
           className="object-cover transition-opacity duration-500"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(9,15,24,.92)_0%,rgba(9,15,24,.68)_44%,rgba(9,15,24,.22)_100%)]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-black/20" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-[760px] max-w-7xl items-center px-4 pb-24 pt-28 sm:px-6 lg:min-h-[92vh] lg:px-8 lg:pb-28">

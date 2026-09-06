@@ -77,7 +77,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
   const { control } = useFormContext();
 
   const renderFormControl = (
-    field: ControllerRenderProps<FieldValues, string>
+    field: ControllerRenderProps<FieldValues, string>,
   ) => {
     switch (type) {
       case "textarea":
@@ -106,7 +106,7 @@ export const CustomFormField: React.FC<FormFieldProps> = ({
                 <SelectItem
                   key={option.value}
                   value={option.value}
-                  className={`cursor-pointer hover:!bg-gray-100 hover:!text-customgreys-darkGrey`}
+                  className="cursor-pointer hover:bg-gray-100! hover:text-customgreys-darkGrey!"
                 >
                   {option.label}
                 </SelectItem>
