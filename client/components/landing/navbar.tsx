@@ -34,7 +34,7 @@ export interface NavbarProps {
 const navLinks = [
   { label: "Start", href: "#" },
   { label: "About", href: "#about" },
-  { label: "Listings", href: "#listings" },
+  { label: "Listings", href: "/rentals" },
   { label: "Features", href: "#features" },
   { label: "Gallery", href: "#gallery" },
   { label: "Contact", href: "#contact" },
@@ -111,17 +111,14 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
               </div>
             )}
             <Link href="/" className="flex items-center gap-2">
-              <Image
-                src="/logo.svg"
-                alt="Habitat"
-                width={32}
-                height={32}
-                className="w-8 h-8"
-              />
-              <span
-                className={`font-display font-semibold text-lg ${isDashboard ? "text-white" : solid ? "text-foreground" : "text-white"}`}
-              >
-                Habitat
+              <span className="relative block h-10 w-[150px] overflow-hidden rounded-sm bg-white">
+                <Image
+                  src="/logo-habitat.png"
+                  alt="Habitat"
+                  width={240}
+                  height={240}
+                  className="absolute -left-[45px] -top-[102px] max-w-none"
+                />
               </span>
             </Link>
           </div>

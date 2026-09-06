@@ -36,15 +36,16 @@ export function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Logo & Description */}
           <div className="col-span-2 lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <Image
-                src="/logo.svg"
-                alt="Habitat"
-                width={32}
-                height={32}
-                className="w-8 h-8"
-              />
-              <span className="font-semibold text-lg text-white">Habitat</span>
+            <Link href="/" className="mb-4 inline-flex">
+              <span className="relative block h-10 w-[150px] overflow-hidden rounded-sm bg-white">
+                <Image
+                  src="/logo-habitat.png"
+                  alt="Habitat"
+                  width={240}
+                  height={240}
+                  className="absolute -left-[45px] -top-[102px] max-w-none"
+                />
+              </span>
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
               A considered way to find the place you&apos;ll build your everyday
