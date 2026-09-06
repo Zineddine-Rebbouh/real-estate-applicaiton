@@ -7,6 +7,9 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import { authRouter } from "./routes/auth.routes.js";
+import { propertyRouter } from "./routes/property.routes.js";
+import { managerRouter } from "./routes/manager.routes.js";
+import { applicationRouter } from "./routes/application.routes.js";
 
 /* conf */
 dotenv.config();
@@ -21,6 +24,9 @@ app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
+app.use("/api/properties", propertyRouter);
+app.use("/api/manager", managerRouter);
+app.use("/api/applications", applicationRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from server!");
