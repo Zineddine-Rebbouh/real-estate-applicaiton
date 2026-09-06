@@ -216,9 +216,9 @@ export default function BillingHistoryPage() {
               <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                 Billing History
               </h1>
-              <Badge variant="outline" className="text-xs">
+              {/* <Badge variant="outline" className="text-xs">
                 2026
-              </Badge>
+              </Badge> */}
             </div>
             <p className="mt-1 text-sm text-muted-foreground">
               Review rent payments, receipts, and account activity.

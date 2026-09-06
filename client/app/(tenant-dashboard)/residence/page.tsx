@@ -107,7 +107,9 @@ function CurrentResidenceCard({ residence }: { residence: Residence }) {
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Current Residence
               </p>
-              <h2 className="mt-2 text-xl font-semibold tracking-tight">{residence.property}</h2>
+              <h2 className="mt-2 text-xl font-semibold tracking-tight">
+                {residence.property}
+              </h2>
               <p className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPinIcon className="size-3.5 shrink-0" /> {residence.address}
               </p>
@@ -178,10 +180,15 @@ function PastResidenceCard({ residence }: { residence: Residence }) {
 function EmptyState() {
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-card px-6 py-16 text-center">
-      <div className="flex size-12 items-center justify-center rounded-full bg-muted" aria-hidden="true">
+      <div
+        className="flex size-12 items-center justify-center rounded-full bg-muted"
+        aria-hidden="true"
+      >
         <HouseIcon className="size-6 text-muted-foreground" />
       </div>
-      <h2 className="mt-4 text-base font-medium">You don&apos;t have any residences yet</h2>
+      <h2 className="mt-4 text-base font-medium">
+        You don&apos;t have any residences yet
+      </h2>
       <Button className="mt-5" nativeButton={false} render={<Link href="/" />}>
         Browse Properties
       </Button>
@@ -196,8 +203,10 @@ export default function ResidencePage() {
     <main className="min-h-full bg-muted/30">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 p-4 sm:p-6 lg:p-8">
         <header>
-          <p className="text-sm font-medium text-primary">Tenant dashboard</p>
-          <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight">Residence</h1>
+          {/* <p className="text-sm font-medium text-primary">Tenant dashboard</p> */}
+          <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            Residence
+          </h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Your current home and previous lease history.
           </p>
@@ -207,19 +216,32 @@ export default function ResidencePage() {
           <EmptyState />
         ) : (
           <>
-            {currentResidence && <CurrentResidenceCard residence={currentResidence} />}
+            {currentResidence && (
+              <CurrentResidenceCard residence={currentResidence} />
+            )}
 
-            <section className="space-y-4" aria-labelledby="past-residences-heading">
+            <section
+              className="space-y-4"
+              aria-labelledby="past-residences-heading"
+            >
               <div>
-                <h2 id="past-residences-heading" className="font-display text-xl font-semibold tracking-tight">
+                <h2
+                  id="past-residences-heading"
+                  className="font-display text-xl font-semibold tracking-tight"
+                >
                   Past Residences
                 </h2>
-                <p className="mt-1 text-sm text-muted-foreground">Your previous homes and lease agreements.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Your previous homes and lease agreements.
+                </p>
               </div>
               {pastResidences.length > 0 && (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {pastResidences.map((residence) => (
-                    <PastResidenceCard key={residence.property} residence={residence} />
+                    <PastResidenceCard
+                      key={residence.property}
+                      residence={residence}
+                    />
                   ))}
                 </div>
               )}

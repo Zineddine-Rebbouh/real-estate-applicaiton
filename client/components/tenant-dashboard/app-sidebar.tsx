@@ -117,6 +117,45 @@ export function AppSidebar() {
       </SidebarHeader> */}
 
       <SidebarContent className="px-2 py-3 group-data-[collapsible=icon]:pt-14">
+        <SidebarGroup className="mt-4">
+          <SidebarGroupLabel className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
+            Explore
+          </SidebarGroupLabel>
+          <SidebarGroupContent className="mt-1">
+            <SidebarMenu className="gap-1">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href="/rentals" onClick={handleNavClick} />}
+                  isActive={
+                    pathname === "/rentals" || pathname.startsWith("/rentals")
+                  }
+                  tooltip="Browse Verified Listings"
+                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
+                >
+                  <CompassIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
+                  <span className="flex-1 truncate">Browse Listings</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  render={<Link href="/explore" onClick={handleNavClick} />}
+                  isActive={
+                    pathname === "/explore" || pathname.startsWith("/explore")
+                  }
+                  tooltip="Interactive Map Search"
+                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
+                >
+                  <MapIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
+                  <span className="flex-1 truncate">Map Search</span>
+                  <SidebarMenuBadge className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary group-data-active:bg-primary group-data-active:text-primary-foreground">
+                    Live
+                  </SidebarMenuBadge>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
             Navigation
@@ -149,48 +188,6 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup className="mt-4">
-          <SidebarGroupLabel className="px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/80">
-            Explore
-          </SidebarGroupLabel>
-          <SidebarGroupContent className="mt-1">
-            <SidebarMenu className="gap-1">
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  render={<Link href="/explore" onClick={handleNavClick} />}
-                  isActive={
-                    pathname === "/explore" ||
-                    pathname.startsWith("/explore")
-                  }
-                  tooltip="Interactive Map Search"
-                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
-                >
-                  <MapIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
-                  <span className="flex-1 truncate">Map Search</span>
-                  <SidebarMenuBadge className="ml-auto rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary group-data-active:bg-primary group-data-active:text-primary-foreground">
-                    Live
-                  </SidebarMenuBadge>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  render={<Link href="/rentals" onClick={handleNavClick} />}
-                  isActive={
-                    pathname === "/rentals" ||
-                    pathname.startsWith("/rentals")
-                  }
-                  tooltip="Browse Verified Listings"
-                  className="group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-active:bg-sidebar-accent data-active:text-sidebar-accent-foreground"
-                >
-                  <CompassIcon className="size-4.5 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground group-data-active:text-primary" />
-                  <span className="flex-1 truncate">Browse Listings</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

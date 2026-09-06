@@ -240,13 +240,13 @@ export default function BrowseRentalsPage() {
                 <h1 className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl">
                   Browse Rental Listings
                 </h1>
-                <Badge
+                {/* <Badge
                   variant="outline"
                   className="hidden sm:inline-flex gap-1 border-primary/20 bg-primary/5 text-primary text-xs font-semibold"
                 >
                   <CompassIcon className="size-3 text-primary" />
                   Primary View
-                </Badge>
+                </Badge> */}
               </div>
               {/* Lighter meta text below */}
               <p className="mt-1.5 text-sm text-muted-foreground">

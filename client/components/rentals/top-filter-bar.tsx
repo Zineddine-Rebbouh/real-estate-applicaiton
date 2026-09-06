@@ -41,7 +41,13 @@ interface TopFilterBarProps {
   hideBrandLogo?: boolean;
 }
 
-type OpenDropdown = "minPrice" | "maxPrice" | "beds" | "baths" | "propertyType" | null;
+type OpenDropdown =
+  | "minPrice"
+  | "maxPrice"
+  | "beds"
+  | "baths"
+  | "propertyType"
+  | null;
 
 const PRICE_PRESETS = [1000, 1500, 2000, 2500, 3000, 3500, 4500];
 const PROPERTY_TYPES: PropertyType[] = [
@@ -118,9 +124,9 @@ export function TopFilterBar({
             height={28}
             className="size-7 transition-transform group-hover:scale-105"
           />
-          <span className="font-bold text-sm tracking-tight text-foreground hidden xl:inline">
+          {/* <span className="font-bold text-sm tracking-tight text-foreground hidden xl:inline">
             Chata
-          </span>
+          </span> */}
         </Link>
         {/* Brand Home Link (standalone mode only) */}
         {!hideBrandLogo && (
@@ -136,9 +142,9 @@ export function TopFilterBar({
               height={28}
               className="size-7 transition-transform group-hover:scale-105"
             />
-            <span className="font-bold text-sm tracking-tight text-foreground hidden xl:inline">
+            {/* <span className="font-bold text-sm tracking-tight text-foreground hidden xl:inline">
               Chata
-            </span>
+            </span> */}
           </Link>
         )}
 
@@ -301,8 +307,8 @@ export function TopFilterBar({
                 {filters.beds === null
                   ? "Beds"
                   : filters.beds === 0
-                  ? "Studio"
-                  : `${filters.beds}+ Beds`}
+                    ? "Studio"
+                    : `${filters.beds}+ Beds`}
               </span>
               <ChevronDownIcon
                 className={`size-3.5 text-muted-foreground transition-transform duration-200 ${
@@ -423,8 +429,8 @@ export function TopFilterBar({
                 {filters.propertyTypes.length === 0
                   ? "Property Type"
                   : filters.propertyTypes.length === 1
-                  ? filters.propertyTypes[0]
-                  : `${filters.propertyTypes.length} Types`}
+                    ? filters.propertyTypes[0]
+                    : `${filters.propertyTypes.length} Types`}
               </span>
               <ChevronDownIcon
                 className={`size-3.5 text-muted-foreground transition-transform duration-200 ${
@@ -458,7 +464,9 @@ export function TopFilterBar({
                         }`}
                       >
                         <span>{type}</span>
-                        {isSelected && <CheckIcon className="size-3.5 text-primary" />}
+                        {isSelected && (
+                          <CheckIcon className="size-3.5 text-primary" />
+                        )}
                       </button>
                     );
                   })}
