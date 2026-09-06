@@ -28,14 +28,8 @@ export default function SignUpPage() {
   const confirmPasswordRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    if (!prefersReducedMotion) {
-      setMounted(true);
-    } else {
-      setMounted(true);
-    }
+    const frame = window.requestAnimationFrame(() => setMounted(true));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   React.useEffect(() => {
