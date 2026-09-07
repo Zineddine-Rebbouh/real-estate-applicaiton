@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -64,7 +65,12 @@ export default function ManagerApplicationsPage() {
   const [confirmingAction, setConfirmingAction] = React.useState<{
     app: ManagerApplication;
     status: "Approved" | "Denied";
+    startDate: string;
   } | null>(null);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const openConfirm = (app: ManagerApplication, status: "Approved" | "Denied") =>
+    setConfirmingAction({ app, status, startDate: today });
 
   const applications = data?.applications ?? [];
 
@@ -87,10 +93,14 @@ export default function ManagerApplicationsPage() {
 
   const handleConfirmStatusChange = async () => {
     if (!confirmingAction) return;
-    const { app, status } = confirmingAction;
+    const { app, status, startDate } = confirmingAction;
 
     try {
-      await updateStatus({ id: app.id, status }).unwrap();
+      await updateStatus(
+        status === "Approved"
+          ? { id: app.id, status, startDate }
+          : { id: app.id, status },
+      ).unwrap();
       toast.success(
         status === "Approved"
           ? `Application for ${app.name} approved!`
@@ -321,7 +331,7 @@ export default function ManagerApplicationsPage() {
                           <Button
                             size="sm"
                             className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 text-xs"
-                            onClick={() => setConfirmingAction({ app, status: "Approved" })}
+                            onClick={() => openConfirm(app, "Approved")}
                             disabled={isUpdating}
                           >
                             <CheckIcon className="size-3.5" />
@@ -331,7 +341,7 @@ export default function ManagerApplicationsPage() {
                             variant="ghost"
                             size="sm"
                             className="text-destructive hover:bg-destructive/10 text-xs"
-                            onClick={() => setConfirmingAction({ app, status: "Denied" })}
+                            onClick={() => openConfirm(app, "Denied")}
                             disabled={isUpdating}
                           >
                             Deny
@@ -344,10 +354,10 @@ export default function ManagerApplicationsPage() {
                             size="sm"
                             className="text-xs text-muted-foreground hover:text-foreground"
                             onClick={() =>
-                              setConfirmingAction({
+                              openConfirm(
                                 app,
-                                status: app.status === "Approved" ? "Denied" : "Approved",
-                              })
+                                app.status === "Approved" ? "Denied" : "Approved",
+                              )
                             }
                             disabled={isUpdating}
                           >
@@ -403,6 +413,25 @@ export default function ManagerApplicationsPage() {
               for {confirmingAction?.app.property.name}?
             </DialogDescription>
           </DialogHeader>
+          {confirmingAction?.status === "Approved" && (
+            <div className="space-y-1.5 px-6">
+              <Label htmlFor="lease-start-date" className="text-xs font-semibold">
+                Lease start date (12-month term)
+              </Label>
+              <Input
+                id="lease-start-date"
+                type="date"
+                value={confirmingAction.startDate}
+                onChange={(e) =>
+                  setConfirmingAction((prev) =>
+                    prev ? { ...prev, startDate: e.target.value } : prev,
+                  )
+                }
+                disabled={isUpdating}
+                className="h-9 text-sm"
+              />
+            </div>
+          )}
           <DialogFooter className="gap-2 sm:justify-end">
             <Button
               variant="outline"

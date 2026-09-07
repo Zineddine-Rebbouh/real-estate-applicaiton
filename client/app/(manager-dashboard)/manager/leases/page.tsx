@@ -22,12 +22,30 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetManagerPropertiesQuery } from "@/state/api";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useCreateLeasePaymentMutation, useGetManagerPropertiesQuery } from "@/state/api";
 
 export default function ManagerLeasesPage() {
   const { data, isLoading } = useGetManagerPropertiesQuery();
+  const [createPayment, { isLoading: isCreating }] = useCreateLeasePaymentMutation();
   const [searchQuery, setSearchQuery] = React.useState("");
+  const [invoiceFor, setInvoiceFor] = React.useState<{
+    propertyId: string;
+    leaseId: string;
+    amountDue: string;
+    amountPaid: string;
+    dueDate: string;
+    paymentStatus: "Pending" | "Paid" | "PartiallyPaid" | "Overdue";
+  } | null>(null);
 
   const properties = data?.properties ?? [];
 
@@ -49,6 +67,33 @@ export default function ManagerLeasesPage() {
     toast.success(`Downloading lease agreement for ${propertyName}...`, {
       description: "Standard residential lease PDF generated.",
     });
+  };
+
+  const openInvoice = (propertyId: string, leaseId: string, rent: number | string) =>
+    setInvoiceFor({
+      propertyId,
+      leaseId,
+      amountDue: String(rent ?? ""),
+      amountPaid: "0",
+      dueDate: new Date().toISOString().slice(0, 10),
+      paymentStatus: "Pending",
+    });
+
+  const handleCreateInvoice = async () => {
+    if (!invoiceFor) return;
+    try {
+      await createPayment({
+        leaseId: invoiceFor.leaseId,
+        amountDue: Number(invoiceFor.amountDue),
+        amountPaid: Number(invoiceFor.amountPaid || 0),
+        dueDate: invoiceFor.dueDate,
+        paymentStatus: invoiceFor.paymentStatus,
+      }).unwrap();
+      toast.success("Invoice created for this lease.");
+      setInvoiceFor(null);
+    } catch {
+      toast.error("Failed to create invoice. Please check the fields.");
+    }
   };
 
   return (
@@ -244,6 +289,22 @@ export default function ManagerLeasesPage() {
                         <DownloadIcon className="size-3.5" />
                         <span>Download Sample Lease</span>
                       </Button>
+                      {(property.leases ?? []).length > 0 && (
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            openInvoice(
+                              property.id,
+                              (property.leases ?? [])[0].id,
+                              (property.leases ?? [])[0].rent,
+                            )
+                          }
+                          className="text-xs gap-1"
+                        >
+                          <PlusIcon className="size-3.5" />
+                          <span>Add invoice</span>
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </Card>
@@ -260,6 +321,124 @@ export default function ManagerLeasesPage() {
           </Card>
         )}
       </div>
+
+      {/* Manual invoice dialog — no automated recurring billing in this pass */}
+      <Dialog
+        open={Boolean(invoiceFor)}
+        onOpenChange={(open) => !open && setInvoiceFor(null)}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add invoice</DialogTitle>
+            <DialogDescription>
+              Create a payment record against this lease. The tenant will see it
+              in their billing history.
+            </DialogDescription>
+          </DialogHeader>
+          {invoiceFor && (
+            <div className="grid gap-4 py-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="invoice-due" className="text-xs font-semibold">
+                    Amount due *
+                  </Label>
+                  <Input
+                    id="invoice-due"
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={invoiceFor.amountDue}
+                    onChange={(e) =>
+                      setInvoiceFor((prev) =>
+                        prev ? { ...prev, amountDue: e.target.value } : prev,
+                      )
+                    }
+                    disabled={isCreating}
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="invoice-paid" className="text-xs font-semibold">
+                    Amount paid
+                  </Label>
+                  <Input
+                    id="invoice-paid"
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={invoiceFor.amountPaid}
+                    onChange={(e) =>
+                      setInvoiceFor((prev) =>
+                        prev ? { ...prev, amountPaid: e.target.value } : prev,
+                      )
+                    }
+                    disabled={isCreating}
+                    className="h-9 text-sm"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="invoice-date" className="text-xs font-semibold">
+                    Due date *
+                  </Label>
+                  <Input
+                    id="invoice-date"
+                    type="date"
+                    value={invoiceFor.dueDate}
+                    onChange={(e) =>
+                      setInvoiceFor((prev) =>
+                        prev ? { ...prev, dueDate: e.target.value } : prev,
+                      )
+                    }
+                    disabled={isCreating}
+                    className="h-9 text-sm"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="invoice-status" className="text-xs font-semibold">
+                    Status
+                  </Label>
+                  <select
+                    id="invoice-status"
+                    value={invoiceFor.paymentStatus}
+                    onChange={(e) =>
+                      setInvoiceFor((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              paymentStatus: e.target.value as typeof prev.paymentStatus,
+                            }
+                          : prev,
+                      )
+                    }
+                    disabled={isCreating}
+                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Paid">Paid</option>
+                    <option value="PartiallyPaid">Partially paid</option>
+                    <option value="Overdue">Overdue</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setInvoiceFor(null)}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleCreateInvoice} disabled={isCreating}>
+              {isCreating ? "Creating…" : "Create invoice"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
