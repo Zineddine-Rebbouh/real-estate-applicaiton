@@ -22,3 +22,14 @@ export async function getOrCreateManager(userId: string) {
     data: { userId },
   });
 }
+
+export async function getOrCreateTenant(userId: string) {
+  const existing = await prisma.tenant.findUnique({
+    where: { userId },
+  });
+  if (existing) return existing;
+
+  return await prisma.tenant.create({
+    data: { userId },
+  });
+}
