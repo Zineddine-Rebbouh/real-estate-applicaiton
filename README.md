@@ -31,12 +31,12 @@ Habitat is a real-estate rental web app: a marketing landing page paired with a 
 
 ## Overview
 
-Habitat targets renters/tenants first. A `MANAGER` role is defined in the data model, but the current build focuses entirely on the tenant experience — property manager tooling is on the roadmap, not yet implemented.
+Habitat targets renters/tenants first. A `MANAGER` role is defined in the data model, but the current build focuses entirely on the tenant experience, property manager tooling is on the roadmap, not yet implemented.
 
 **Where things stand today:**
-- The frontend is a fully designed, polished tenant experience — currently running on **local mock data** for listings, favorites, applications, billing, and residence.
+- The frontend is a fully designed, polished tenant experience, currently running on **local mock data** for listings, favorites, applications, billing, and residence.
 - The backend currently implements **authentication only**: signup, login, logout, session, and silent token refresh, backed by a real PostgreSQL database.
-- No property, booking, or payment endpoints exist yet — that's the next major phase of work.
+- No property, booking, or payment endpoints exist yet, that's the next major phase of work.
 
 This repo is intentionally transparent about that split, since it's actively being built out feature by feature.
 
@@ -59,20 +59,20 @@ This repo is intentionally transparent about that split, since it's actively bei
 
 ## Tech Stack
 
-**Frontend** (`client/` — `real-estate-app`)
+**Frontend** (`client/`, `real-estate-app`)
 - Next.js 16 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4, shadcn (`base-nova`), Radix-alternative `@base-ui/react`, `lucide-react`
 - Redux Toolkit + RTK Query (auth endpoints, with automatic 401 refresh-and-retry)
 - React Hook Form + Zod for forms and validation
 - Framer Motion, `next-themes`, Sonner (toasts), Mapbox GL (installed, not yet wired)
 
-**Backend** (`server/` — Express + Prisma)
+**Backend** (`server/`, Express + Prisma)
 - Express 5, Helmet, Morgan, CORS, cookie-based sessions
 - Prisma 7 + PostgreSQL (via `pg` and the Prisma Pg adapter)
 - JWT access/refresh tokens (httpOnly cookies), bcrypt password hashing, rate limiting
 - Zod for request validation
 
-**Installed for upcoming work:** AWS S3 SDK + Multer (uploads), Mapbox GL (live maps) — not yet connected to any route.
+**Installed for upcoming work:** AWS S3 SDK + Multer (uploads), Mapbox GL (live maps), not yet connected to any route.
 
 ## Architecture
 
@@ -113,7 +113,7 @@ real-estate-applicaiton/
 │   │   └── config/            # env validation (zod)
 │   └── prisma/
 │       ├── schema.prisma      # Current model: User (Role: TENANT | MANAGER)
-│       └── seed.ts            # Legacy seeder — currently out of sync with schema
+│       └── seed.ts            # Legacy seeder, currently out of sync with schema
 └── PROJECT_OVERVIEW.md         # Full technical audit of the codebase
 ```
 
@@ -131,7 +131,7 @@ cd real-estate-applicaiton
 **Backend**
 ```bash
 cd server
-cp .env.example .env   # fill in your own values — see below
+cp .env.example .env   # fill in your own values, see below
 npm install
 npx prisma migrate dev
 npm run dev             # runs on http://localhost:3002
@@ -168,16 +168,16 @@ NEXT_PUBLIC_API_BASE_URL="http://localhost:3002"
 
 Ordered by dependency, based on the current state of the schema, mock UI, and installed-but-unused dependencies:
 
-1. **Domain schema** — design `Location / Property / Tenant / Manager / Lease / Application / Payment` models and migrate.
-2. **Fix the seeder** — rewrite `seed.ts` to match the new schema.
-3. **Property APIs** — listing search/filter + detail endpoints, replacing `MOCK_RENTALS` with real RTK Query calls.
-4. **Favorites & applications** — persistence and a manager review flow.
-5. **Leases, residence, billing, payments** — connect the existing dashboard UI to real data and pick a payment gateway.
-6. **Uploads** — wire Multer + S3 to the existing property-creation form and FilePond UI.
-7. **Live maps** — connect Mapbox GL using the lat/lng already present in the mock data.
-8. **Manager role** — enable manager signup/assignment and a manager dashboard.
-9. **Hygiene & testing** — remove duplicate/dead files, add test coverage, document deployment.
+1. **Domain schema**, design `Location / Property / Tenant / Manager / Lease / Application / Payment` models and migrate.
+2. **Fix the seeder**, rewrite `seed.ts` to match the new schema.
+3. **Property APIs**, listing search/filter + detail endpoints, replacing `MOCK_RENTALS` with real RTK Query calls.
+4. **Favorites & applications**, persistence and a manager review flow.
+5. **Leases, residence, billing, payments**, connect the existing dashboard UI to real data and pick a payment gateway.
+6. **Uploads**, wire Multer + S3 to the existing property-creation form and FilePond UI.
+7. **Live maps**, connect Mapbox GL using the lat/lng already present in the mock data.
+8. **Manager role**, enable manager signup/assignment and a manager dashboard.
+9. **Hygiene & testing**, remove duplicate/dead files, add test coverage, document deployment.
 
 ## License
 
-No license has been set for this repository yet — all rights reserved by default until one is added.
+No license has been set for this repository yet, all rights reserved by default until one is added.
