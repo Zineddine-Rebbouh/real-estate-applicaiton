@@ -57,6 +57,10 @@ const PROPERTY_TYPES: PropertyType[] = [
   "Townhouse",
   "Studio",
   "Loft",
+  "Rooms",
+  "Tinyhouse",
+  "Villa",
+  "Cottage",
 ];
 
 export function BrowseFilterBar({

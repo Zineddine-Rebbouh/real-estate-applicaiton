@@ -19,8 +19,10 @@ import {
   Home,
   Warehouse,
   Building,
+  Building2,
   Castle,
   Trees,
+  Layers,
   LucideIcon,
 } from "lucide-react";
 
@@ -99,6 +101,10 @@ export enum PropertyTypeEnum {
   Villa = "Villa",
   Townhouse = "Townhouse",
   Cottage = "Cottage",
+  House = "House",
+  Condo = "Condo",
+  Studio = "Studio",
+  Loft = "Loft",
 }
 
 export const PropertyTypeIcons: Record<PropertyTypeEnum, LucideIcon> = {
@@ -108,6 +114,10 @@ export const PropertyTypeIcons: Record<PropertyTypeEnum, LucideIcon> = {
   Villa: Castle,
   Townhouse: Home,
   Cottage: Trees,
+  House: Home,
+  Condo: Building2,
+  Studio: Maximize,
+  Loft: Layers,
 };
 
 // Add this constant at the end of the file

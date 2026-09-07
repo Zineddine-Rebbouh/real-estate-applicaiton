@@ -57,6 +57,10 @@ const PROPERTY_TYPE_ITEMS: { type: PropertyType; label: string; icon: any }[] = 
   { type: "Townhouse", label: "Townhouse", icon: HomeIcon },
   { type: "Studio", label: "Studio", icon: MaximizeIcon },
   { type: "Loft", label: "Loft", icon: LayersIcon },
+  { type: "Rooms", label: "Rooms", icon: HomeIcon },
+  { type: "Tinyhouse", label: "Tinyhouse", icon: HomeIcon },
+  { type: "Villa", label: "Villa", icon: BuildingIcon },
+  { type: "Cottage", label: "Cottage", icon: HomeIcon },
 ];
 
 export function FilterSidebar({

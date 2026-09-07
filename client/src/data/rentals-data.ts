@@ -1,8 +1,12 @@
 export type PropertyType =
+  | "Rooms"
+  | "Tinyhouse"
   | "Apartment"
+  | "Villa"
+  | "Townhouse"
+  | "Cottage"
   | "House"
   | "Condo"
-  | "Townhouse"
   | "Studio"
   | "Loft";
 

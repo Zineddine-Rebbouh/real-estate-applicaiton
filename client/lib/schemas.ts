@@ -4,9 +4,9 @@ import { PropertyTypeEnum } from "@/lib/constants";
 export const propertySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
-  pricePerMonth: z.coerce.number().positive().min(0).int(),
-  securityDeposit: z.coerce.number().positive().min(0).int(),
-  applicationFee: z.coerce.number().positive().min(0).int(),
+  pricePerMonth: z.coerce.number().positive(),
+  securityDeposit: z.coerce.number().positive(),
+  applicationFee: z.coerce.number().positive(),
   isPetsAllowed: z.boolean(),
   isParkingIncluded: z.boolean(),
   photoUrls: z
@@ -23,6 +23,14 @@ export const propertySchema = z.object({
   state: z.string().min(1, "State is required"),
   country: z.string().min(1, "Country is required"),
   postalCode: z.string().min(1, "Postal code is required"),
+  latitude: z.preprocess(
+    (v) => (v === "" || v === undefined || v === null ? undefined : v),
+    z.coerce.number().min(-90).max(90).optional(),
+  ),
+  longitude: z.preprocess(
+    (v) => (v === "" || v === undefined || v === null ? undefined : v),
+    z.coerce.number().min(-180).max(180).optional(),
+  ),
 });
 
 export type PropertyFormData = z.infer<typeof propertySchema>;
