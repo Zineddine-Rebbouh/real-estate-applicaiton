@@ -41,24 +41,43 @@ export async function signup(req: Request, res: Response) {
 
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
   const role = parsed.data.role || "TENANT";
+  const inviteCode = parsed.data.inviteCode?.trim() || "";
+  if (role === "MANAGER") {
+    if (!inviteCode)
+      return res.status(400).json({ error: "Manager signup requires an invite code" });
+    const code = await prisma.managerInviteCode.findUnique({
+      where: { code: inviteCode },
+    });
+    if (!code || code.usedAt)
+      return res.status(403).json({ error: "Invalid or already-used invite code" });
+  }
   try {
-    const user = await prisma.user.create({
-      data: {
-        name: parsed.data.name,
-        email: parsed.data.email,
-        passwordHash,
-        role,
-        ...(role === "MANAGER"
-          ? { manager: { create: {} } }
-          : { tenant: { create: {} } }),
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        refreshTokenVersion: true,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          name: parsed.data.name,
+          email: parsed.data.email,
+          passwordHash,
+          role,
+          ...(role === "MANAGER"
+            ? { manager: { create: {} } }
+            : { tenant: { create: {} } }),
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          refreshTokenVersion: true,
+        },
+      });
+      if (role === "MANAGER") {
+        await tx.managerInviteCode.update({
+          where: { code: inviteCode },
+          data: { usedAt: new Date(), usedByUserId: created.id },
+        });
+      }
+      return created;
     });
     const refreshToken = setAuthCookies(res, user.id, user.refreshTokenVersion);
     await prisma.user.update({

@@ -10,6 +10,7 @@ export const signupSchema = z.object({
     .transform((value) => value.toLowerCase()),
   password: z.string().min(8).max(128),
   role: z.enum(["TENANT", "MANAGER"]).default("TENANT").optional(),
+  inviteCode: z.string().trim().max(100).optional(),
 });
 
 export const loginSchema = z.object({
