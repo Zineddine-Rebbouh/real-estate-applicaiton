@@ -103,6 +103,8 @@ export function PropertyForm({
       state: initialData?.state ?? "",
       country: initialData?.country ?? "United States",
       postalCode: initialData?.postalCode ?? "",
+      latitude: initialData?.latitude ?? undefined,
+      longitude: initialData?.longitude ?? undefined,
       amenities: initialData?.amenities?.join(",") ?? "WiFi",
       highlights: initialData?.highlights?.join(",") ?? "CloseToTransit",
       photoUrls: defaultPhotoFiles,
@@ -153,6 +155,8 @@ export function PropertyForm({
       state: data.state,
       country: data.country,
       postalCode: data.postalCode,
+      latitude: data.latitude,
+      longitude: data.longitude,
       amenities: selectedAmenities.length > 0 ? selectedAmenities : ["WiFi"],
       highlights: selectedHighlights.length > 0 ? selectedHighlights : ["CloseToTransit"],
       photoUrls,
@@ -413,6 +417,35 @@ export function PropertyForm({
             {errors.country && (
               <p className="text-xs text-destructive">{getErrorMsg(errors.country)}</p>
             )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 sm:col-span-2">
+            <div className="space-y-2">
+              <Label htmlFor="latitude">Latitude (optional)</Label>
+              <Input
+                id="latitude"
+                type="number"
+                step="any"
+                placeholder="37.7749"
+                {...register("latitude")}
+              />
+              {errors.latitude && (
+                <p className="text-xs text-destructive">{getErrorMsg(errors.latitude)}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="longitude">Longitude (optional)</Label>
+              <Input
+                id="longitude"
+                type="number"
+                step="any"
+                placeholder="-122.4194"
+                {...register("longitude")}
+              />
+              {errors.longitude && (
+                <p className="text-xs text-destructive">{getErrorMsg(errors.longitude)}</p>
+              )}
+            </div>
           </div>
         </div>
       </Card>

@@ -11,6 +11,8 @@ const rawBaseQuery = fetchBaseQuery({
   credentials: "include",
 });
 
+let refreshPromise: Promise<unknown> | null = null;
+
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -24,11 +26,19 @@ const baseQueryWithReauth: BaseQueryFn<
 
   if (!shouldRefresh) return result;
 
-  const refreshResult = await rawBaseQuery(
-    { url: "/api/auth/refresh", method: "POST" },
-    api,
-    extraOptions,
-  );
+  // ponytail: single-flight refresh, parallel 401s share one call (rotation reuse would log user out)
+  if (!refreshPromise) {
+    refreshPromise = Promise.resolve(
+      rawBaseQuery(
+        { url: "/api/auth/refresh", method: "POST" },
+        api,
+        extraOptions,
+      ),
+    ).finally(() => {
+      refreshPromise = null;
+    });
+  }
+  const refreshResult = await refreshPromise as { data?: unknown };
 
   if (refreshResult.data) return rawBaseQuery(args, api, extraOptions);
 
@@ -38,7 +48,7 @@ const baseQueryWithReauth: BaseQueryFn<
 export const apiSlice = createApi({
   baseQuery: baseQueryWithReauth,
   reducerPath: "api",
-  tagTypes: ["Auth", "Properties", "ManagerProperties", "ManagerApplications"],
+  tagTypes: ["Auth", "Properties", "ManagerProperties", "ManagerApplications", "Favorites", "TenantLeases", "TenantPayments", "Reviews"],
   endpoints: (build) => ({
     signup: build.mutation<AuthResponse, SignupRequest>({
       query: (body) => ({ url: "/api/auth/signup", method: "POST", body }),
@@ -124,13 +134,73 @@ export const apiSlice = createApi({
       query: () => "/api/manager/applications",
       providesTags: ["ManagerApplications"],
     }),
-    updateApplicationStatus: build.mutation<{ application: ManagerApplication }, UpdateApplicationStatusRequest>({
-      query: ({ id, status }) => ({
+    updateApplicationStatus: build.mutation<{ application: ManagerApplication; lease?: Lease }, UpdateApplicationStatusRequest>({
+      query: ({ id, status, startDate }) => ({
         url: `/api/applications/${id}`,
         method: "PATCH",
-        body: { status },
+        body: startDate ? { status, startDate } : { status },
       }),
       invalidatesTags: ["ManagerApplications", "ManagerProperties"],
+    }),
+    createLeasePayment: build.mutation<{ payment: TenantPayment }, CreateLeasePaymentRequest>({
+      query: ({ leaseId, ...body }) => ({
+        url: `/api/manager/leases/${leaseId}/payments`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["ManagerProperties", "TenantPayments"],
+    }),
+
+    // Tenant favorites (join table, newest first)
+    getFavorites: build.query<{ favorites: Favorite[] }, void>({
+      query: () => "/api/favorites",
+      providesTags: ["Favorites"],
+    }),
+    addFavorite: build.mutation<{ favorite: Favorite }, string>({
+      query: (propertyId) => ({
+        url: "/api/favorites",
+        method: "POST",
+        body: { propertyId },
+      }),
+      invalidatesTags: ["Favorites"],
+    }),
+    removeFavorite: build.mutation<void, string>({
+      query: (propertyId) => ({
+        url: `/api/favorites/${propertyId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Favorites"],
+    }),
+
+    // Tenant residence + payment history
+    getCurrentLease: build.query<{ currentLease: Lease | null; pastLeases: Lease[] }, void>({
+      query: () => "/api/tenant/current-lease",
+      providesTags: ["TenantLeases"],
+    }),
+    getTenantPayments: build.query<{ payments: TenantPayment[] }, void>({
+      query: () => "/api/tenant/payments",
+      providesTags: ["TenantPayments"],
+    }),
+
+    // Reviews (public list, tenant create/delete)
+    getPropertyReviews: build.query<{ reviews: Review[]; averageRating: number | null; numberOfReviews: number }, string>({
+      query: (propertyId) => `/api/reviews/property/${propertyId}`,
+      providesTags: (_result, _error, propertyId) => [{ type: "Reviews", id: propertyId }],
+    }),
+    createReview: build.mutation<{ review: Review }, { propertyId: string; rating: number; comment?: string }>({
+      query: ({ propertyId, rating, comment }) => ({
+        url: `/api/reviews/property/${propertyId}`,
+        method: "POST",
+        body: { rating, comment },
+      }),
+      invalidatesTags: (_result, _error, { propertyId }) => [{ type: "Reviews", id: propertyId }, "Properties"],
+    }),
+    deleteReview: build.mutation<void, { id: string; propertyId: string }>({
+      query: ({ id }) => ({
+        url: `/api/reviews/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (_result, _error, { propertyId }) => [{ type: "Reviews", id: propertyId }, "Properties"],
     }),
   }),
 });
@@ -150,6 +220,7 @@ export type SignupRequest = {
   email: string;
   password: string;
   role?: "TENANT" | "MANAGER";
+  inviteCode?: string;
 };
 export type LoginRequest = { email: string; password: string };
 
@@ -177,6 +248,8 @@ export type Property = {
   postalCode: string;
   averageRating?: number | null;
   numberOfReviews?: number;
+  latitude?: number | null;
+  longitude?: number | null;
   availableFrom?: string | null;
   createdAt?: string;
   updatedAt?: string;
@@ -188,6 +261,7 @@ export type Property = {
   pendingApplicationsCount?: number;
   totalApplicationsCount?: number;
   activeLeasesCount?: number;
+  leases?: { id: string; startDate: string; endDate: string; rent: number | string }[];
 };
 
 export type ManagerApplication = {
@@ -226,6 +300,61 @@ export type ManagerApplication = {
 export type UpdateApplicationStatusRequest = {
   id: string;
   status: "Pending" | "Approved" | "Denied";
+  startDate?: string;
+};
+
+export type Lease = {
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  startDate: string;
+  endDate: string;
+  rent: number | string;
+  deposit: number | string;
+  property?: Property;
+};
+
+export type Favorite = {
+  id: string;
+  tenantId: string;
+  propertyId: string;
+  createdAt: string;
+  property: Property;
+};
+
+export type TenantPayment = {
+  id: string;
+  leaseId: string;
+  amountDue: number | string;
+  amountPaid: number | string;
+  dueDate: string;
+  paymentDate?: string | null;
+  paymentStatus: "Pending" | "Paid" | "PartiallyPaid" | "Overdue";
+  lease?: {
+    id: string;
+    startDate: string;
+    endDate: string;
+    property?: { id: string; name: string; address: string } | null;
+  };
+};
+
+export type CreateLeasePaymentRequest = {
+  leaseId: string;
+  amountDue: number | string;
+  amountPaid?: number | string;
+  dueDate: string;
+  paymentDate?: string;
+  paymentStatus?: TenantPayment["paymentStatus"];
+};
+
+export type Review = {
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  rating: number;
+  comment?: string | null;
+  createdAt: string;
+  tenant?: { user?: { id: string; name: string } };
 };
 
 export const {
@@ -243,4 +372,13 @@ export const {
   useGetManagerPropertiesQuery,
   useGetManagerApplicationsQuery,
   useUpdateApplicationStatusMutation,
+  useCreateLeasePaymentMutation,
+  useGetFavoritesQuery,
+  useAddFavoriteMutation,
+  useRemoveFavoriteMutation,
+  useGetCurrentLeaseQuery,
+  useGetTenantPaymentsQuery,
+  useGetPropertyReviewsQuery,
+  useCreateReviewMutation,
+  useDeleteReviewMutation,
 } = api;
