@@ -24,6 +24,32 @@ function parseEnumArray<T>(val: unknown): T[] {
   return [];
 }
 
+function parseCoordinate(value: unknown): number | null | undefined {
+  if (value === undefined || value === null || value === "") return undefined;
+  const num = typeof value === "string" ? Number(value.trim()) : Number(value);
+  if (!Number.isFinite(num)) return null;
+  return num;
+}
+
+// averageRating/numberOfReviews are computed from Review rows on read —
+// they are not stored on Property. Exported for reuse by other
+// property-embedding reads (e.g. favorites) so they stay consistent.
+export async function withReviewStats<T extends { id: string }>(properties: T[]) {
+  if (properties.length === 0) return properties.map((p) => ({ ...p, averageRating: null as number | null, numberOfReviews: 0 }));
+  const stats = await prisma.review.groupBy({
+    by: ["propertyId"],
+    where: { propertyId: { in: properties.map((p) => p.id) } },
+    _avg: { rating: true },
+    _count: true,
+  });
+  const byProperty = new Map(stats.map((s) => [s.propertyId, s]));
+  return properties.map((p) => ({
+    ...p,
+    averageRating: byProperty.get(p.id)?._avg.rating ?? null,
+    numberOfReviews: byProperty.get(p.id)?._count ?? 0,
+  }));
+}
+
 export async function getProperties(req: Request, res: Response) {
   try {
     const { city, propertyType, beds, baths, minPrice, maxPrice } = req.query;
@@ -62,7 +88,7 @@ export async function getProperties(req: Request, res: Response) {
       },
     });
 
-    return res.json({ properties });
+    return res.json({ properties: await withReviewStats(properties) });
   } catch (error) {
     console.error("Error fetching properties:", error);
     return res.status(500).json({ error: "Failed to fetch properties" });
@@ -93,7 +119,8 @@ export async function getPropertyById(req: Request, res: Response) {
       return res.status(404).json({ error: "Property not found" });
     }
 
-    return res.json({ property });
+    const [withStats] = await withReviewStats([property]);
+    return res.json({ property: withStats });
   } catch (error) {
     console.error("Error fetching property by ID:", error);
     return res.status(500).json({ error: "Failed to fetch property" });
@@ -125,10 +152,18 @@ export async function createProperty(req: Request, res: Response) {
       state,
       country,
       postalCode,
+      latitude,
+      longitude,
     } = req.body;
 
     if (!name || !pricePerMonth || !address || !city || !state || !country || !postalCode) {
       return res.status(400).json({ error: "Missing required listing fields" });
+    }
+
+    const lat = parseCoordinate(latitude);
+    const lng = parseCoordinate(longitude);
+    if (lat === null || lng === null) {
+      return res.status(400).json({ error: "Latitude and longitude must be valid numbers" });
     }
 
     const property = await prisma.property.create({
@@ -153,6 +188,8 @@ export async function createProperty(req: Request, res: Response) {
         state: String(state),
         country: String(country),
         postalCode: String(postalCode),
+        ...(lat !== undefined ? { latitude: lat } : {}),
+        ...(lng !== undefined ? { longitude: lng } : {}),
       },
       include: {
         manager: {
@@ -211,6 +248,8 @@ export async function updateProperty(req: Request, res: Response) {
       state,
       country,
       postalCode,
+      latitude,
+      longitude,
     } = req.body;
 
     const data: Record<string, unknown> = {};
@@ -233,6 +272,16 @@ export async function updateProperty(req: Request, res: Response) {
     if (state !== undefined) data.state = String(state);
     if (country !== undefined) data.country = String(country);
     if (postalCode !== undefined) data.postalCode = String(postalCode);
+    if (latitude !== undefined || longitude !== undefined) {
+      const lat = parseCoordinate(latitude ?? null);
+      const lng = parseCoordinate(longitude ?? null);
+      if (lat === null || lng === null) {
+        return res.status(400).json({ error: "Latitude and longitude must be valid numbers" });
+      }
+      // Explicit null clears a coordinate; undefined leaves it untouched.
+      if (latitude !== undefined) data.latitude = latitude === null ? null : lat;
+      if (longitude !== undefined) data.longitude = longitude === null ? null : lng;
+    }
 
     const updatedProperty = await prisma.property.update({
       where: { id },
