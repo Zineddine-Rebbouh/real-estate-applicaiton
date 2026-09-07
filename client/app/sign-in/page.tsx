@@ -92,8 +92,21 @@ export default function SignInPage() {
       router.push(
         res.user.role === "MANAGER" ? "/manager/overview" : "/tenant/overview",
       );
-    } catch {
-      setErrors({ form: "Invalid email or password" });
+    } catch (e: unknown) {
+      const status =
+        typeof e === "object" && e !== null && "status" in e
+          ? (e as { status?: unknown }).status
+          : undefined;
+      const serverError =
+        typeof e === "object" && e !== null && "data" in e
+          ? (e as { data?: { error?: string } }).data?.error
+          : undefined;
+      setErrors({
+        form:
+          status === 429
+            ? (serverError ?? "Too many attempts, please try again later")
+            : "Invalid email or password",
+      });
     } finally {
       setIsLoading(false);
     }

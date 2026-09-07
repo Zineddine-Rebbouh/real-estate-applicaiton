@@ -108,6 +108,7 @@ export default function SignUpPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
+    const inviteCode = (formData.get("inviteCode") as string) || "";
 
     const nameError = validateName(name);
     const emailError = validateEmail(email);
@@ -116,13 +117,18 @@ export default function SignUpPage() {
       confirmPassword,
       password,
     );
+    const inviteCodeError =
+      role === "MANAGER" && !inviteCode.trim()
+        ? "Manager signup requires an invite code"
+        : "";
 
-    if (nameError || emailError || passwordError || confirmPasswordError) {
+    if (nameError || emailError || passwordError || confirmPasswordError || inviteCodeError) {
       setErrors({
         name: nameError,
         email: emailError,
         password: passwordError,
         confirmPassword: confirmPasswordError,
+        inviteCode: inviteCodeError,
       });
 
       // Focus first invalid field
@@ -141,7 +147,11 @@ export default function SignUpPage() {
     }
 
     try {
-      const res = await signup({ name, email, password, role }).unwrap();
+      const res = await signup(
+        role === "MANAGER"
+          ? { name, email, password, role, inviteCode: inviteCode.trim() }
+          : { name, email, password, role },
+      ).unwrap();
       router.push(
         res.user.role === "MANAGER" ? "/manager/overview" : "/tenant/overview",
       );
@@ -296,6 +306,38 @@ export default function SignUpPage() {
                 </label>
               </div>
             </div>
+            {role === "MANAGER" && (
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="inviteCode"
+                  className="text-sm font-semibold text-foreground"
+                >
+                  Manager invite code
+                </Label>
+                <Input
+                  id="inviteCode"
+                  name="inviteCode"
+                  type="text"
+                  autoComplete="off"
+                  placeholder="HAB-XXXXXXXX"
+                  aria-invalid={!!errors.inviteCode}
+                  aria-describedby={
+                    errors.inviteCode ? "inviteCode-error" : undefined
+                  }
+                  className="h-10 text-sm"
+                  disabled={isLoading}
+                />
+                {errors.inviteCode && (
+                  <p
+                    id="inviteCode-error"
+                    className="text-sm text-destructive"
+                    role="alert"
+                  >
+                    {errors.inviteCode}
+                  </p>
+                )}
+              </div>
+            )}
             {/* Password field */}
             <div className="space-y-1.5">
               <Label
