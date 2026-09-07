@@ -10,6 +10,9 @@ import { authRouter } from "./routes/auth.routes.js";
 import { propertyRouter } from "./routes/property.routes.js";
 import { managerRouter } from "./routes/manager.routes.js";
 import { applicationRouter } from "./routes/application.routes.js";
+import { favoriteRouter } from "./routes/favorite.routes.js";
+import { tenantRouter } from "./routes/tenant.routes.js";
+import { reviewRouter } from "./routes/review.routes.js";
 
 /* conf */
 dotenv.config();
@@ -27,6 +30,9 @@ app.use("/api/auth", authRouter);
 app.use("/api/properties", propertyRouter);
 app.use("/api/manager", managerRouter);
 app.use("/api/applications", applicationRouter);
+app.use("/api/favorites", favoriteRouter);
+app.use("/api/tenant", tenantRouter);
+app.use("/api/reviews", reviewRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello from server!");
