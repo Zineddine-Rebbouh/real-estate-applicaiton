@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  createLeasePayment,
   getManagerApplications,
   getManagerProperties,
 } from "../controllers/manager.controller.js";
@@ -12,6 +13,7 @@ router.use(authenticate, authorize("MANAGER"));
 
 router.get("/properties", getManagerProperties);
 router.get("/applications", getManagerApplications);
+router.post("/leases/:leaseId/payments", createLeasePayment);
 
 export { router as managerRouter };
 
