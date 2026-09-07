@@ -10,7 +10,7 @@ import { ListingHighlights } from "@/components/rentals/detail/listing-highlight
 import { ListingFeatures } from "@/components/rentals/detail/listing-features";
 import { ListingFeesPolicies } from "@/components/rentals/detail/listing-fees-policies";
 import { ListingMapSection } from "@/components/rentals/detail/listing-map-section";
-import { ListingReviews } from "@/components/rentals/detail/listing-reviews";
+import { PropertyReviewsSection } from "@/components/rentals/detail/property-reviews";
 import { ListingContactCard } from "@/components/rentals/detail/listing-contact-card";
 import { SimilarListingsCarousel } from "@/components/rentals/detail/listing-similar-carousel";
 
@@ -104,13 +104,8 @@ export default async function RentalDetailPage({ params }: PageProps) {
               pois={property.nearbyPOIs}
             />
 
-            {/* Verified Tenant Reviews with Rating Breakdown */}
-            <ListingReviews
-              overallRating={property.reviews.overall}
-              totalReviews={property.reviews.totalReviews}
-              breakdown={property.reviews.breakdown}
-              reviews={property.reviews.list}
-            />
+            {/* Tenant reviews from real review data */}
+            <PropertyReviewsSection propertyId={property.id} />
           </div>
 
           {/* Sticky Contact Column (Right: 4 of 12 columns on desktop) */}

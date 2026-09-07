@@ -38,7 +38,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 
-export type ApplicationStatus = "Pending" | "Approved" | "Rejected";
+export type ApplicationStatus = "Pending" | "Approved" | "Denied";
 export type FilterStatus = "All" | ApplicationStatus;
 
 export type Application = {
@@ -132,7 +132,7 @@ const initialApplications: Application[] = [
     price: "$1,820 /mo",
     image: "/landing-i4.png",
     property: "Garden Square",
-    status: "Rejected",
+    status: "Denied",
     beds: "2 Beds",
     baths: "1 Bath",
     sqft: "940 sq ft",
@@ -163,7 +163,7 @@ const statusOptions: FilterStatus[] = [
   "All",
   "Pending",
   "Approved",
-  "Rejected",
+  "Denied",
 ];
 
 const statusDetails = {
@@ -175,7 +175,7 @@ const statusDetails = {
     icon: CheckIcon,
     className: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
   },
-  Rejected: {
+  Denied: {
     icon: XIcon,
     className: "bg-rose-500/10 text-rose-700 border-rose-500/20",
   },
@@ -361,12 +361,12 @@ export default function ApplicationsPage() {
           <Card className="p-4 shadow-2xs">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">
-                Rejected
+                Denied
               </span>
               <XCircleIcon className="size-4 text-rose-500" />
             </div>
             <p className="mt-2 text-2xl font-bold text-rose-600">
-              {countFor("Rejected")}
+              {countFor("Denied")}
             </p>
             <p className="mt-0.5 text-[11px] text-muted-foreground">
               Closed inquiries

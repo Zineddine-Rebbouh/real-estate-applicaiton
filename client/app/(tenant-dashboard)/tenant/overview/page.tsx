@@ -61,7 +61,7 @@ const applications = [
     address: "7 Garden Square, Apt 12",
     image: "/landing-i4.png",
     property: "Garden Square",
-    status: "Rejected",
+    status: "Denied",
     rent: "$1,820 /mo",
     variant: "destructive" as const,
     date: "Aug 14, 2026",
