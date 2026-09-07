@@ -1,191 +1,77 @@
 [
   {
-    "id": 1,
-    "cognitoId": "817b3540-a061-707b-742a-a28391181149",
-    "name": "Carol White",
-    "email": "carol.white@example.com",
-    "phoneNumber": "+1 (555) 555-6666",
-    "properties": {
-      "connect": [{ "id": 5 }, { "id": 6 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000001",
+    "userId": "00000000-0000-0000-0000-000000000101",
+    "phoneNumber": "+1 (555) 000-0001"
   },
   {
-    "id": 2,
-    "cognitoId": "us-east-2:87654321-90ab-cdef-1234-567890abcdef",
-    "name": "Bob Green",
-    "email": "bob.green@example.com",
-    "phoneNumber": "+1 (555) 333-4444",
-    "favorites": {
-      "connect": [{ "id": 2 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000002",
+    "userId": "00000000-0000-0000-0000-000000000102",
+    "phoneNumber": "+1 (555) 000-0002"
   },
   {
-    "id": 3,
-    "cognitoId": "us-east-2:98765432-90ab-cdef-1234-567890abcdef",
-    "name": "Alice Brown",
-    "email": "alice.brown@example.com",
-    "phoneNumber": "+1 (555) 111-2222",
-    "properties": {
-      "connect": []
-    },
-    "favorites": {
-      "connect": []
-    }
+    "id": "bb000000-0000-0000-0000-000000000003",
+    "userId": "00000000-0000-0000-0000-000000000103",
+    "phoneNumber": "+1 (555) 000-0003"
   },
   {
-    "id": 4,
-    "cognitoId": "us-east-2:65432109-90ab-cdef-1234-567890abcdef",
-    "name": "David Lee",
-    "email": "david.lee@example.com",
-    "phoneNumber": "+1 (555) 777-8888",
-    "properties": {
-      "connect": [{ "id": 4 }]
-    },
-    "favorites": {
-      "connect": [{ "id": 4 }, { "id": 5 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000004",
+    "userId": "00000000-0000-0000-0000-000000000104",
+    "phoneNumber": "+1 (555) 000-0004"
   },
   {
-    "id": 5,
-    "cognitoId": "us-east-2:54321098-90ab-cdef-1234-567890abcdef",
-    "name": "Emma Taylor",
-    "email": "emma.taylor@example.com",
-    "phoneNumber": "+1 (555) 999-0000",
-    "properties": {
-      "connect": [{ "id": 2 }, { "id": 9 }]
-    },
-    "favorites": {
-      "connect": [{ "id": 1 }, { "id": 5 }, { "id": 6 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000005",
+    "userId": "00000000-0000-0000-0000-000000000105",
+    "phoneNumber": "+1 (555) 000-0005"
   },
   {
-    "id": 6,
-    "cognitoId": "us-east-2:43210987-90ab-cdef-1234-567890abcdef",
-    "name": "Frank Wilson",
-    "email": "frank.wilson@example.com",
-    "phoneNumber": "+1 (555) 222-3333",
-    "properties": {
-      "connect": [{ "id": 10 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000006",
+    "userId": "00000000-0000-0000-0000-000000000106",
+    "phoneNumber": "+1 (555) 000-0006"
   },
   {
-    "id": 7,
-    "cognitoId": "us-east-2:32109876-90ab-cdef-1234-567890abcdef",
-    "name": "Grace Miller",
-    "email": "grace.miller@example.com",
-    "phoneNumber": "+1 (555) 444-5555",
-    "properties": {
-      "connect": [{ "id": 6 }]
-    },
-    "favorites": {
-      "connect": [{ "id": 3 }, { "id": 7 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000007",
+    "userId": "00000000-0000-0000-0000-000000000107",
+    "phoneNumber": "+1 (555) 000-0007"
   },
   {
-    "id": 8,
-    "cognitoId": "us-east-2:21098765-90ab-cdef-1234-567890abcdef",
-    "name": "Henry Wilson",
-    "email": "henry.wilson@example.com",
-    "phoneNumber": "+1 (555) 444-5555",
-    "properties": {
-      "connect": [{ "id": 3 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000008",
+    "userId": "00000000-0000-0000-0000-000000000108",
+    "phoneNumber": "+1 (555) 000-0008"
   },
   {
-    "id": 9,
-    "cognitoId": "us-east-2:10987654-90ab-cdef-1234-567890abcdef",
-    "name": "Isabella Garcia",
-    "email": "isabella.garcia@example.com",
-    "phoneNumber": "+1 (555) 666-7777",
-    "properties": {
-      "connect": [{ "id": 7 }, { "id": 8 }]
-    },
-    "favorites": {
-      "connect": [{ "id": 7 }, { "id": 9 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000009",
+    "userId": "00000000-0000-0000-0000-000000000109",
+    "phoneNumber": "+1 (555) 000-0009"
   },
   {
-    "id": 10,
-    "cognitoId": "us-east-2:09876543-90ab-cdef-1234-567890abcdef",
-    "name": "Jack Thompson",
-    "email": "jack.thompson@example.com",
-    "phoneNumber": "+1 (555) 888-9999",
-    "properties": {
-      "connect": [{ "id": 10 }]
-    },
-    "favorites": {
-      "connect": [{ "id": 2 }, { "id": 10 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000010",
+    "userId": "00000000-0000-0000-0000-000000000110",
+    "phoneNumber": "+1 (555) 000-0010"
   },
   {
-    "id": 11,
-    "cognitoId": "us-east-2:a9876543-90ab-cdef-1234-567890abcdef",
-    "name": "Karen Martinez",
-    "email": "karen.martinez@example.com",
-    "phoneNumber": "+1 (555) 123-4567",
-    "properties": {
-      "connect": [{ "id": 2 }]
-    },
-    "favorites": {
-      "connect": [{ "id": 1 }, { "id": 4 }, { "id": 7 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000011",
+    "userId": "00000000-0000-0000-0000-000000000111",
+    "phoneNumber": "+1 (555) 000-0011"
   },
   {
-    "id": 12,
-    "cognitoId": "us-east-2:b9876543-90ab-cdef-1234-567890abcdef",
-    "name": "Liam Johnson",
-    "email": "liam.johnson@example.com",
-    "phoneNumber": "+1 (555) 987-6543",
-    "favorites": {
-      "connect": [{ "id": 3 }, { "id": 6 }, { "id": 9 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000012",
+    "userId": "00000000-0000-0000-0000-000000000112",
+    "phoneNumber": "+1 (555) 000-0012"
   },
   {
-    "id": 13,
-    "cognitoId": "us-east-2:c9876543-90ab-cdef-1234-567890abcdef",
-    "name": "Mia Rodriguez",
-    "email": "mia.rodriguez@example.com",
-    "phoneNumber": "+1 (555) 246-8135",
-    "properties": {
-      "connect": [{ "id": 4 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000013",
+    "userId": "00000000-0000-0000-0000-000000000113",
+    "phoneNumber": "+1 (555) 000-0013"
   },
   {
-    "id": 14,
-    "cognitoId": "us-east-2:d9876543-90ab-cdef-1234-567890abcdef",
-    "name": "Noah Kim",
-    "email": "noah.kim@example.com",
-    "phoneNumber": "+1 (555) 369-2580",
-    "favorites": {
-      "connect": [{ "id": 1 }, { "id": 10 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000014",
+    "userId": "00000000-0000-0000-0000-000000000114",
+    "phoneNumber": "+1 (555) 000-0014"
   },
   {
-    "id": 15,
-    "cognitoId": "us-east-2:e9876543-90ab-cdef-1234-567890abcdef",
-    "name": "Olivia Chen",
-    "email": "olivia.chen@example.com",
-    "phoneNumber": "+1 (555) 159-7531",
-    "properties": {
-      "connect": [{ "id": 5 }]
-    },
-    "favorites": {
-      "connect": [{ "id": 4 }, { "id": 7 }, { "id": 9 }]
-    }
+    "id": "bb000000-0000-0000-0000-000000000015",
+    "userId": "00000000-0000-0000-0000-000000000115",
+    "phoneNumber": "+1 (555) 000-0015"
   }
-  { "id": "bb000000-0000-0000-0000-000000000001", "userId": "00000000-0000-0000-0000-000000000101", "phoneNumber": "+1 (555) 555-6666" },
-  { "id": "bb000000-0000-0000-0000-000000000002", "userId": "00000000-0000-0000-0000-000000000102", "phoneNumber": "+1 (555) 333-4444" },
-  { "id": "bb000000-0000-0000-0000-000000000003", "userId": "00000000-0000-0000-0000-000000000103", "phoneNumber": "+1 (555) 111-2222" },
-  { "id": "bb000000-0000-0000-0000-000000000004", "userId": "00000000-0000-0000-0000-000000000104", "phoneNumber": "+1 (555) 777-8888" },
-  { "id": "bb000000-0000-0000-0000-000000000005", "userId": "00000000-0000-0000-0000-000000000105", "phoneNumber": "+1 (555) 999-0000" },
-  { "id": "bb000000-0000-0000-0000-000000000006", "userId": "00000000-0000-0000-0000-000000000106", "phoneNumber": "+1 (555) 222-3333" },
-  { "id": "bb000000-0000-0000-0000-000000000007", "userId": "00000000-0000-0000-0000-000000000107", "phoneNumber": "+1 (555) 444-5555" },
-  { "id": "bb000000-0000-0000-0000-000000000008", "userId": "00000000-0000-0000-0000-000000000108", "phoneNumber": "+1 (555) 444-5555" },
-  { "id": "bb000000-0000-0000-0000-000000000009", "userId": "00000000-0000-0000-0000-000000000109", "phoneNumber": "+1 (555) 666-7777" },
-  { "id": "bb000000-0000-0000-0000-000000000010", "userId": "00000000-0000-0000-0000-000000000110", "phoneNumber": "+1 (555) 888-9999" },
-  { "id": "bb000000-0000-0000-0000-000000000011", "userId": "00000000-0000-0000-0000-000000000111", "phoneNumber": "+1 (555) 123-4567" },
-  { "id": "bb000000-0000-0000-0000-000000000012", "userId": "00000000-0000-0000-0000-000000000112", "phoneNumber": "+1 (555) 987-6543" },
-  { "id": "bb000000-0000-0000-0000-000000000013", "userId": "00000000-0000-0000-0000-000000000113", "phoneNumber": "+1 (555) 246-8135" },
-  { "id": "bb000000-0000-0000-0000-000000000014", "userId": "00000000-0000-0000-0000-000000000114", "phoneNumber": "+1 (555) 369-2580" },
-  { "id": "bb000000-0000-0000-0000-000000000015", "userId": "00000000-0000-0000-0000-000000000115", "phoneNumber": "+1 (555) 159-7531" }
 ]
