@@ -30,7 +30,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--ink)] text-white/70" id="contact">
+    <footer className="bg-[#1e3a5f] text-white/70" id="contact">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Logo & Description */}
@@ -41,7 +41,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
-              A considered way to find the place you&apos;ll build your everyday life around.
+              A considered way to find the place you&apos;ll build your everyday
+              life around.
             </p>
           </div>
 
