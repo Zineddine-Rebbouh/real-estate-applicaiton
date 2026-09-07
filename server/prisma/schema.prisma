@@ -22,6 +22,10 @@ enum PropertyType {
   Villa
   Townhouse
   Cottage
+  House
+  Condo
+  Studio
+  Loft
 }
 
 enum AmenityEnum {
@@ -121,6 +125,7 @@ model Tenant {
   leases       Lease[]
   applications Application[]
   favorites    Favorite[]
+  reviews      Review[]
 }
 
 // ---------------------------------------------------------------------------
@@ -156,9 +161,10 @@ model Property {
   propertyType      PropertyType
   postedDate        DateTime      @default(now())
 
-  // Review aggregates — denormalized for query performance
-  averageRating     Float?
-  numberOfReviews   Int           @default(0)
+  // Optional coordinates — plain numeric fields, no PostGIS.
+  // Map rendering off these is a follow-up; nothing else depends on them.
+  latitude          Float?
+  longitude         Float?
 
   // Availability
   availableFrom     DateTime?
@@ -177,6 +183,7 @@ model Property {
   leases            Lease[]
   applications      Application[]
   favorites         Favorite[]
+  reviews           Review[]
 }
 
 // ---------------------------------------------------------------------------
@@ -249,6 +256,47 @@ model Payment {
   updatedAt     DateTime      @updatedAt
 
   lease         Lease         @relation(fields: [leaseId], references: [id])
+}
+
+// ---------------------------------------------------------------------------
+// Review
+//
+// One review per tenant per property (@@unique). Rating only makes sense
+// from someone who has actually held a lease there — enforced in the
+// review controller (application logic), not as a DB rule.
+// Property-level averages/counts are computed from these rows on read;
+// nothing is denormalized onto Property.
+// ---------------------------------------------------------------------------
+
+model Review {
+  id         String   @id @default(uuid()) @db.Uuid
+  propertyId String   @db.Uuid
+  tenantId   String   @db.Uuid
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, tenantId])
+}
+
+// ---------------------------------------------------------------------------
+// ManagerInviteCode
+//
+// Signing up as MANAGER requires a valid, unused code. Codes are minted
+// out-of-band (prisma/generate-invite-codes.ts); consuming one stamps
+// usedAt/usedByUserId so it cannot be reused.
+// ---------------------------------------------------------------------------
+
+model ManagerInviteCode {
+  id            String    @id @default(uuid()) @db.Uuid
+  code          String    @unique
+  usedAt        DateTime?
+  usedByUserId  String?   @db.Uuid
+  createdAt     DateTime  @default(now())
 }
 
 // ---------------------------------------------------------------------------
