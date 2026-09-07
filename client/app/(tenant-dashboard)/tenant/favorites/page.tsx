@@ -35,126 +35,75 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import {
+  useAddFavoriteMutation,
+  useGetFavoritesQuery,
+  useRemoveFavoriteMutation,
+  type Favorite,
+} from "@/state/api";
+import { formatEnumString } from "@/lib/utils";
 
 type Amenity = { icon: LucideIcon; label: string };
 
 type FavoriteProperty = {
-  id: string;
+  id: string; // propertyId — the real remove/re-add key
   address: string;
   amenities: Amenity[];
-  badges?: string[];
   image: string;
   name: string;
   price: string;
   priceNum: number;
-  rating: number;
+  rating: number | null;
   reviews: number;
   bedsCount: number;
+  bathsCount: number;
+  amenityLabels: string[];
+  availability: string;
 };
 
-const initialFavoriteProperties: FavoriteProperty[] = [
-  {
-    id: "fav-1",
-    name: "North Street Lofts",
-    address: "42 North Street, Unit 3B",
-    image: "/singlelisting-3.jpg",
-    price: "$2,450 /mo",
-    priceNum: 2450,
-    rating: 4.9,
-    reviews: 28,
-    bedsCount: 2,
-    badges: ["Featured"],
-    amenities: [
-      { icon: BedDoubleIcon, label: "2 beds" },
-      { icon: BathIcon, label: "2 baths" },
-    ],
-  },
-  {
-    id: "fav-2",
-    name: "Willow Lane Residences",
-    address: "18 Willow Lane, Apt 204",
-    image: "/singlelisting-2.jpg",
-    price: "$2,180 /mo",
-    priceNum: 2180,
-    rating: 4.8,
-    reviews: 41,
-    bedsCount: 3,
-    amenities: [
-      { icon: BedDoubleIcon, label: "3 beds" },
-      { icon: BathIcon, label: "2 baths" },
-      { icon: WavesIcon, label: "Pool" },
-    ],
-  },
-  {
-    id: "fav-3",
-    name: "Park View House",
-    address: "9 Park View Road, Apt 6C",
-    image: "/landing-i3.png",
-    price: "$1,950 /mo",
-    priceNum: 1950,
-    rating: 4.7,
-    reviews: 19,
-    bedsCount: 2,
-    badges: ["New"],
-    amenities: [
-      { icon: BedDoubleIcon, label: "2 beds" },
-      { icon: BathIcon, label: "1 bath" },
-    ],
-  },
-  {
-    id: "fav-4",
-    name: "Garden Square",
-    address: "7 Garden Square, Apt 12",
-    image: "/landing-i4.png",
-    price: "$1,820 /mo",
-    priceNum: 1820,
-    rating: 4.6,
-    reviews: 34,
-    bedsCount: 2,
-    amenities: [
-      { icon: BedDoubleIcon, label: "2 beds" },
-      { icon: BathIcon, label: "1 bath" },
-    ],
-  },
-  {
-    id: "fav-5",
-    name: "The Linden House",
-    address: "24 Linden Avenue, Apt 4A",
-    image: "/landing-splash.jpg",
-    price: "$2,300 /mo",
-    priceNum: 2300,
-    rating: 4.9,
-    reviews: 52,
-    bedsCount: 3,
-    badges: ["Popular"],
-    amenities: [
-      { icon: BedDoubleIcon, label: "3 beds" },
-      { icon: BathIcon, label: "2 baths" },
-      { icon: WavesIcon, label: "Pool" },
-    ],
-  },
-  {
-    id: "fav-6",
-    name: "Maple Court Studio",
-    address: "11 Maple Court, Studio 5",
-    image: "/landing-i6.png",
-    price: "$1,540 /mo",
-    priceNum: 1540,
-    rating: 4.5,
-    reviews: 16,
-    bedsCount: 1,
-    amenities: [
-      { icon: BedDoubleIcon, label: "1 bed" },
-      { icon: BathIcon, label: "1 bath" },
-    ],
-  },
-];
+function toFavoriteProperty(fav: Favorite): FavoriteProperty {
+  const p = fav.property;
+  const priceNum = Number(p.pricePerMonth);
+  const amenities: Amenity[] = [
+    { icon: BedDoubleIcon, label: `${p.beds} bed${p.beds === 1 ? "" : "s"}` },
+    { icon: BathIcon, label: `${p.baths} bath${p.baths === 1 ? "" : "s"}` },
+  ];
+  if ((p.amenities ?? []).includes("Pool"))
+    amenities.push({ icon: WavesIcon, label: "Pool" });
+
+  const amenityLabels = (p.amenities ?? []).map(formatEnumString);
+  if (p.isPetsAllowed) amenityLabels.push("Pet Friendly");
+  if (p.isParkingIncluded) amenityLabels.push("Parking Included");
+
+  const availableFrom = p.availableFrom ? new Date(p.availableFrom) : null;
+  const availability =
+    availableFrom && availableFrom.getTime() > Date.now()
+      ? `Available ${availableFrom.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+      : "Available Now";
+
+  return {
+    id: fav.propertyId,
+    address: `${p.address}, ${p.city}`,
+    amenities,
+    image: p.photoUrls?.[0] ?? "/singlelisting-1.jpg",
+    name: p.name,
+    price: `$${priceNum.toLocaleString()} /mo`,
+    priceNum,
+    rating: p.averageRating != null ? Number(p.averageRating) : null,
+    reviews: p.numberOfReviews ?? 0,
+    bedsCount: p.beds,
+    bathsCount: p.baths,
+    amenityLabels,
+    availability,
+  };
+}
 
 export default function FavoritesPage() {
-  const [favorites, setFavorites] = useState<FavoriteProperty[]>(
-    initialFavoriteProperties,
-  );
+  const { data, isLoading, isError, refetch } = useGetFavoritesQuery();
+  const [removeFavorite] = useRemoveFavoriteMutation();
+  const [addFavorite] = useAddFavoriteMutation();
   const [searchQuery, setSearchQuery] = useState("");
   const [bedFilter, setBedFilter] = useState<"all" | "1" | "2" | "3+">("all");
   const [sortBy, setSortBy] = useState<
@@ -171,6 +120,10 @@ export default function FavoritesPage() {
   const [isApplying, setIsApplying] = useState(false);
 
   // Compute metrics
+  const favorites = useMemo(
+    () => (data?.favorites ?? []).map(toFavoriteProperty),
+    [data],
+  );
   const filteredProperties = useMemo(() => {
     return favorites
       .filter((property) => {
@@ -190,42 +143,55 @@ export default function FavoritesPage() {
       .sort((a, b) => {
         if (sortBy === "price-asc") return a.priceNum - b.priceNum;
         if (sortBy === "price-desc") return b.priceNum - a.priceNum;
-        if (sortBy === "rating") return b.rating - a.rating;
+        if (sortBy === "rating") return (b.rating ?? -1) - (a.rating ?? -1);
         return 0;
       });
   }, [favorites, searchQuery, bedFilter, sortBy]);
 
-  const handleRemoveFavorite = (property: FavoriteProperty) => {
-    setFavorites((current) =>
-      current.filter((item) => item.id !== property.id),
-    );
-
-    toast("Property removed from favorites", {
-      description: property.name,
-      action: {
-        label: "Undo",
-        onClick: () => {
-          setFavorites((current) => [property, ...current]);
-          toast.success(`Restored ${property.name} to favorites`);
+  const handleRemoveFavorite = async (property: FavoriteProperty) => {
+    try {
+      await removeFavorite(property.id).unwrap();
+      toast("Property removed from favorites", {
+        description: property.name,
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            try {
+              await addFavorite(property.id).unwrap();
+              toast.success(`Restored ${property.name} to favorites`);
+            } catch {
+              toast.error(`Couldn't restore ${property.name}`);
+            }
+          },
         },
-      },
-    });
+      });
+    } catch {
+      toast.error(`Couldn't remove ${property.name} from favorites`);
+    }
   };
 
-  const handleClearAll = () => {
-    const savedCopy = [...favorites];
-    setFavorites([]);
+  const handleClearAll = async () => {
+    const ids = favorites.map((item) => item.id);
     setClearAllConfirmOpen(false);
 
-    toast.info("All favorites cleared", {
-      action: {
-        label: "Undo All",
-        onClick: () => {
-          setFavorites(savedCopy);
-          toast.success("Favorites restored");
+    try {
+      await Promise.all(ids.map((id) => removeFavorite(id).unwrap()));
+      toast.info("All favorites cleared", {
+        action: {
+          label: "Undo All",
+          onClick: async () => {
+            try {
+              await Promise.all(ids.map((id) => addFavorite(id).unwrap()));
+              toast.success("Favorites restored");
+            } catch {
+              toast.error("Couldn't restore all favorites");
+            }
+          },
         },
-      },
-    });
+      });
+    } catch {
+      toast.error("Couldn't clear all favorites");
+    }
   };
 
   const handleApplySubmit = (e: React.FormEvent) => {
@@ -381,8 +347,42 @@ export default function FavoritesPage() {
           </div>
         )}
 
-        {/* Empty State */}
-        {favorites.length === 0 ? (
+        {/* Empty / Loading / Error States */}
+        {isLoading ? (
+          <section
+            aria-label="Loading saved properties"
+            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="overflow-hidden rounded-xl border border-border/80 bg-card"
+              >
+                <Skeleton className="aspect-4/3 w-full rounded-none" />
+                <div className="space-y-3 p-4">
+                  <Skeleton className="h-5 w-2/3" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-9 w-full" />
+                </div>
+              </div>
+            ))}
+          </section>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card px-6 py-20 text-center shadow-2xs">
+            <div className="flex size-14 items-center justify-center rounded-full bg-rose-500/10 text-rose-500">
+              <HeartIcon className="size-7" />
+            </div>
+            <h2 className="mt-4 text-lg font-semibold text-foreground">
+              Couldn&apos;t load your saved homes
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground max-w-sm">
+              Please try again.
+            </p>
+            <Button className="mt-6" onClick={() => refetch()}>
+              Retry
+            </Button>
+          </div>
+        ) : favorites.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card px-6 py-20 text-center shadow-2xs">
             <div className="flex size-14 items-center justify-center rounded-full bg-rose-500/10 text-rose-500">
               <HeartIcon className="size-7" />
@@ -447,20 +447,6 @@ export default function FavoritesPage() {
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
-                      {property.badges && property.badges.length > 0 && (
-                        <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-                          {property.badges.map((badge) => (
-                            <Badge
-                              key={badge}
-                              variant="secondary"
-                              className="backdrop-blur-xs bg-background/90 text-xs font-semibold"
-                            >
-                              {badge}
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-
                       {/* Remove Favorite Button */}
                       <button
                         onClick={() => handleRemoveFavorite(property)}
@@ -503,14 +489,16 @@ export default function FavoritesPage() {
                         <div className="flex items-center gap-1">
                           <StarIcon className="size-3.5 fill-amber-400 text-amber-400" />
                           <span className="font-semibold text-foreground">
-                            {property.rating}
+                            {property.rating != null
+                              ? property.rating.toFixed(1)
+                              : "New"}
                           </span>
                           <span className="text-muted-foreground">
                             ({property.reviews} reviews)
                           </span>
                         </div>
                         <span className="text-[11px] text-emerald-600 font-medium">
-                          Available Now
+                          {property.availability}
                         </span>
                       </div>
 
@@ -612,7 +600,9 @@ export default function FavoritesPage() {
                   <div className="flex items-center gap-1 text-xs">
                     <StarIcon className="size-3.5 fill-amber-400 text-amber-400" />
                     <span className="font-semibold">
-                      {viewingProperty.rating}
+                      {viewingProperty.rating != null
+                        ? viewingProperty.rating.toFixed(1)
+                        : "New"}
                     </span>
                     <span className="text-muted-foreground">
                       ({viewingProperty.reviews})
@@ -638,7 +628,8 @@ export default function FavoritesPage() {
                     Bathrooms
                   </span>
                   <p className="font-semibold text-foreground mt-0.5">
-                    2 Baths
+                    {viewingProperty.bathsCount} Bath
+                    {viewingProperty.bathsCount === 1 ? "" : "s"}
                   </p>
                 </div>
                 <div>
@@ -656,18 +647,20 @@ export default function FavoritesPage() {
                   Included Amenities
                 </span>
                 <div className="flex flex-wrap gap-2 pt-1 text-muted-foreground">
-                  <span className="rounded-md bg-muted px-2 py-0.5">
-                    In-unit Washer/Dryer
-                  </span>
-                  <span className="rounded-md bg-muted px-2 py-0.5">
-                    Central AC & Heating
-                  </span>
-                  <span className="rounded-md bg-muted px-2 py-0.5">
-                    Pet Friendly
-                  </span>
-                  <span className="rounded-md bg-muted px-2 py-0.5">
-                    Assigned Parking
-                  </span>
+                  {viewingProperty.amenityLabels.length > 0 ? (
+                    viewingProperty.amenityLabels.map((label) => (
+                      <span
+                        key={label}
+                        className="rounded-md bg-muted px-2 py-0.5"
+                      >
+                        {label}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="rounded-md bg-muted px-2 py-0.5">
+                      No amenities listed
+                    </span>
+                  )}
                 </div>
               </div>
 

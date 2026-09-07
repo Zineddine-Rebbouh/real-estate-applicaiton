@@ -22,9 +22,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useGetTenantPaymentsQuery, type TenantPayment } from "@/state/api";
 
-type TransactionStatus = "Paid" | "Pending" | "Failed" | "Refunded";
+type TransactionStatus = TenantPayment["paymentStatus"];
 type Transaction = {
   id: string;
   date: string;
@@ -34,84 +36,26 @@ type Transaction = {
   lineItems: { label: string; amount: number }[];
 };
 
-const transactions: Transaction[] = [
-  {
-    id: "TX-984210",
-    date: "Sep 01, 2026",
-    property: "The Linden House · Apt 4A",
-    amount: 2418,
-    status: "Paid",
+function toTransaction(payment: TenantPayment): Transaction {
+  const due = Number(payment.amountDue);
+  const paid = Number(payment.amountPaid);
+  return {
+    id: `INV-${payment.id.slice(0, 8).toUpperCase()}`,
+    date: new Date(payment.dueDate).toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    }),
+    property: payment.lease?.property?.name ?? "Lease payment",
+    amount: due,
+    status: payment.paymentStatus,
     lineItems: [
-      { label: "Monthly rent", amount: 2300 },
-      { label: "Resident services", amount: 48 },
-      { label: "Local taxes", amount: 70 },
+      { label: "Amount due", amount: due },
+      { label: "Amount paid", amount: paid },
+      { label: "Balance", amount: due - paid },
     ],
-  },
-  {
-    id: "TX-983104",
-    date: "Aug 01, 2026",
-    property: "The Linden House · Apt 4A",
-    amount: 2418,
-    status: "Paid",
-    lineItems: [
-      { label: "Monthly rent", amount: 2300 },
-      { label: "Resident services", amount: 48 },
-      { label: "Local taxes", amount: 70 },
-    ],
-  },
-  {
-    id: "TX-981972",
-    date: "Jul 01, 2026",
-    property: "The Linden House · Apt 4A",
-    amount: 2418,
-    status: "Paid",
-    lineItems: [
-      { label: "Monthly rent", amount: 2300 },
-      { label: "Resident services", amount: 48 },
-      { label: "Local taxes", amount: 70 },
-    ],
-  },
-  {
-    id: "TX-980841",
-    date: "Jun 01, 2026",
-    property: "The Linden House · Apt 4A",
-    amount: 2348,
-    status: "Refunded",
-    lineItems: [
-      { label: "Monthly rent", amount: 2300 },
-      { label: "Local taxes", amount: 70 },
-      { label: "Processing adjustment", amount: -22 },
-    ],
-  },
-  {
-    id: "TX-979620",
-    date: "May 01, 2026",
-    property: "The Linden House · Apt 4A",
-    amount: 2418,
-    status: "Paid",
-    lineItems: [
-      { label: "Monthly rent", amount: 2300 },
-      { label: "Resident services", amount: 48 },
-      { label: "Local taxes", amount: 70 },
-    ],
-  },
-  {
-    id: "TX-978511",
-    date: "Apr 01, 2026",
-    property: "Willow Lane Residences · Apt 204",
-    amount: 2180,
-    status: "Failed",
-    lineItems: [{ label: "Monthly rent", amount: 2180 }],
-  },
-  {
-    id: "TX-977403",
-    date: "Mar 01, 2026",
-    property: "Willow Lane Residences · Apt 204",
-    amount: 2180,
-    status: "Paid",
-    lineItems: [{ label: "Monthly rent", amount: 2180 }],
-  },
-];
+  };
+}
 
 const statusDetails: Record<
   TransactionStatus,
@@ -125,13 +69,13 @@ const statusDetails: Record<
     icon: Clock3Icon,
     className: "border-amber-500/20 bg-amber-500/10 text-amber-700",
   },
-  Failed: {
+  PartiallyPaid: {
+    icon: ReceiptTextIcon,
+    className: "border-sky-500/20 bg-sky-500/10 text-sky-700",
+  },
+  Overdue: {
     icon: XCircleIcon,
     className: "border-rose-500/20 bg-rose-500/10 text-rose-700",
-  },
-  Refunded: {
-    icon: ReceiptTextIcon,
-    className: "border-slate-500/20 bg-slate-500/10 text-slate-700",
   },
 };
 
@@ -149,20 +93,21 @@ function StatusBadge({ status }: { status: TransactionStatus }) {
   );
 }
 
-function SpendChart() {
+function SpendChart({ values }: { values: { label: string; amount: number }[] }) {
+  const max = Math.max(1, ...values.map((v) => v.amount));
   return (
     <div
       className="flex h-20 items-end gap-1.5"
-      aria-label="Monthly spend trend from March through September"
+      aria-label="Monthly spend trend"
     >
-      {[38, 52, 45, 68, 58, 72, 64].map((height, index) => (
+      {values.map((bar, index) => (
         <div key={index} className="flex flex-1 flex-col items-center gap-1">
           <div
-            className={`w-full rounded-t-sm ${index === 6 ? "bg-primary" : "bg-primary/20"}`}
-            style={{ height: `${height}%` }}
+            className={`w-full rounded-t-sm ${index === values.length - 1 ? "bg-primary" : "bg-primary/20"}`}
+            style={{ height: `${Math.max(6, (bar.amount / max) * 100)}%` }}
           />
           <span className="text-[10px] text-muted-foreground">
-            {["Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"][index]}
+            {bar.label}
           </span>
         </div>
       ))}
@@ -170,7 +115,11 @@ function SpendChart() {
   );
 }
 
+const monthLabel = (date: Date) =>
+  date.toLocaleDateString("en-US", { month: "short" });
+
 export default function BillingHistoryPage() {
+  const { data, isLoading, isError } = useGetTenantPaymentsQuery();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"All" | TransactionStatus>("All");
   const [fromDate, setFromDate] = useState("");
@@ -178,6 +127,44 @@ export default function BillingHistoryPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const pageSize = 5;
+
+  const transactions = useMemo(
+    () => (data?.payments ?? []).map(toTransaction),
+    [data],
+  );
+
+  const totalPaid = useMemo(
+    () => (data?.payments ?? []).reduce((sum, p) => sum + Number(p.amountPaid), 0),
+    [data],
+  );
+
+  const nextDue = useMemo(
+    () =>
+      (data?.payments ?? [])
+        .filter((p) => p.paymentStatus !== "Paid")
+        .sort((a, b) => +new Date(a.dueDate) - +new Date(b.dueDate))[0],
+    [data],
+  );
+
+  const spendTrend = useMemo(() => {
+    const buckets = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(1);
+      d.setMonth(d.getMonth() - (6 - i));
+      return { label: monthLabel(d), amount: 0, key: `${d.getFullYear()}-${d.getMonth()}` };
+    });
+    for (const p of data?.payments ?? []) {
+      const d = paymentDateOf(p);
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const bucket = buckets.find((b) => b.key === key);
+      if (bucket) bucket.amount += Number(p.amountPaid);
+    }
+    return buckets;
+  }, [data]);
+
+  function paymentDateOf(p: TenantPayment) {
+    return new Date(p.paymentDate ?? p.dueDate);
+  }
 
   const filteredTransactions = useMemo(
     () =>
@@ -193,7 +180,7 @@ export default function BillingHistoryPage() {
           !toDate || parsedDate <= new Date(`${toDate}T23:59:59`).getTime();
         return matchesQuery && matchesStatus && matchesFrom && matchesTo;
       }),
-    [fromDate, query, status, toDate],
+    [fromDate, query, status, toDate, transactions],
   );
 
   const visibleTransactions = filteredTransactions.slice(
@@ -254,10 +241,10 @@ export default function BillingHistoryPage() {
                   Total paid this year
                 </p>
                 <p className="mt-2 text-2xl font-bold tracking-tight">
-                  $16,928.00
+                  {currency(totalPaid)}
                 </p>
-                <p className="mt-1 text-xs text-emerald-700">
-                  ↑ 4.2% from last year
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Across all your leases
                 </p>
               </div>
               <div className="rounded-lg bg-emerald-500/10 p-2.5 text-emerald-700">
@@ -271,9 +258,18 @@ export default function BillingHistoryPage() {
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   Next payment due
                 </p>
-                <p className="mt-2 text-2xl font-bold tracking-tight">Oct 01</p>
+                <p className="mt-2 text-2xl font-bold tracking-tight">
+                  {nextDue
+                    ? new Date(nextDue.dueDate).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                      })
+                    : "—"}
+                </p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  $2,418.00 · The Linden House
+                  {nextDue
+                    ? `${currency(Number(nextDue.amountDue))} · ${nextDue.lease?.property?.name ?? "Lease payment"}`
+                    : "Nothing outstanding"}
                 </p>
               </div>
               <div className="rounded-lg bg-primary/10 p-2.5 text-primary">
@@ -293,7 +289,7 @@ export default function BillingHistoryPage() {
               </div>
               <span className="text-xs text-muted-foreground">Mar–Sep</span>
             </div>
-            <SpendChart />
+            <SpendChart values={spendTrend} />
           </Card>
         </section>
         <Card className="overflow-visible p-0">
@@ -345,7 +341,7 @@ export default function BillingHistoryPage() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2 border-b px-4 py-3 sm:px-5">
-            {(["All", "Paid", "Pending", "Failed", "Refunded"] as const).map(
+            {(["All", "Paid", "Pending", "PartiallyPaid", "Overdue"] as const).map(
               (filter) => (
                 <button
                   key={filter}
@@ -362,7 +358,23 @@ export default function BillingHistoryPage() {
               ),
             )}
           </div>
-          {visibleTransactions.length === 0 ? (
+          {isLoading ? (
+            <div className="space-y-3 p-5">
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+            </div>
+          ) : isError ? (
+            <div className="flex flex-col items-center px-6 py-16 text-center">
+              <XCircleIcon className="size-8 text-destructive" />
+              <h3 className="mt-3 text-base font-semibold">
+                Couldn&apos;t load your payments
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Please try again later.
+              </p>
+            </div>
+          ) : visibleTransactions.length === 0 ? (
             <div className="flex flex-col items-center px-6 py-16 text-center">
               <FileTextIcon className="size-8 text-muted-foreground" />
               <h3 className="mt-3 text-base font-semibold">

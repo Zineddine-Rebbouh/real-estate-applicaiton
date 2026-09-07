@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useGetCurrentLeaseQuery, type Lease } from "@/state/api";
 
 type Residence = {
   address: string;
@@ -23,41 +25,26 @@ type Residence = {
   startDate: string;
 };
 
-const currentResidence: Residence | null = {
-  address: "24 Linden Avenue, Apt 4A",
-  endDate: "Ongoing",
-  image: "/landing-splash.jpg",
-  property: "The Linden House",
-  rent: "$2,300 / month",
-  startDate: "August 18, 2026",
-};
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
 
-const pastResidences: Residence[] = [
-  {
-    address: "18 Willow Lane, Apt 204",
-    endDate: "August 28, 2026",
-    image: "/singlelisting-2.jpg",
-    property: "Willow Lane Residences",
-    rent: "$2,180 / month",
-    startDate: "September 15, 2025",
-  },
-  {
-    address: "7 Garden Square, Apt 12",
-    endDate: "July 31, 2025",
-    image: "/landing-i4.png",
-    property: "Garden Square",
-    rent: "$1,820 / month",
-    startDate: "August 1, 2024",
-  },
-  {
-    address: "9 Park View Road, Apt 6C",
-    endDate: "June 30, 2024",
-    image: "/landing-i3.png",
-    property: "Park View House",
-    rent: "$1,950 / month",
-    startDate: "July 1, 2023",
-  },
-];
+const formatRent = (rent: number | string) =>
+  `$${Number(rent).toLocaleString()} / month`;
+
+function leaseToResidence(lease: Lease): Residence {
+  return {
+    address: lease.property?.address ?? "",
+    endDate: formatDate(lease.endDate),
+    image: lease.property?.photoUrls?.[0] ?? "/singlelisting-1.jpg",
+    property: lease.property?.name ?? "Leased property",
+    rent: formatRent(lease.rent),
+    startDate: formatDate(lease.startDate),
+  };
+}
 
 function LeaseDates({ residence }: { residence: Residence }) {
   return (
@@ -198,6 +185,12 @@ function EmptyState() {
 }
 
 export default function ResidencePage() {
+  const { data, isLoading, isError } = useGetCurrentLeaseQuery();
+
+  const currentResidence = data?.currentLease
+    ? leaseToResidence(data.currentLease)
+    : null;
+  const pastResidences = (data?.pastLeases ?? []).map(leaseToResidence);
   const hasResidences = currentResidence !== null || pastResidences.length > 0;
 
   return (
@@ -213,7 +206,25 @@ export default function ResidencePage() {
           </p>
         </header>
 
-        {!hasResidences ? (
+        {isLoading ? (
+          <div className="space-y-6">
+            <Skeleton className="h-64 w-full rounded-xl" />
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <Skeleton className="h-72 w-full rounded-xl" />
+              <Skeleton className="h-72 w-full rounded-xl" />
+              <Skeleton className="h-72 w-full rounded-xl" />
+            </div>
+          </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed bg-card px-6 py-16 text-center">
+            <h2 className="text-base font-medium">
+              Couldn&apos;t load your residence
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Please try again later.
+            </p>
+          </div>
+        ) : !hasResidences ? (
           <EmptyState />
         ) : (
           <>
