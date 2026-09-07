@@ -1,0 +1,16 @@
+[
+  {
+    "id": "be000000-0000-0000-0000-000000000001",
+    "propertyId": "cc000000-0000-0000-0000-000000000001",
+    "tenantId": "bb000000-0000-0000-0000-000000000001",
+    "rating": 5,
+    "comment": "Sunny, quiet, and the manager responds fast."
+  },
+  {
+    "id": "be000000-0000-0000-0000-000000000002",
+    "propertyId": "cc000000-0000-0000-0000-000000000002",
+    "tenantId": "bb000000-0000-0000-0000-000000000002",
+    "rating": 4,
+    "comment": "Great ocean breeze, parking is tight."
+  }
+]
