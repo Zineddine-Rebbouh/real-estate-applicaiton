@@ -66,6 +66,7 @@ enum ApplicationStatus {
   Pending
   Approved
   Denied
+  Withdrawn
 }
 
 enum PaymentStatus {
@@ -126,6 +127,10 @@ model Tenant {
   applications Application[]
   favorites    Favorite[]
   reviews      Review[]
+  paymentMethods PaymentMethod[]
+  maintenanceRequests MaintenanceRequest[]
+  tourRequests TourRequest[]
+  contactMessages ContactMessage[]
 }
 
 // ---------------------------------------------------------------------------
@@ -184,6 +189,9 @@ model Property {
   applications      Application[]
   favorites         Favorite[]
   reviews           Review[]
+  maintenanceRequests MaintenanceRequest[]
+  tourRequests      TourRequest[]
+  contactMessages   ContactMessage[]
 }
 
 // ---------------------------------------------------------------------------
@@ -205,6 +213,7 @@ model Lease {
   tenant       Tenant        @relation(fields: [tenantId], references: [id])
   payments     Payment[]
   applications Application[]
+  maintenanceRequests MaintenanceRequest[]
 }
 
 // ---------------------------------------------------------------------------
@@ -317,4 +326,117 @@ model Favorite {
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@unique([tenantId, propertyId])
+}
+
+enum PaymentMethodType {
+  Card
+  Bank
+}
+
+// ---------------------------------------------------------------------------
+// PaymentMethod
+//
+// Reference-only vault: brand/last4/expiry/holder plus gateway ids for a
+// future processor. Full PANs, CVCs, and IBANs must NEVER be sent here —
+// the client derives references locally and discards the rest. No charging
+// happens off this table until a gateway is integrated.
+// ---------------------------------------------------------------------------
+
+model PaymentMethod {
+  id                     String            @id @default(uuid()) @db.Uuid
+  tenantId               String            @db.Uuid
+  type                   PaymentMethodType
+  brand                  String?
+  last4                  String
+  expMonth               Int?
+  expYear                Int?
+  accountHolder          String
+  gatewayCustomerId      String?
+  gatewayPaymentMethodId String?
+  isDefault              Boolean           @default(false)
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+enum MaintenanceStatus {
+  Open
+  InProgress
+  Resolved
+}
+
+// ---------------------------------------------------------------------------
+// MaintenanceRequest
+//
+// Tenant-reported issue on a property. leaseId snapshots the tenant's
+// current lease on that property at report time (nullable — a tenant may
+// report without an active lease) for manager context.
+// ---------------------------------------------------------------------------
+
+model MaintenanceRequest {
+  id          String            @id @default(uuid()) @db.Uuid
+  propertyId  String            @db.Uuid
+  tenantId    String            @db.Uuid
+  leaseId     String?           @db.Uuid
+  title       String
+  description String
+  status      MaintenanceStatus @default(Open)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id])
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  lease    Lease?   @relation(fields: [leaseId], references: [id])
+}
+
+enum TourType {
+  InPerson
+  Video
+}
+
+enum TourStatus {
+  Pending
+  Confirmed
+  Declined
+}
+
+// ---------------------------------------------------------------------------
+// TourRequest + ContactMessage
+//
+// Persist exactly what the listing modals collect: tour type + the
+// preferred slot labels as picked (no fake date parsing) + note, and free
+// text messages. Contact snapshots come from the session, not the form.
+// Tenants have no history surface yet — the manager queue is the reader.
+// ---------------------------------------------------------------------------
+
+model TourRequest {
+  id            String     @id @default(uuid()) @db.Uuid
+  propertyId    String     @db.Uuid
+  tenantId      String     @db.Uuid
+  name          String
+  email         String
+  tourType      TourType
+  preferredDate String
+  preferredTime String
+  note          String?
+  status        TourStatus @default(Pending)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  property Property @relation(fields: [propertyId], references: [id])
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+}
+
+model ContactMessage {
+  id         String   @id @default(uuid()) @db.Uuid
+  propertyId String   @db.Uuid
+  tenantId   String   @db.Uuid
+  name       String
+  email      String
+  message    String
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id])
+  tenant   Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 }
