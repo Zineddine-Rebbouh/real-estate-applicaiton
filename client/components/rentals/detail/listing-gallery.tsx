@@ -12,14 +12,17 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { ListingLightbox } from "./listing-lightbox";
+import { useAddFavoriteMutation, useRemoveFavoriteMutation } from "@/state/api";
 
 interface ListingGalleryProps {
+  propertyId: string;
   images: { url: string; caption: string; tag?: string }[];
   title: string;
   isFavorite?: boolean;
 }
 
 export function ListingGallery({
+  propertyId,
   images,
   title,
   isFavorite: initialFavorite = false,
@@ -29,6 +32,8 @@ export function ListingGallery({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [addFavorite] = useAddFavoriteMutation();
+  const [removeFavorite] = useRemoveFavoriteMutation();
 
   // Mobile touch swipe handling
   const touchStartX = useRef<number | null>(null);
@@ -53,17 +58,23 @@ export function ListingGallery({
 
   const toggleFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setFavorite((prev) => {
-      const next = !prev;
-      if (next) {
-        toast.success("Saved to favorites", {
-          description: `${title} has been added to your saved rentals.`,
-        });
-      } else {
-        toast.info("Removed from favorites");
-      }
-      return next;
-    });
+    const next = !favorite;
+    setFavorite(next);
+    (next ? addFavorite(propertyId) : removeFavorite(propertyId))
+      .unwrap()
+      .then(() => {
+        if (next) {
+          toast.success("Saved to favorites", {
+            description: `${title} has been added to your saved rentals.`,
+          });
+        } else {
+          toast.info("Removed from favorites");
+        }
+      })
+      .catch(() => {
+        setFavorite(!next);
+        toast.error("Couldn't update favorites. Please try again.");
+      });
   };
 
   const handleShare = async (e: React.MouseEvent) => {

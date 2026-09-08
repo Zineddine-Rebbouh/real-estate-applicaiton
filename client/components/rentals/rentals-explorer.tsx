@@ -9,9 +9,15 @@ import { MobileBottomSheet } from "@/components/rentals/mobile-bottom-sheet";
 import {
   FilterState,
   INITIAL_FILTERS,
-  MOCK_RENTALS,
   RentalProperty,
 } from "@/src/data/rentals-data";
+import {
+  applyListingFilters,
+  layoutListingCoords,
+  mapPropertyToListing,
+  toPropertyQuery,
+} from "@/lib/listings";
+import { useGetPropertiesQuery } from "@/state/api";
 
 interface RentalsExplorerProps {
   isDashboard?: boolean;
@@ -35,57 +41,19 @@ export function RentalsExplorer({ isDashboard = false }: RentalsExplorerProps) {
     setFilters(INITIAL_FILTERS);
   };
 
+  // Server-filtered listings (price/type/beds/baths) mapped onto the
+  // RentalProperty contract, with the remaining filters applied locally.
+  const { data: propertiesData } = useGetPropertiesQuery(
+    toPropertyQuery(filters),
+  );
+  const serverListings = useMemo(
+    () => (propertiesData?.properties ?? []).map(mapPropertyToListing),
+    [propertiesData],
+  );
+
   // Instant reactive client-side filtering with zero page reload
   const filteredProperties = useMemo(() => {
-    return MOCK_RENTALS.filter((property) => {
-      // Location query search
-      if (filters.locationQuery.trim()) {
-        const query = filters.locationQuery.toLowerCase().trim();
-        const matchesLocation =
-          property.title.toLowerCase().includes(query) ||
-          property.address.toLowerCase().includes(query) ||
-          property.neighborhood.toLowerCase().includes(query) ||
-          property.city.toLowerCase().includes(query);
-        if (!matchesLocation) return false;
-      }
-
-      // Price range filter
-      if (property.price < filters.minPrice) return false;
-      if (filters.maxPrice < 4500 && property.price > filters.maxPrice) return false;
-
-      // Property type filter
-      if (
-        filters.propertyTypes.length > 0 &&
-        !filters.propertyTypes.includes(property.propertyType)
-      ) {
-        return false;
-      }
-
-      // Bedrooms filter
-      if (filters.beds !== null) {
-        if (filters.beds === 0 && property.beds !== 0) return false;
-        if (filters.beds > 0 && property.beds < filters.beds) return false;
-      }
-
-      // Bathrooms filter
-      if (filters.baths !== null && property.baths < filters.baths) {
-        return false;
-      }
-
-      // Square footage filter
-      if (property.sqft < filters.minSqft) return false;
-      if (filters.maxSqft < 2800 && property.sqft > filters.maxSqft) return false;
-
-      // Amenities multi-select filter
-      if (filters.amenities.length > 0) {
-        const hasAllAmenities = filters.amenities.every((amenity) =>
-          property.amenities.includes(amenity)
-        );
-        if (!hasAllAmenities) return false;
-      }
-
-      return true;
-    }).sort((a, b) => {
+    const sorted = applyListingFilters(serverListings, filters).sort((a, b) => {
       if (sortBy === "price-asc") return a.price - b.price;
       if (sortBy === "price-desc") return b.price - a.price;
       if (sortBy === "rating") return b.rating - a.rating;
@@ -93,7 +61,8 @@ export function RentalsExplorer({ isDashboard = false }: RentalsExplorerProps) {
       if (!a.featured && b.featured) return 1;
       return b.rating - a.rating;
     });
-  }, [filters, sortBy]);
+    return layoutListingCoords(sorted);
+  }, [serverListings, filters, sortBy]);
 
   const handleSelectProperty = (property: RentalProperty) => {
     setSelectedPropertyId(property.id);

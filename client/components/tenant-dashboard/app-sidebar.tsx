@@ -10,7 +10,9 @@ import {
   CreditCardIcon,
   Building2Icon,
   CompassIcon,
+  InboxIcon,
   MapIcon,
+  WrenchIcon,
 } from "lucide-react";
 
 import {
@@ -107,6 +109,18 @@ const managerNavItems = [
     title: "Leases",
     href: "/manager/leases",
     icon: CreditCardIcon,
+    badge: null,
+  },
+  {
+    title: "Maintenance",
+    href: "/manager/maintenance",
+    icon: WrenchIcon,
+    badge: null,
+  },
+  {
+    title: "Inquiries",
+    href: "/manager/inquiries",
+    icon: InboxIcon,
     badge: null,
   },
 ] as const;

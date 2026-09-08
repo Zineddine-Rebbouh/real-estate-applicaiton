@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { FilePond, registerPlugin } from "react-filepond";
+import { toast } from "sonner";
 import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
@@ -26,6 +27,7 @@ import {
   PropertyTypeEnum,
 } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
+import { PropertyThumb } from "@/components/rentals/property-thumb";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
@@ -41,10 +43,16 @@ import type { Property } from "@/state/api";
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
-function getErrorMsg(err: any): string {
+function getErrorMsg(err: unknown): string {
   if (!err) return "";
   if (typeof err === "string") return err;
-  if (typeof err.message === "string") return err.message;
+  if (
+    typeof err === "object" &&
+    "message" in err &&
+    typeof (err as { message?: unknown }).message === "string"
+  ) {
+    return (err as { message: string }).message;
+  }
   return "Invalid field value";
 }
 
@@ -62,6 +70,8 @@ export function PropertyForm({
   isEdit = false,
 }: PropertyFormProps) {
   const router = useRouter();
+  // FilePond item type is unexported by react-filepond — matches utils.ts precedent.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [files, setFiles] = React.useState<any[]>([]);
   const [selectedAmenities, setSelectedAmenities] = React.useState<string[]>(
     initialData?.amenities ?? []
@@ -84,12 +94,12 @@ export function PropertyForm({
     control,
     setValue,
     formState: { errors },
-  } = useForm<any>({
+  } = useForm<any>({ // eslint-disable-line @typescript-eslint/no-explicit-any -- untyped dynamic defaults
     resolver: zodResolver(propertySchema),
     defaultValues: {
       name: initialData?.name ?? "",
       description: initialData?.description ?? "",
-      pricePerMonth: initialData?.pricePerMonth ? Number(initialData.pricePerMonth) : ("" as any),
+      pricePerMonth: initialData?.pricePerMonth ? Number(initialData.pricePerMonth) : ("" as unknown as number),
       securityDeposit: initialData?.securityDeposit ? Number(initialData.securityDeposit) : 0,
       applicationFee: initialData?.applicationFee ? Number(initialData.applicationFee) : 50,
       isPetsAllowed: initialData?.isPetsAllowed ?? false,
@@ -127,16 +137,59 @@ export function PropertyForm({
     setValue("highlights", updated.join(","), { shouldValidate: true });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped dynamic payload
   const onFormSubmit = async (data: any) => {
-    // Stub S3 photos upload: for new properties, stub sample listing images if none uploaded yet
-    const photoUrls =
-      initialData?.photoUrls && initialData.photoUrls.length > 0
-        ? initialData.photoUrls
-        : [
-            "/singlelisting-1.jpg",
-            "/singlelisting-2.jpg",
-            "/singlelisting-3.jpg",
-          ];
+    // Newly picked files upload first; their urls join any existing ones
+    // when editing. The "existing-photo.jpg" File is only a validation
+    // placeholder, never an upload.
+    const newFiles = files
+      .map((f) => f.file)
+      .filter((f): f is File => f instanceof File && f.name !== "existing-photo.jpg");
+
+    let photoUrls: string[];
+    try {
+      if (newFiles.length > 0) {
+        const sigRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/uploads/signature`,
+          { method: "POST", credentials: "include" },
+        );
+        if (!sigRes.ok) throw new Error("Photo upload failed");
+        const sig: {
+          cloudName: string;
+          apiKey: string;
+          timestamp: number;
+          signature: string;
+          folder: string;
+        } = await sigRes.json();
+        const uploaded: string[] = [];
+        for (const file of newFiles) {
+          const form = new FormData();
+          form.append("file", file);
+          form.append("api_key", sig.apiKey);
+          form.append("timestamp", String(sig.timestamp));
+          form.append("signature", sig.signature);
+          form.append("folder", sig.folder);
+          const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`,
+            { method: "POST", body: form },
+          );
+          if (!res.ok) throw new Error("Photo upload failed");
+          const data: { secure_url?: string } = await res.json();
+          if (!data.secure_url?.startsWith("https://res.cloudinary.com/"))
+            throw new Error("Photo upload failed");
+          uploaded.push(data.secure_url);
+        }
+        photoUrls = [...(initialData?.photoUrls ?? []), ...uploaded];
+      } else if (initialData?.photoUrls && initialData.photoUrls.length > 0) {
+        photoUrls = initialData.photoUrls;
+      } else {
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Photo upload failed. Please try again.");
+      return;
+    }
 
     const payload = {
       name: data.name,
@@ -177,8 +230,8 @@ export function PropertyForm({
         <div className="space-y-1">
           <p className="font-semibold text-primary">Media Upload Note</p>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            FilePond is active for image selection. Direct S3 upload (<code className="rounded bg-muted px-1 py-0.5 text-[11px]">/api/uploads</code>)
-            is pending implementation; listings are currently saved with stubbed/verified preview images.
+            Selected photos upload to Cloudinary when you save the listing — up to
+            10 images, 5&nbsp;MB each.
           </p>
         </div>
       </div>
@@ -554,7 +607,7 @@ export function PropertyForm({
               <div className="flex flex-wrap gap-3">
                 {initialData.photoUrls.map((url, i) => (
                   <div key={i} className="relative size-20 overflow-hidden rounded-lg border bg-muted">
-                    <img src={url} alt={`Listing photo ${i + 1}`} className="size-full object-cover" />
+                    <PropertyThumb src={url} alt={`Listing photo ${i + 1}`} fill />
                   </div>
                 ))}
               </div>

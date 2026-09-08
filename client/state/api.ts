@@ -7,7 +7,8 @@ import {
 } from "@reduxjs/toolkit/query/react";
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+  // ponytail: fail loud on missing env instead of silently sending relative requests
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3002",
   credentials: "include",
 });
 
@@ -48,7 +49,7 @@ const baseQueryWithReauth: BaseQueryFn<
 export const apiSlice = createApi({
   baseQuery: baseQueryWithReauth,
   reducerPath: "api",
-  tagTypes: ["Auth", "Properties", "ManagerProperties", "ManagerApplications", "Favorites", "TenantLeases", "TenantPayments", "Reviews"],
+  tagTypes: ["Auth", "Properties", "ManagerProperties", "ManagerApplications", "Favorites", "TenantLeases", "TenantPayments", "TenantApplications", "PaymentMethods", "Maintenance", "Inquiries", "Reviews"],
   endpoints: (build) => ({
     signup: build.mutation<AuthResponse, SignupRequest>({
       query: (body) => ({ url: "/api/auth/signup", method: "POST", body }),
@@ -181,6 +182,124 @@ export const apiSlice = createApi({
       query: () => "/api/tenant/payments",
       providesTags: ["TenantPayments"],
     }),
+    payInvoice: build.mutation<{ payment: TenantPayment }, { id: string; amount?: number }>({
+      query: ({ id, amount }) => ({
+        url: `/api/tenant/payments/${id}/pay`,
+        method: "PATCH",
+        body: amount === undefined ? {} : { amount },
+      }),
+      invalidatesTags: ["TenantPayments"],
+    }),
+
+    // Tenant applications (submit / own list / withdraw)
+    getTenantApplications: build.query<{ applications: TenantApplication[] }, void>({
+      query: () => "/api/applications",
+      providesTags: ["TenantApplications"],
+    }),
+    submitApplication: build.mutation<{ application: TenantApplication }, SubmitApplicationRequest>({
+      query: (body) => ({
+        url: "/api/applications",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["TenantApplications"],
+    }),
+    withdrawApplication: build.mutation<{ application: TenantApplication }, string>({
+      query: (id) => ({
+        url: `/api/applications/${id}/withdraw`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["TenantApplications", "ManagerApplications"],
+    }),
+
+    // Tenant payment-method references (brand/last4 only — never PANs)
+    getPaymentMethods: build.query<{ paymentMethods: PaymentMethod[] }, void>({
+      query: () => "/api/payment-methods",
+      providesTags: ["PaymentMethods"],
+    }),
+    addPaymentMethod: build.mutation<{ paymentMethod: PaymentMethod }, AddPaymentMethodRequest>({
+      query: (body) => ({
+        url: "/api/payment-methods",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["PaymentMethods"],
+    }),
+    updatePaymentMethod: build.mutation<{ paymentMethod: PaymentMethod }, { id: string; data: UpdatePaymentMethodRequest }>({
+      query: ({ id, data }) => ({
+        url: `/api/payment-methods/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["PaymentMethods"],
+    }),
+    removePaymentMethod: build.mutation<void, string>({
+      query: (id) => ({
+        url: `/api/payment-methods/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["PaymentMethods"],
+    }),
+
+    // Maintenance requests (tenant report + own list, manager queue)
+    getTenantMaintenance: build.query<{ maintenanceRequests: MaintenanceRequest[] }, void>({
+      query: () => "/api/maintenance",
+      providesTags: ["Maintenance"],
+    }),
+    createMaintenanceRequest: build.mutation<{ maintenanceRequest: MaintenanceRequest }, { propertyId: string; title: string; description: string }>({
+      query: (body) => ({
+        url: "/api/maintenance",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Maintenance"],
+    }),
+    getManagerMaintenance: build.query<{ maintenanceRequests: ManagerMaintenanceRequest[] }, void>({
+      query: () => "/api/manager/maintenance",
+      providesTags: ["Maintenance"],
+    }),
+    updateMaintenanceStatus: build.mutation<{ maintenanceRequest: MaintenanceRequest }, { id: string; status: MaintenanceRequest["status"] }>({
+      query: ({ id, status }) => ({
+        url: `/api/maintenance/${id}`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["Maintenance"],
+    }),
+
+    // Tours + contact messages (tenant submit, manager queue)
+    submitTourRequest: build.mutation<{ tourRequest: TourRequest }, { propertyId: string; tourType: "InPerson" | "Video"; preferredDate: string; preferredTime: string; note?: string }>({
+      query: (body) => ({
+        url: "/api/tours",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Inquiries"],
+    }),
+    sendContactMessage: build.mutation<{ contactMessage: ContactMessage }, { propertyId: string; message: string }>({
+      query: (body) => ({
+        url: "/api/messages",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Inquiries"],
+    }),
+    getManagerTourRequests: build.query<{ tourRequests: ManagerTourRequest[] }, void>({
+      query: () => "/api/manager/tours",
+      providesTags: ["Inquiries"],
+    }),
+    getManagerContactMessages: build.query<{ contactMessages: ManagerContactMessage[] }, void>({
+      query: () => "/api/manager/messages",
+      providesTags: ["Inquiries"],
+    }),
+    updateTourStatus: build.mutation<{ tourRequest: TourRequest }, { id: string; status: "Pending" | "Confirmed" | "Declined" }>({
+      query: ({ id, status }) => ({
+        url: `/api/tours/${id}`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["Inquiries"],
+    }),
 
     // Reviews (public list, tenant create/delete)
     getPropertyReviews: build.query<{ reviews: Review[]; averageRating: number | null; numberOfReviews: number }, string>({
@@ -214,6 +333,85 @@ export type AuthUser = {
   role: "TENANT" | "MANAGER";
   phoneNumber?: string | null;
 };
+export type MaintenanceRequest = {
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  leaseId?: string | null;
+  title: string;
+  description: string;
+  status: "Open" | "InProgress" | "Resolved";
+  createdAt: string;
+  updatedAt: string;
+  property: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    photoUrls: string[];
+  };
+};
+
+export type ManagerMaintenanceRequest = MaintenanceRequest & {
+  tenant: {
+    phoneNumber?: string | null;
+    user?: { name: string; email: string };
+  };
+};
+
+export type TourRequest = {
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  name: string;
+  email: string;
+  tourType: "InPerson" | "Video";
+  preferredDate: string;
+  preferredTime: string;
+  note?: string | null;
+  status: "Pending" | "Confirmed" | "Declined";
+  createdAt: string;
+  updatedAt: string;
+  property: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    photoUrls: string[];
+  };
+};
+
+export type ManagerTourRequest = TourRequest & {
+  tenant: {
+    phoneNumber?: string | null;
+    user?: { name: string; email: string };
+  };
+};
+
+export type ContactMessage = {
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: string;
+  property: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    photoUrls: string[];
+  };
+};
+
+export type ManagerContactMessage = ContactMessage & {
+  tenant: {
+    phoneNumber?: string | null;
+    user?: { name: string; email: string };
+  };
+};
+
 export type AuthResponse = { user: AuthUser };
 export type SignupRequest = {
   name: string;
@@ -269,7 +467,7 @@ export type ManagerApplication = {
   propertyId: string;
   tenantId: string;
   applicationDate: string;
-  status: "Pending" | "Approved" | "Denied";
+  status: "Pending" | "Approved" | "Denied" | "Withdrawn";
   name: string;
   email: string;
   phoneNumber: string;
@@ -322,6 +520,75 @@ export type Favorite = {
   property: Property;
 };
 
+export type TenantApplication = {
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  leaseId?: string | null;
+  applicationDate: string;
+  status: "Pending" | "Approved" | "Denied" | "Withdrawn";
+  name: string;
+  email: string;
+  phoneNumber: string;
+  message?: string | null;
+  property: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    pricePerMonth: number | string;
+    photoUrls: string[];
+    beds: number;
+    baths: number;
+    squareFeet: number;
+    manager?: {
+      phoneNumber?: string | null;
+      user?: { name: string; email: string };
+    };
+  };
+  lease?: { startDate: string; endDate: string } | null;
+};
+
+export type SubmitApplicationRequest = {
+  propertyId: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  message?: string;
+};
+
+export type PaymentMethod = {
+  id: string;
+  tenantId: string;
+  type: "Card" | "Bank";
+  brand?: string | null;
+  last4: string;
+  expMonth?: number | null;
+  expYear?: number | null;
+  accountHolder: string;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AddPaymentMethodRequest = {
+  type: "Card" | "Bank";
+  brand?: string;
+  last4: string;
+  expMonth?: number;
+  expYear?: number;
+  accountHolder: string;
+  isDefault?: boolean;
+};
+
+export type UpdatePaymentMethodRequest = {
+  accountHolder?: string;
+  expMonth?: number;
+  expYear?: number;
+  isDefault?: boolean;
+};
+
 export type TenantPayment = {
   id: string;
   leaseId: string;
@@ -372,12 +639,29 @@ export const {
   useGetManagerPropertiesQuery,
   useGetManagerApplicationsQuery,
   useUpdateApplicationStatusMutation,
+  useGetTenantApplicationsQuery,
+  useSubmitApplicationMutation,
+  useWithdrawApplicationMutation,
   useCreateLeasePaymentMutation,
   useGetFavoritesQuery,
   useAddFavoriteMutation,
   useRemoveFavoriteMutation,
   useGetCurrentLeaseQuery,
   useGetTenantPaymentsQuery,
+  usePayInvoiceMutation,
+  useGetPaymentMethodsQuery,
+  useAddPaymentMethodMutation,
+  useUpdatePaymentMethodMutation,
+  useRemovePaymentMethodMutation,
+  useGetTenantMaintenanceQuery,
+  useCreateMaintenanceRequestMutation,
+  useGetManagerMaintenanceQuery,
+  useUpdateMaintenanceStatusMutation,
+  useSubmitTourRequestMutation,
+  useSendContactMessageMutation,
+  useGetManagerTourRequestsQuery,
+  useGetManagerContactMessagesQuery,
+  useUpdateTourStatusMutation,
   useGetPropertyReviewsQuery,
   useCreateReviewMutation,
   useDeleteReviewMutation,

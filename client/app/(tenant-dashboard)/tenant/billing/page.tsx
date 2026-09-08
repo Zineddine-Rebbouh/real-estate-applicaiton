@@ -11,7 +11,6 @@ import {
   DownloadIcon,
   FileDownIcon,
   FileTextIcon,
-  MailIcon,
   ReceiptTextIcon,
   SearchIcon,
   TriangleAlertIcon,
@@ -24,14 +23,18 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { downloadReceipt, downloadStatement } from "@/lib/utils";
 import { useGetTenantPaymentsQuery, type TenantPayment } from "@/state/api";
 
 type TransactionStatus = TenantPayment["paymentStatus"];
 type Transaction = {
   id: string;
+  paymentId: string;
   date: string;
   property: string;
   amount: number;
+  paid: number;
+  balance: number;
   status: TransactionStatus;
   lineItems: { label: string; amount: number }[];
 };
@@ -41,6 +44,7 @@ function toTransaction(payment: TenantPayment): Transaction {
   const paid = Number(payment.amountPaid);
   return {
     id: `INV-${payment.id.slice(0, 8).toUpperCase()}`,
+    paymentId: payment.id,
     date: new Date(payment.dueDate).toLocaleDateString("en-US", {
       month: "short",
       day: "2-digit",
@@ -48,6 +52,8 @@ function toTransaction(payment: TenantPayment): Transaction {
     }),
     property: payment.lease?.property?.name ?? "Lease payment",
     amount: due,
+    paid,
+    balance: due - paid,
     status: payment.paymentStatus,
     lineItems: [
       { label: "Amount due", amount: due },
@@ -55,6 +61,27 @@ function toTransaction(payment: TenantPayment): Transaction {
       { label: "Balance", amount: due - paid },
     ],
   };
+}
+
+function downloadCsv(filename: string, rows: Transaction[]) {
+  const header = "Reference,Date,Property,Amount Due,Amount Paid,Balance,Status";
+  const escape = (v: string | number) => `"${String(v).replace(/"/g, '""')}"`;
+  const body = rows
+    .map((t) =>
+      [t.id, t.date, t.property, t.amount.toFixed(2), t.paid.toFixed(2), t.balance.toFixed(2), t.status]
+        .map(escape)
+        .join(","),
+    )
+    .join("\n");
+  const blob = new Blob([[header, body].join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }
 
 const statusDetails: Record<
@@ -191,8 +218,15 @@ export default function BillingHistoryPage() {
     1,
     Math.ceil(filteredTransactions.length / pageSize),
   );
-  const notify = (message: string) =>
-    toast.success(message, { description: "Your request is being prepared." });
+
+  const handleDownloadReceipt = async (transaction: Transaction) => {
+    try {
+      await downloadReceipt(transaction.paymentId, `Receipt_${transaction.id}.pdf`);
+      toast.success(`Receipt ${transaction.id} downloaded`);
+    } catch {
+      toast.error(`Couldn't download receipt ${transaction.id}`);
+    }
+  };
 
   return (
     <main className="min-h-full bg-muted/30">
@@ -215,7 +249,12 @@ export default function BillingHistoryPage() {
             <Button
               variant="outline"
               className="min-h-11 gap-2"
-              onClick={() => notify("CSV export started")}
+              onClick={() => {
+                downloadCsv("billing-history.csv", filteredTransactions);
+                toast.success("CSV export downloaded", {
+                  description: `${filteredTransactions.length} records.`,
+                });
+              }}
             >
               <DownloadIcon className="size-4" />
               Export CSV
@@ -223,7 +262,14 @@ export default function BillingHistoryPage() {
             <Button
               variant="outline"
               className="min-h-11 gap-2"
-              onClick={() => notify("PDF export started")}
+              onClick={async () => {
+                try {
+                  await downloadStatement({ from: fromDate, to: toDate });
+                  toast.success("PDF statement downloaded");
+                } catch {
+                  toast.error("Couldn't download the PDF statement");
+                }
+              }}
             >
               <FileDownIcon className="size-4" />
               Export PDF
@@ -446,24 +492,9 @@ export default function BillingHistoryPage() {
                                   size="icon"
                                   className="size-11"
                                   aria-label={`Download invoice ${transaction.id}`}
-                                  onClick={() =>
-                                    notify(
-                                      `Invoice ${transaction.id} downloaded`,
-                                    )
-                                  }
+                                  onClick={() => handleDownloadReceipt(transaction)}
                                 >
                                   <DownloadIcon className="size-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="size-11"
-                                  aria-label={`Resend receipt ${transaction.id}`}
-                                  onClick={() =>
-                                    notify(`Receipt ${transaction.id} resent`)
-                                  }
-                                >
-                                  <MailIcon className="size-4" />
                                 </Button>
                               </div>
                             </td>
@@ -523,22 +554,9 @@ export default function BillingHistoryPage() {
                             size="icon"
                             className="size-11"
                             aria-label={`Download invoice ${transaction.id}`}
-                            onClick={() =>
-                              notify(`Invoice ${transaction.id} downloaded`)
-                            }
+                            onClick={() => handleDownloadReceipt(transaction)}
                           >
                             <DownloadIcon className="size-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-11"
-                            aria-label={`Resend receipt ${transaction.id}`}
-                            onClick={() =>
-                              notify(`Receipt ${transaction.id} resent`)
-                            }
-                          >
-                            <MailIcon className="size-4" />
                           </Button>
                           <Button
                             variant="outline"

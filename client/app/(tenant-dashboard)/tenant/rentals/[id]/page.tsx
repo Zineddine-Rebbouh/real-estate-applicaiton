@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getRentalDetailById } from "@/src/data/rental-details-data";
-import { MOCK_RENTALS } from "@/src/data/rentals-data";
+import type { RentalDetail } from "@/src/data/rental-details-data";
+import { mapPropertyToListing, formatHighlights } from "@/lib/listings";
 import { ListingGallery } from "@/components/rentals/detail/listing-gallery";
 import { ListingHeader } from "@/components/rentals/detail/listing-header";
 import { KeyFactsStrip } from "@/components/rentals/detail/key-facts-strip";
@@ -13,29 +13,144 @@ import { ListingMapSection } from "@/components/rentals/detail/listing-map-secti
 import { PropertyReviewsSection } from "@/components/rentals/detail/property-reviews";
 import { ListingContactCard } from "@/components/rentals/detail/listing-contact-card";
 import { SimilarListingsCarousel } from "@/components/rentals/detail/listing-similar-carousel";
+import type { Property } from "@/state/api";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+async function fetchProperty(id: string): Promise<Property | null> {
+  try {
+    const res = await fetch(`${API}/api/properties/${id}`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.property ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchAllProperties(): Promise<Property[]> {
+  try {
+    const res = await fetch(`${API}/api/properties`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.properties ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// Core listing facts come from the real property. Sections with no backend
+// counterpart (fee schedule beyond the stored amounts, pet/parking policy
+// wording, host card, POIs) are derived from the stored fields where
+// possible and fall back to neutral placeholders otherwise.
+function toRentalDetail(p: Property): RentalDetail {
+  const listing = mapPropertyToListing(p);
+  const price = Number(p.pricePerMonth);
+  const photos = p.photoUrls?.length ? p.photoUrls : ["/singlelisting-2.jpg"];
+  const hostName = p.manager?.user?.name ?? "Property Manager";
+
+  return {
+    ...listing,
+    breadcrumbs: {
+      country: p.country,
+      region: p.state,
+      city: p.city,
+      neighborhood: p.city,
+    },
+    deposit: Number(p.securityDeposit),
+    leaseTerm: "12 Months",
+    aboutText: [p.description || "No description provided yet."],
+    highlights: formatHighlights(p.highlights),
+    detailedGallery: photos.map((url, i) => ({
+      url,
+      caption: `${p.name} — photo ${i + 1}`,
+    })),
+    feesBreakdown: {
+      requiredFees: [
+        { name: "Monthly rent", amount: `$${price.toLocaleString()}`, frequency: "per month", required: true },
+        { name: "Security deposit", amount: `$${Number(p.securityDeposit).toLocaleString()}`, frequency: "one-time", required: true },
+        { name: "Application fee", amount: `$${Number(p.applicationFee).toLocaleString()}`, frequency: "one-time", required: true },
+      ],
+      petFees: [],
+      parkingFees: [],
+    },
+    policies: {
+      petPolicy: {
+        allowed: p.isPetsAllowed,
+        summary: p.isPetsAllowed ? "Pets are welcome at this property." : "Pets are not allowed at this property.",
+        rules: [],
+      },
+      parkingPolicy: {
+        included: p.isParkingIncluded,
+        type: p.isParkingIncluded ? "Included" : "Not included",
+        summary: p.isParkingIncluded
+          ? "Parking is included with this listing."
+          : "Parking is not included with this listing.",
+        rules: [],
+      },
+    },
+    host: {
+      name: hostName,
+      role: "Property Manager",
+      company: "",
+      avatar: "/landing-i1.png",
+      phone: p.manager?.phoneNumber ?? "",
+      email: p.manager?.user?.email ?? "",
+      rating: listing.rating,
+      reviewCount: listing.reviewCount,
+      responseRate: "—",
+      responseTime: "—",
+      languages: ["English"],
+      viewingHours: { weekdays: "By appointment", weekends: "By appointment" },
+      verified: true,
+    },
+    nearbyPOIs: [],
+    reviews: {
+      overall: listing.rating,
+      totalReviews: listing.reviewCount,
+      breakdown: {
+        cleanliness: listing.rating,
+        accuracy: listing.rating,
+        communication: listing.rating,
+        location: listing.rating,
+        value: listing.rating,
+      },
+      list: [],
+    },
+  };
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const property = getRentalDetailById(id);
+  const property = await fetchProperty(id);
   if (!property) return { title: "Listing Not Found" };
 
   return {
-    title: `${property.title} | ${property.neighborhood}, ${property.city} Rentals`,
-    description: `Rent ${property.title} in ${property.neighborhood}. ${property.beds} beds, ${property.baths} baths, ${property.sqft} sq ft for $${property.price}/month. Verified listing with tour scheduling.`,
+    title: `${property.name} | ${property.city} Rentals`,
+    description: `Rent ${property.name} in ${property.city}. ${property.beds} beds, ${property.baths} baths, ${property.squareFeet} sq ft for $${Number(property.pricePerMonth).toLocaleString()}/month.`,
   };
 }
 
 export default async function RentalDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const property = getRentalDetailById(id);
+  const raw = await fetchProperty(id);
 
-  if (!property) {
+  if (!raw) {
     notFound();
   }
+
+  const property = toRentalDetail(raw);
+  const similar = (await fetchAllProperties())
+    .filter((p) => p.id !== raw.id)
+    .map(mapPropertyToListing);
 
   return (
     <div className="min-h-full bg-muted/20 pb-20 sm:pb-16">
@@ -43,6 +158,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
         {/* 1. PHOTO GALLERY (Hero 60% + 2x2 Grid 40% on desktop; Swipeable on mobile) */}
         <section aria-label="Photo gallery">
           <ListingGallery
+            propertyId={property.id}
             images={property.detailedGallery}
             title={property.title}
             isFavorite={property.isFavorite}
@@ -102,6 +218,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
               price={property.price}
               coords={property.coords}
               pois={property.nearbyPOIs}
+              listing={property}
             />
 
             {/* Tenant reviews from real review data */}
@@ -111,6 +228,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
           {/* Sticky Contact Column (Right: 4 of 12 columns on desktop) */}
           <div className="lg:col-span-4 min-w-0">
             <ListingContactCard
+              propertyId={property.id}
               propertyTitle={property.title}
               price={property.price}
               deposit={property.deposit}
@@ -124,7 +242,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
         <section aria-label="Similar listings">
           <SimilarListingsCarousel
             currentPropertyId={property.id}
-            properties={MOCK_RENTALS}
+            properties={similar}
             neighborhood={property.neighborhood}
           />
         </section>
@@ -132,4 +250,3 @@ export default async function RentalDetailPage({ params }: PageProps) {
     </div>
   );
 }
-

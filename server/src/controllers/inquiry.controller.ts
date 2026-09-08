@@ -35,10 +35,10 @@ export async function createTourRequest(req: Request, res: Response) {
       return res.status(400).json({ error: "propertyId is required" });
     if (!tourType || !validTourTypes.includes(tourType as TourType))
       return res.status(400).json({ error: "tourType must be InPerson or Video" });
-    if (!preferredDate || typeof preferredDate !== "string" || !preferredDate.trim())
-      return res.status(400).json({ error: "A preferred date is required" });
-    if (!preferredTime || typeof preferredTime !== "string" || !preferredTime.trim())
-      return res.status(400).json({ error: "A preferred time is required" });
+    if (!preferredDate || typeof preferredDate !== "string" || !preferredDate.trim() || preferredDate.trim().length > 60)
+      return res.status(400).json({ error: "A preferred date (max 60 characters) is required" });
+    if (!preferredTime || typeof preferredTime !== "string" || !preferredTime.trim() || preferredTime.trim().length > 60)
+      return res.status(400).json({ error: "A preferred time (max 60 characters) is required" });
 
     const property = await prisma.property.findUnique({
       where: { id: propertyId },

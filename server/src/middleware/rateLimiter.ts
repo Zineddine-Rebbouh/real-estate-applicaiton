@@ -27,3 +27,18 @@ export const refreshRateLimiter = rateLimit({
   legacyHeaders: false,
   handler: jsonHandler as any,
 });
+// ponytail: one shared limiter for tenant write endpoints (spam) + a stricter one for uploads (cost)
+export const writeRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 60,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  handler: jsonHandler as any,
+});
+export const uploadRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  handler: jsonHandler as any,
+});

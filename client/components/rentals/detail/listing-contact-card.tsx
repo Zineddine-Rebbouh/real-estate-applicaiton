@@ -18,6 +18,7 @@ import { RequestTourModal, ContactHostModal } from "./tour-and-message-modals";
 import { formatPriceValue } from "@/lib/utils";
 
 interface ListingContactCardProps {
+  propertyId: string;
   propertyTitle: string;
   price: number;
   deposit: number;
@@ -26,6 +27,7 @@ interface ListingContactCardProps {
 }
 
 export function ListingContactCard({
+  propertyId,
   propertyTitle,
   price,
   deposit,
@@ -230,6 +232,7 @@ export function ListingContactCard({
       <RequestTourModal
         isOpen={isTourModalOpen}
         onClose={() => setIsTourModalOpen(false)}
+        propertyId={propertyId}
         propertyTitle={propertyTitle}
         host={host}
       />
@@ -238,6 +241,7 @@ export function ListingContactCard({
       <ContactHostModal
         isOpen={isMessageModalOpen}
         onClose={() => setIsMessageModalOpen(false)}
+        propertyId={propertyId}
         propertyTitle={propertyTitle}
         host={host}
       />

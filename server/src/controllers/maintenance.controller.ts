@@ -49,6 +49,15 @@ export async function createMaintenanceRequest(req: Request, res: Response) {
       },
       select: { id: true },
     });
+    // ponytail: residents only — same lease-history gate as reviews, otherwise any tenant can spam any property
+    if (!currentLease) {
+      const pastStay = await prisma.lease.findFirst({
+        where: { tenantId: tenant.id, propertyId, startDate: { lte: now } },
+        select: { id: true },
+      });
+      if (!pastStay)
+        return res.status(403).json({ error: "Only residents of this property can report issues" });
+    }
 
     const request = await prisma.maintenanceRequest.create({
       data: {

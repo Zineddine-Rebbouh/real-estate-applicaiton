@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import type { ComponentType } from "react";
 import {
   AirVentIcon,
   BathIcon,
@@ -50,7 +51,7 @@ interface FilterSidebarProps {
   isMobileDrawer?: boolean;
 }
 
-const PROPERTY_TYPE_ITEMS: { type: PropertyType; label: string; icon: any }[] = [
+const PROPERTY_TYPE_ITEMS: { type: PropertyType; label: string; icon: ComponentType<{ className?: string }> }[] = [
   { type: "Apartment", label: "Apartment", icon: Building2Icon },
   { type: "House", label: "House", icon: HomeIcon },
   { type: "Condo", label: "Condo", icon: BuildingIcon },

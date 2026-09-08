@@ -1,0 +1,56 @@
+# Local full-stack run:  postgres + api + web.
+# Replace the JWT_*_SECRET placeholders before any non-local use.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: real_estate
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./server
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/real_estate?schema=public
+      CLIENT_URL: http://localhost:3000
+      JWT_ACCESS_SECRET: replace-with-a-random-secret-at-least-32-characters
+      JWT_REFRESH_SECRET: replace-with-a-different-random-secret-at-least-32-characters
+      NODE_ENV: production
+      PORT: 3002
+      # Listing photo uploads (Cloudinary-only). Set real values or the
+      # API container will exit on boot (env validation) and uploads 502.
+      CLOUDINARY_CLOUD_NAME: replace-with-cloud-name
+      CLOUDINARY_API_KEY: replace-with-api-key
+      CLOUDINARY_API_SECRET: replace-with-api-secret
+      CLOUDINARY_FOLDER: real-estate/listings
+    ports:
+      - "3002:3002"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3002/ || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: ./client
+      args:
+        NEXT_PUBLIC_API_BASE_URL: http://localhost:3002
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:

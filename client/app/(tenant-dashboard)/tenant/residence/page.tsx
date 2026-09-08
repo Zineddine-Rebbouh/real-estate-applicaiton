@@ -1,5 +1,7 @@
 "use client";
 
+import * as React from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -7,16 +9,35 @@ import {
   DownloadIcon,
   HouseIcon,
   MapPinIcon,
+  WrenchIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetCurrentLeaseQuery, type Lease } from "@/state/api";
+import { downloadLeaseAgreement, openLeaseAgreement } from "@/lib/utils";
+import {
+  useCreateMaintenanceRequestMutation,
+  useGetCurrentLeaseQuery,
+  useGetTenantMaintenanceQuery,
+  type Lease,
+} from "@/state/api";
 
 type Residence = {
+  id: string;
+  propertyId: string;
   address: string;
   endDate: string;
   image: string;
@@ -37,9 +58,11 @@ const formatRent = (rent: number | string) =>
 
 function leaseToResidence(lease: Lease): Residence {
   return {
+    id: lease.id,
+    propertyId: lease.propertyId,
     address: lease.property?.address ?? "",
     endDate: formatDate(lease.endDate),
-    image: lease.property?.photoUrls?.[0] ?? "/singlelisting-1.jpg",
+    image: lease.property?.photoUrls?.[0] ?? "/singlelisting-2.jpg",
     property: lease.property?.name ?? "Leased property",
     rent: formatRent(lease.rent),
     startDate: formatDate(lease.startDate),
@@ -67,18 +90,40 @@ function LeaseDates({ residence }: { residence: Residence }) {
   );
 }
 
-function LeaseActions({ compact = false }: { compact?: boolean }) {
+async function handleDownloadAgreement(residence: Residence) {
+  const filename = `Lease_Agreement_${residence.property.replace(/\s+/g, "_")}.pdf`;
+  try {
+    await downloadLeaseAgreement(residence.id, filename);
+    toast.success("Lease agreement downloaded", { description: filename });
+  } catch {
+    toast.error("Couldn't download the lease agreement");
+  }
+}
+
+function LeaseActions({
+  residence,
+  compact = false,
+}: {
+  residence: Residence;
+  compact?: boolean;
+}) {
   return (
     <div className={`flex flex-wrap gap-2 ${compact ? "border-t pt-4" : ""}`}>
-      <Button variant="outline" size="sm" onClick={() => toast.success("View Lease clicked")}>View Lease</Button>
-      <Button variant="outline" size="sm" onClick={() => toast.success("Download Agreement clicked")}>
+      <Button variant="outline" size="sm" onClick={() => openLeaseAgreement(residence.id)}>View Lease</Button>
+      <Button variant="outline" size="sm" onClick={() => handleDownloadAgreement(residence)}>
         <DownloadIcon /> Download Agreement
       </Button>
     </div>
   );
 }
 
-function CurrentResidenceCard({ residence }: { residence: Residence }) {
+function CurrentResidenceCard({
+  residence,
+  onRequestMaintenance,
+}: {
+  residence: Residence;
+  onRequestMaintenance: () => void;
+}) {
   return (
     <Card className="overflow-hidden p-0">
       <div className="grid lg:grid-cols-[minmax(280px,0.85fr)_1.15fr]">
@@ -121,9 +166,15 @@ function CurrentResidenceCard({ residence }: { residence: Residence }) {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline">View Lease</Button>
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => openLeaseAgreement(residence.id)}>View Lease</Button>
+            <Button
+              variant="outline"
+              onClick={() => handleDownloadAgreement(residence)}
+            >
               <DownloadIcon /> Download Agreement
+            </Button>
+            <Button variant="outline" onClick={onRequestMaintenance}>
+              <WrenchIcon /> Request Maintenance
             </Button>
             <Button variant="ghost">Contact Manager</Button>
           </div>
@@ -159,7 +210,7 @@ function PastResidenceCard({ residence }: { residence: Residence }) {
           <p className="shrink-0 text-right font-semibold">{residence.rent}</p>
         </div>
         <LeaseDates residence={residence} />
-        <LeaseActions compact />
+        <LeaseActions residence={residence} compact />
       </div>
     </Card>
   );
@@ -177,10 +228,195 @@ function EmptyState() {
       <h2 className="mt-4 text-base font-medium">
         You don&apos;t have any residences yet
       </h2>
-      <Button className="mt-5" nativeButton={false} render={<Link href="/" />}>
+      <Button className="mt-5" nativeButton={false} render={<Link href="/tenant/explore" />}>
         Browse Properties
       </Button>
     </div>
+  );
+}
+
+const maintenanceStatusStyles: Record<string, string> = {
+  Open: "bg-amber-500/10 text-amber-700 border-amber-500/20",
+  InProgress: "bg-sky-500/10 text-sky-700 border-sky-500/20",
+  Resolved: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
+};
+
+function MaintenanceSection({
+  properties,
+  defaultPropertyId,
+}: {
+  properties: { id: string; name: string }[];
+  defaultPropertyId?: string;
+}) {
+  const { data, isLoading } = useGetTenantMaintenanceQuery();
+  const [createRequest, { isLoading: isSubmitting }] =
+    useCreateMaintenanceRequestMutation();
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [propertyId, setPropertyId] = useState(defaultPropertyId ?? "");
+
+  const requests = data?.maintenanceRequests ?? [];
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const title = ((form.get("title") as string) || "").trim();
+    const description = ((form.get("description") as string) || "").trim();
+    if (!propertyId || !title || !description) return;
+    try {
+      await createRequest({ propertyId, title, description }).unwrap();
+      setDialogOpen(false);
+      toast.success("Maintenance request submitted");
+    } catch {
+      toast.error("Couldn't submit your request. Please try again.");
+    }
+  };
+
+  return (
+    <section
+      id="maintenance-requests"
+      className="space-y-4 scroll-mt-20"
+      aria-labelledby="maintenance-heading"
+    >
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2
+            id="maintenance-heading"
+            className="font-display text-xl font-semibold tracking-tight"
+          >
+            Maintenance Requests
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Report an issue and track how it&apos;s being handled.
+          </p>
+        </div>
+        <Button
+          size="sm"
+          onClick={() => {
+            setPropertyId(defaultPropertyId ?? properties[0]?.id ?? "");
+            setDialogOpen(true);
+          }}
+          disabled={properties.length === 0}
+        >
+          <WrenchIcon className="size-4" />
+          <span>Report an issue</span>
+        </Button>
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+        </div>
+      ) : requests.length === 0 ? (
+        <Card className="p-6 text-center">
+          <p className="text-sm font-medium text-foreground">No requests yet</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Anything broken? Report it and your manager will pick it up here.
+          </p>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {requests.map((r) => (
+            <Card key={r.id} className="p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold text-foreground">{r.title}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {r.property.name} ·{" "}
+                    {new Date(r.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {r.description}
+                  </p>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={`shrink-0 ${maintenanceStatusStyles[r.status] ?? ""}`}
+                >
+                  {r.status === "InProgress" ? "In Progress" : r.status}
+                </Badge>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Report a maintenance issue</DialogTitle>
+            <DialogDescription>
+              Describe the problem and your property manager will follow up.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-3 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="mr-property" className="text-xs font-semibold">
+                Property
+              </Label>
+              <select
+                id="mr-property"
+                value={propertyId}
+                onChange={(e) => setPropertyId(e.target.value)}
+                required
+                className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+              >
+                {properties.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="mr-title" className="text-xs font-semibold">
+                Issue
+              </Label>
+              <Input
+                id="mr-title"
+                name="title"
+                placeholder="e.g. Kitchen faucet leaking"
+                required
+                maxLength={120}
+                className="h-9 text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="mr-description" className="text-xs font-semibold">
+                Details
+              </Label>
+              <textarea
+                id="mr-description"
+                name="description"
+                rows={4}
+                required
+                maxLength={2000}
+                placeholder="What&apos;s wrong, where, and since when?"
+                className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setDialogOpen(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" size="sm" disabled={isSubmitting}>
+                {isSubmitting ? "Submitting…" : "Submit request"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </section>
   );
 }
 
@@ -192,6 +428,12 @@ export default function ResidencePage() {
     : null;
   const pastResidences = (data?.pastLeases ?? []).map(leaseToResidence);
   const hasResidences = currentResidence !== null || pastResidences.length > 0;
+  const leaseProperties = [
+    ...(currentResidence
+      ? [{ id: currentResidence.propertyId, name: currentResidence.property }]
+      : []),
+    ...pastResidences.map((r) => ({ id: r.propertyId, name: r.property })),
+  ];
 
   return (
     <main className="min-h-full bg-muted/30">
@@ -229,7 +471,14 @@ export default function ResidencePage() {
         ) : (
           <>
             {currentResidence && (
-              <CurrentResidenceCard residence={currentResidence} />
+              <CurrentResidenceCard
+                residence={currentResidence}
+                onRequestMaintenance={() =>
+                  document
+                    .getElementById("maintenance-requests")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+              />
             )}
 
             <section
@@ -258,6 +507,11 @@ export default function ResidencePage() {
                 </div>
               )}
             </section>
+
+            <MaintenanceSection
+              properties={leaseProperties}
+              defaultPropertyId={currentResidence?.propertyId}
+            />
           </>
         )}
       </div>

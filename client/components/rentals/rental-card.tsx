@@ -24,6 +24,8 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RentalProperty } from "@/src/data/rentals-data";
 import { formatPriceValue } from "@/lib/utils";
+import { useAddFavoriteMutation, useRemoveFavoriteMutation } from "@/state/api";
+import { toast } from "sonner";
 
 interface RentalCardProps {
   property: RentalProperty;
@@ -44,6 +46,8 @@ export function RentalCard({
 }: RentalCardProps) {
   const [isFavorite, setIsFavorite] = useState(property.isFavorite || false);
   const [currentImageIdx, setCurrentImageIdx] = useState(0);
+  const [addFavorite] = useAddFavoriteMutation();
+  const [removeFavorite] = useRemoveFavoriteMutation();
   const isList = viewMode === "list";
   const images = property.gallery?.length ? property.gallery : [property.image];
 
@@ -115,7 +119,14 @@ export function RentalCard({
           }
           onClick={(event) => {
             event.stopPropagation();
-            setIsFavorite((favorite) => !favorite);
+            const next = !isFavorite;
+            setIsFavorite(next);
+            (next ? addFavorite(property.id) : removeFavorite(property.id))
+              .unwrap()
+              .catch(() => {
+                setIsFavorite(!next);
+                toast.error("Couldn't update favorites. Please try again.");
+              });
           }}
           className="absolute right-1.5 top-1.5 z-10 flex size-11 items-center justify-center rounded-full"
         >

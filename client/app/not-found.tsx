@@ -32,7 +32,7 @@ export default function NotFound() {
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button nativeButton={false} render={<Link href="/" />}>
+          <Button nativeButton={false} render={<Link href="/tenant/explore" />}>
             <SearchIcon />
             Browse Properties
           </Button>

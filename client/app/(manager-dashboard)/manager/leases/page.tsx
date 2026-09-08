@@ -20,6 +20,7 @@ import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PropertyThumb } from "@/components/rentals/property-thumb";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,6 +34,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useCreateLeasePaymentMutation, useGetManagerPropertiesQuery } from "@/state/api";
+import { downloadLeaseAgreement } from "@/lib/utils";
 
 export default function ManagerLeasesPage() {
   const { data, isLoading } = useGetManagerPropertiesQuery();
@@ -63,10 +65,17 @@ export default function ManagerLeasesPage() {
     );
   });
 
-  const handleDownload = (propertyName: string) => {
-    toast.success(`Downloading lease agreement for ${propertyName}...`, {
-      description: "Standard residential lease PDF generated.",
-    });
+  const handleDownload = async (leaseId: string | undefined, propertyName: string) => {
+    if (!leaseId) {
+      toast.info(`No active lease for ${propertyName} yet.`);
+      return;
+    }
+    try {
+      await downloadLeaseAgreement(leaseId, `lease-${propertyName}.pdf`);
+      toast.success(`Lease agreement for ${propertyName} downloaded.`);
+    } catch {
+      toast.error("Couldn't download the lease agreement. Please try again.");
+    }
   };
 
   const openInvoice = (propertyId: string, leaseId: string, rent: number | string) =>
@@ -207,10 +216,10 @@ export default function ManagerLeasesPage() {
                     {/* Property info */}
                     <div className="flex min-w-0 flex-1 items-center gap-4 p-5">
                       <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-muted">
-                        <img
-                          src={property.photoUrls?.[0] || "/singlelisting-1.jpg"}
+                        <PropertyThumb
+                          src={property.photoUrls?.[0]}
                           alt={property.name}
-                          className="size-full object-cover"
+                          className="size-full"
                         />
                       </div>
                       <div className="min-w-0 flex-1">
@@ -283,11 +292,11 @@ export default function ManagerLeasesPage() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => handleDownload(property.name)}
+                        onClick={() => handleDownload((property.leases ?? [])[0]?.id, property.name)}
                         className="text-xs gap-1"
                       >
                         <DownloadIcon className="size-3.5" />
-                        <span>Download Sample Lease</span>
+                        <span>Download Lease</span>
                       </Button>
                       {(property.leases ?? []).length > 0 && (
                         <Button

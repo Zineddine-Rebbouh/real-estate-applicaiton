@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -34,11 +34,15 @@ import { FilterDrawer } from "@/components/rentals/filter-drawer";
 import {
   FilterState,
   INITIAL_FILTERS,
-  MOCK_RENTALS,
-  PropertyType,
   RentalProperty,
   AMENITIES_LIST,
 } from "@/src/data/rentals-data";
+import {
+  applyListingFilters,
+  mapPropertyToListing,
+  toPropertyQuery,
+} from "@/lib/listings";
+import { useGetPropertiesQuery } from "@/state/api";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -49,7 +53,6 @@ export default function BrowseRentalsPage() {
   const [viewMode, setViewMode] = useState<BrowseViewMode>("grid");
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
   const [showSkeletonDemo, setShowSkeletonDemo] = useState(false);
 
 
@@ -64,64 +67,15 @@ export default function BrowseRentalsPage() {
   };
 
   // Filter listings based on active filter state
+  const { data: propertiesData, isLoading } = useGetPropertiesQuery(
+    toPropertyQuery(filters),
+  );
+  const serverListings = useMemo(
+    () => (propertiesData?.properties ?? []).map(mapPropertyToListing),
+    [propertiesData],
+  );
   const filteredProperties = useMemo(() => {
-    return MOCK_RENTALS.filter((property) => {
-      // Location search
-      if (filters.locationQuery.trim()) {
-        const query = filters.locationQuery.toLowerCase().trim();
-        const matchesLocation =
-          property.title.toLowerCase().includes(query) ||
-          property.address.toLowerCase().includes(query) ||
-          property.neighborhood.toLowerCase().includes(query) ||
-          property.city.toLowerCase().includes(query);
-        if (!matchesLocation) return false;
-      }
-
-      // Price range
-      if (property.price < filters.minPrice) return false;
-      if (filters.maxPrice < 4500 && property.price > filters.maxPrice)
-        return false;
-
-      // Property type
-      if (
-        filters.propertyTypes.length > 0 &&
-        !filters.propertyTypes.includes(property.propertyType)
-      ) {
-        return false;
-      }
-
-      // Bedrooms
-      if (filters.beds !== null) {
-        if (filters.beds === 0 && property.beds !== 0) return false;
-        if (filters.beds > 0 && property.beds < filters.beds) return false;
-      }
-
-      // Bathrooms
-      if (filters.baths !== null && property.baths < filters.baths) {
-        return false;
-      }
-
-      // Square footage
-      if (property.sqft < filters.minSqft) return false;
-      if (filters.maxSqft < 2800 && property.sqft > filters.maxSqft)
-        return false;
-
-      // Amenities
-      if (filters.amenities.length > 0) {
-        const hasAllAmenities = filters.amenities.every((amenity) =>
-          property.amenities.includes(amenity),
-        );
-        if (!hasAllAmenities) return false;
-      }
-
-      // Pet friendly
-      if (filters.petFriendlyOnly && !property.petFriendly) return false;
-
-      // Parking
-      if (filters.parkingOnly && !property.parkingIncluded) return false;
-
-      return true;
-    }).sort((a, b) => {
+    return applyListingFilters(serverListings, filters).sort((a, b) => {
       if (sortBy === "price-asc") return a.price - b.price;
       if (sortBy === "price-desc") return b.price - a.price;
       if (sortBy === "rating") return b.rating - a.rating;
@@ -132,7 +86,7 @@ export default function BrowseRentalsPage() {
       if (!a.featured && b.featured) return 1;
       return b.reviewCount - a.reviewCount;
     });
-  }, [filters, sortBy]);
+  }, [serverListings, filters, sortBy]);
 
   // Paginated subset
   const totalPages = Math.ceil(filteredProperties.length / ITEMS_PER_PAGE) || 1;
@@ -229,13 +183,7 @@ export default function BrowseRentalsPage() {
     return chips;
   }, [filters]);
 
-  const activeCityName = filters.locationQuery.trim() || "Wrocław";
-
-  // Simulate loading for skeleton demo
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+  const activeCityName = filters.locationQuery.trim() || "all areas";
 
   return (
     <div className="min-h-full bg-muted/30 pb-16">

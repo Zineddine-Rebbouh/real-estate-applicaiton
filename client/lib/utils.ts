@@ -92,3 +92,71 @@ export const createNewUserInDatabase = async (
 
   return createUserResponse;
 };
+
+// Downloads the signed lease agreement PDF for a lease the current user
+// is a party to (tenant on the lease, or its property's manager).
+export async function downloadLeaseAgreement(leaseId: string, filename: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/leases/${leaseId}/agreement`,
+    { credentials: "include" },
+  );
+  if (!res.ok) throw new Error("Download failed");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Opens the agreement in a new tab (server returns it inline).
+export function openLeaseAgreement(leaseId: string) {
+  window.open(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/leases/${leaseId}/agreement?inline=1`,
+    "_blank",
+    "noopener",
+  );
+}
+
+// Downloads the full payment-history statement PDF, honoring the same
+// optional from/to (YYYY-MM-DD) due-date filters as the billing page.
+export async function downloadStatement(params: { from?: string; to?: string }) {
+  const query = new URLSearchParams(
+    Object.fromEntries(Object.entries(params).filter(([, v]) => Boolean(v))),
+  ).toString();
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/tenant/payments/statement${query ? `?${query}` : ""}`,
+    { credentials: "include" },
+  );
+  if (!res.ok) throw new Error("Download failed");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "Payment_Statement.pdf";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Downloads a single-invoice receipt PDF (same party rule as agreements).
+export async function downloadReceipt(paymentId: string, filename: string) {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/leases/payments/${paymentId}/receipt`,
+    { credentials: "include" },
+  );
+  if (!res.ok) throw new Error("Download failed");
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}

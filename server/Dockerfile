@@ -9,9 +9,8 @@ FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package*.json ./
-RUN npm ci --omit=dev && npx prisma generate
+RUN npm ci
 COPY --from=build /app/dist ./dist
 COPY prisma ./prisma
-VOLUME /app/uploads
 EXPOSE 3002
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run seed && node dist/index.js"]

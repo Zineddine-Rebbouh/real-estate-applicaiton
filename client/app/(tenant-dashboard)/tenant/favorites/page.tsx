@@ -40,7 +40,9 @@ import { toast } from "sonner";
 import {
   useAddFavoriteMutation,
   useGetFavoritesQuery,
+  useGetMeQuery,
   useRemoveFavoriteMutation,
+  useSubmitApplicationMutation,
   type Favorite,
 } from "@/state/api";
 import { formatEnumString } from "@/lib/utils";
@@ -87,7 +89,7 @@ function toFavoriteProperty(fav: Favorite): FavoriteProperty {
     id: fav.propertyId,
     address: `${p.address}, ${p.city}`,
     amenities,
-    image: p.photoUrls?.[0] ?? "/singlelisting-1.jpg",
+    image: p.photoUrls?.[0] ?? "/singlelisting-2.jpg",
     name: p.name,
     price: `$${priceNum.toLocaleString()} /mo`,
     priceNum,
@@ -102,8 +104,10 @@ function toFavoriteProperty(fav: Favorite): FavoriteProperty {
 
 export default function FavoritesPage() {
   const { data, isLoading, isError, refetch } = useGetFavoritesQuery();
+  const { data: currentUser } = useGetMeQuery();
   const [removeFavorite] = useRemoveFavoriteMutation();
   const [addFavorite] = useAddFavoriteMutation();
+  const [submitApplication] = useSubmitApplicationMutation();
   const [searchQuery, setSearchQuery] = useState("");
   const [bedFilter, setBedFilter] = useState<"all" | "1" | "2" | "3+">("all");
   const [sortBy, setSortBy] = useState<
@@ -194,21 +198,45 @@ export default function FavoritesPage() {
     }
   };
 
-  const handleApplySubmit = (e: React.FormEvent) => {
+  const handleApplySubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!applyingProperty) return;
 
+    const form = new FormData(e.currentTarget);
+    const name = ((form.get("name") as string) || "").trim();
+    const email = ((form.get("email") as string) || "").trim();
+    const phoneNumber = ((form.get("phoneNumber") as string) || "").trim();
+    const notes = ((form.get("notes") as string) || "").trim();
+    if (!name || !email || !phoneNumber) return;
+
     setIsApplying(true);
-    setTimeout(() => {
-      setIsApplying(false);
+    try {
+      await submitApplication({
+        propertyId: applyingProperty.id,
+        name,
+        email,
+        phoneNumber,
+        message: [`Move-in: ${moveInDate}`, notes].filter(Boolean).join(" — "),
+      }).unwrap();
       const propName = applyingProperty.name;
       setApplyingProperty(null);
-
       toast.success(`Application submitted for ${propName}!`, {
         description:
           "Your rental application was received. Track status in Applications.",
       });
-    }, 700);
+    } catch (err: unknown) {
+      const status =
+        typeof err === "object" && err !== null && "status" in err
+          ? (err as { status?: number }).status
+          : undefined;
+      toast.error(
+        status === 409
+          ? "You already have a pending application for this property."
+          : "Couldn't submit your application. Please try again.",
+      );
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   return (
@@ -246,7 +274,7 @@ export default function FavoritesPage() {
             <Button
               size="sm"
               nativeButton={false}
-              render={<Link href="/" className="flex items-center gap-1.5" />}
+              render={<Link href="/tenant/explore" className="flex items-center gap-1.5" />}
             >
               <CompassIcon className="size-3.5" />
               <span>Browse More Listings</span>
@@ -396,7 +424,7 @@ export default function FavoritesPage() {
             </p>
             <Button
               className="mt-6"
-              render={<Link href="/" className="flex items-center gap-1.5" />}
+              render={<Link href="/tenant/explore" className="flex items-center gap-1.5" />}
             >
               <CompassIcon className="size-4" />
               <span>Browse Properties</span>
@@ -729,6 +757,50 @@ export default function FavoritesPage() {
 
                 <div>
                   <label className="font-medium text-foreground block mb-1">
+                    Full name
+                  </label>
+                  <Input
+                    name="name"
+                    defaultValue={currentUser?.user?.name ?? ""}
+                    placeholder="Jane Doe"
+                    required
+                    minLength={1}
+                    className="h-9 text-xs"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className="font-medium text-foreground block mb-1">
+                      Email
+                    </label>
+                    <Input
+                      name="email"
+                      type="email"
+                      defaultValue={currentUser?.user?.email ?? ""}
+                      placeholder="jane@example.com"
+                      required
+                      className="h-9 text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-medium text-foreground block mb-1">
+                      Phone
+                    </label>
+                    <Input
+                      name="phoneNumber"
+                      type="tel"
+                      defaultValue={currentUser?.user?.phoneNumber ?? ""}
+                      placeholder="(555) 123-4567"
+                      required
+                      minLength={10}
+                      className="h-9 text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="font-medium text-foreground block mb-1">
                     Desired Move-in Date
                   </label>
                   <Input
@@ -745,6 +817,7 @@ export default function FavoritesPage() {
                     Notes for Landlord (Optional)
                   </label>
                   <Input
+                    name="notes"
                     placeholder="e.g., 2 occupants, excellent credit history"
                     className="h-9 text-xs"
                   />

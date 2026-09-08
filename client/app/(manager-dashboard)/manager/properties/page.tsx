@@ -15,6 +15,7 @@ import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PropertyThumb } from "@/components/rentals/property-thumb";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -147,10 +148,12 @@ export default function ManagerPropertiesPage() {
               >
                 <div>
                   <div className="relative aspect-16/9 w-full bg-muted overflow-hidden">
-                    <img
-                      src={property.photoUrls?.[0] || "/singlelisting-1.jpg"}
+                    <PropertyThumb
+                      src={property.photoUrls?.[0]}
                       alt={property.name}
-                      className="size-full object-cover transition-transform hover:scale-105 duration-300"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="transition-transform hover:scale-105 duration-300"
                     />
                     <Badge className="absolute top-3 left-3 bg-background/90 text-foreground font-semibold backdrop-blur-xs">
                       {property.propertyType}

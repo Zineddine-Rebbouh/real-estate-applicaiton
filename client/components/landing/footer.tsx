@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Globe, MessageCircle, Send, Briefcase } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 const footerLinks = {
   company: [
@@ -35,10 +36,8 @@ export function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Logo & Description */}
           <div className="col-span-2 lg:col-span-2">
-            <Link href="/" className="mb-4 inline-flex">
-              <span className="font-display text-2xl font-bold tracking-tight text-white">
-                Habitat
-              </span>
+            <Link href="/" className="mb-4 inline-flex" aria-label="Habitat home">
+              <Logo light className="h-10" />
             </Link>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
               A considered way to find the place you&apos;ll build your everyday

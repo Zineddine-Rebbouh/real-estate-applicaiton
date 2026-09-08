@@ -26,6 +26,7 @@ import {
 import { useGetMeQuery, useLogoutMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
 import { SettingsDialog } from "@/components/settings/settings-dialog";
+import { Logo } from "@/components/logo";
 
 export interface NavbarProps {
   isDashboard?: boolean;
@@ -119,14 +120,8 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
                   <SidebarTrigger className="-ml-1 text-white hover:bg-white/10 hover:text-white" />
                 </div>
               )}
-              <Link href="/" className="flex items-center">
-                <span
-                  className={`font-display text-2xl font-bold tracking-tight ${
-                    isDashboard || !scrolled ? "text-white" : "text-foreground"
-                  }`}
-                >
-                  Habitat
-                </span>
+              <Link href="/" className="flex items-center" aria-label="Habitat home">
+                <Logo light={isDashboard || !scrolled} className="h-10" />
               </Link>
             </div>
 

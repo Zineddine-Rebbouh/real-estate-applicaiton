@@ -222,12 +222,19 @@ export async function createLeasePayment(req: Request, res: Response) {
     const leaseId = Array.isArray(req.params.leaseId)
       ? req.params.leaseId[0]
       : req.params.leaseId;
+    if (!leaseId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(leaseId))
+      return res.status(404).json({ error: "Lease not found" });
     const { amountDue, amountPaid, dueDate, paymentDate, paymentStatus } = req.body;
 
-    if (typeof amountDue !== "number" && typeof amountDue !== "string")
-      return res.status(400).json({ error: "amountDue is required" });
+    const due = Number(amountDue);
+    if (amountDue === undefined || !Number.isFinite(due) || due <= 0)
+      return res.status(400).json({ error: "amountDue must be a positive number" });
+    if (amountPaid !== undefined && (!Number.isFinite(Number(amountPaid)) || Number(amountPaid) < 0))
+      return res.status(400).json({ error: "amountPaid must be a non-negative number" });
     if (!dueDate || Number.isNaN(new Date(dueDate).getTime()))
       return res.status(400).json({ error: "A valid dueDate is required" });
+    if (paymentDate !== undefined && paymentDate !== null && Number.isNaN(new Date(paymentDate).getTime()))
+      return res.status(400).json({ error: "Invalid payment date" });
     if (paymentStatus !== undefined && !validPaymentStatuses.includes(paymentStatus as PaymentStatus))
       return res.status(400).json({ error: "Invalid payment status. Allowed: Pending, Paid, PartiallyPaid, Overdue" });
 

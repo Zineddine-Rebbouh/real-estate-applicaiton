@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     // Next.js 16 requires an explicit allowlist; 90 keeps hero/landing imagery sharp.
     qualities: [75, 90],
+    remotePatterns: [{ protocol: "https", hostname: "res.cloudinary.com" }],
   },
   async redirects() {
     // Legacy tenant routes (pre-/tenant prefix) → new locations.

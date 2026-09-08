@@ -26,6 +26,7 @@ import {
   PropertyType,
 } from "@/src/data/rentals-data";
 import { formatPriceValue } from "@/lib/utils";
+import { Logo } from "@/components/logo";
 
 export type ViewMode = "split" | "list-focus" | "map-focus";
 
@@ -120,10 +121,9 @@ export function TopFilterBar({
             href="/"
             className="flex items-center mr-1 shrink-0 group"
             title="Return to Home"
+            aria-label="Habitat home"
           >
-            <span className="font-display text-xl font-bold tracking-tight text-foreground">
-              Habitat
-            </span>
+            <Logo className="h-9" />
           </Link>
         )}
 

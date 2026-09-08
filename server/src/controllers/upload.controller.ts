@@ -1,13 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
+import { cloudinary } from "../lib/cloudinary.js";
 import { env } from "../config/env.js";
-
-cloudinary.config({
-  cloud_name: env.CLOUDINARY_CLOUD_NAME,
-  api_key: env.CLOUDINARY_API_KEY,
-  api_secret: env.CLOUDINARY_API_SECRET,
-});
 
 function imageFilter(
   _req: Request,

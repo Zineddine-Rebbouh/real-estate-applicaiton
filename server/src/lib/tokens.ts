@@ -59,7 +59,7 @@ export function refreshCookieOptions(): CookieOptions {
   return {
     ...baseCookieOptions,
     maxAge: REFRESH_TOKEN_MAX_AGE_MS,
-    path: "/api/auth/refresh",
+    path: "/",
   };
 }
 
@@ -68,5 +68,5 @@ export function clearAccessCookieOptions(): CookieOptions {
 }
 
 export function clearRefreshCookieOptions(): CookieOptions {
-  return { ...baseCookieOptions, path: "/api/auth/refresh" };
+  return { ...baseCookieOptions, path: "/" };
 }

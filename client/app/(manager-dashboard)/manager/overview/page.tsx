@@ -19,6 +19,7 @@ import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PropertyThumb } from "@/components/rentals/property-thumb";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -259,10 +260,11 @@ export default function ManagerOverviewPage() {
                 <Card key={prop.id} className="overflow-hidden flex flex-col justify-between">
                   <div>
                     <div className="relative aspect-16/9 w-full bg-muted">
-                      <img
-                        src={prop.photoUrls?.[0] || "/singlelisting-1.jpg"}
+                      <PropertyThumb
+                        src={prop.photoUrls?.[0]}
                         alt={prop.name}
-                        className="size-full object-cover"
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       />
                       <Badge className="absolute top-2 right-2 bg-background/80 text-foreground backdrop-blur-xs">
                         {prop.propertyType}

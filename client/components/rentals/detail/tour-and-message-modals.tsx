@@ -14,10 +14,15 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { HostProfile } from "@/src/data/rental-details-data";
+import {
+  useSendContactMessageMutation,
+  useSubmitTourRequestMutation,
+} from "@/state/api";
 
 interface RequestTourModalProps {
   isOpen: boolean;
   onClose: () => void;
+  propertyId: string;
   propertyTitle: string;
   host: HostProfile;
 }
@@ -25,6 +30,7 @@ interface RequestTourModalProps {
 export function RequestTourModal({
   isOpen,
   onClose,
+  propertyId,
   propertyTitle,
   host,
 }: RequestTourModalProps) {
@@ -33,19 +39,31 @@ export function RequestTourModal({
   const [selectedTime, setSelectedTime] = useState("11:00 AM");
   const [note, setNote] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitTour, { isLoading: isSubmitting }] = useSubmitTourRequestMutation();
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
-    toast.success("Tour request sent successfully!", {
-      description: `${host.name} from ${host.company} will confirm your ${tourType === "in_person" ? "in-person" : "virtual"} tour for ${selectedDate} at ${selectedTime}.`,
-    });
-    setTimeout(() => {
-      setIsSubmitted(false);
-      onClose();
-    }, 1200);
+    try {
+      await submitTour({
+        propertyId,
+        tourType: tourType === "in_person" ? "InPerson" : "Video",
+        preferredDate: selectedDate,
+        preferredTime: selectedTime,
+        note: note.trim() || undefined,
+      }).unwrap();
+      setIsSubmitted(true);
+      toast.success("Tour request sent successfully!", {
+        description: `${host.name} will confirm your ${tourType === "in_person" ? "in-person" : "virtual"} tour for ${selectedDate} at ${selectedTime}.`,
+      });
+      setTimeout(() => {
+        setIsSubmitted(false);
+        onClose();
+      }, 1200);
+    } catch {
+      toast.error("Couldn't send your tour request. Please try again.");
+    }
   };
 
   const dates = [
@@ -201,7 +219,7 @@ export function RequestTourModal({
             </button>
             <button
               type="submit"
-              disabled={isSubmitted}
+              disabled={isSubmitted || isSubmitting}
               className="flex min-h-[44px] items-center gap-2 rounded-xl bg-primary px-5 text-xs sm:text-sm font-semibold text-primary-foreground shadow-sm hover:bg-primary/90 transition-all disabled:opacity-50"
             >
               {isSubmitted ? (
@@ -226,6 +244,7 @@ export function RequestTourModal({
 interface ContactHostModalProps {
   isOpen: boolean;
   onClose: () => void;
+  propertyId: string;
   propertyTitle: string;
   host: HostProfile;
 }
@@ -233,6 +252,7 @@ interface ContactHostModalProps {
 export function ContactHostModal({
   isOpen,
   onClose,
+  propertyId,
   propertyTitle,
   host,
 }: ContactHostModalProps) {
@@ -240,19 +260,25 @@ export function ContactHostModal({
     "Hello Karolina, I am very interested in this property and would like more details about availability and application requirements."
   );
   const [isSending, setIsSending] = useState(false);
+  const [sendMessage] = useSendContactMessageMutation();
 
   if (!isOpen) return null;
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!message.trim()) return;
     setIsSending(true);
-    toast.success("Message sent to host", {
-      description: `${host.name} typically responds ${host.responseTime.toLowerCase()}.`,
-    });
-    setTimeout(() => {
+    try {
+      await sendMessage({ propertyId, message: message.trim() }).unwrap();
+      toast.success("Message sent to host", {
+        description: `${host.name} typically responds ${host.responseTime.toLowerCase()}.`,
+      });
       setIsSending(false);
       onClose();
-    }, 1000);
+    } catch {
+      setIsSending(false);
+      toast.error("Couldn't send your message. Please try again.");
+    }
   };
 
   const quickQuestions = [

@@ -16,7 +16,7 @@ import {
 
 export const authRouter = Router();
 authRouter.post("/signup", signupRateLimiter, signup);
-authRouter.post("/login", login);
+authRouter.post("/login", loginRateLimiter, login);
 authRouter.post("/logout", logout);
 authRouter.post("/refresh", refreshRateLimiter, refresh);
 authRouter.get("/me", authenticate, me);

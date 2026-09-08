@@ -76,10 +76,13 @@ export async function signup(req: Request, res: Response) {
         },
       });
       if (role === "MANAGER") {
-        await tx.managerInviteCode.update({
-          where: { code: inviteCode },
+        // ponytail: consumption is conditional inside the txn — the pre-check above is a fast 403, this wins races
+        const consumed = await tx.managerInviteCode.updateMany({
+          where: { code: inviteCode, usedAt: null },
           data: { usedAt: new Date(), usedByUserId: created.id },
         });
+        if (consumed.count !== 1)
+          throw new Error("InviteCodeConsumed");
       }
       return created;
     });
@@ -90,6 +93,11 @@ export async function signup(req: Request, res: Response) {
     });
     return res.status(201).json({ user: toPublicUser(user) });
   } catch (error: unknown) {
+    if (error instanceof Error && error.message === "InviteCodeConsumed") {
+      return res
+        .status(403)
+        .json({ error: "Invalid or already-used invite code" });
+    }
     if (
       error instanceof Error &&
       error.constructor.name === "PrismaClientKnownRequestError"

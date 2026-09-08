@@ -20,6 +20,7 @@ import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PropertyThumb } from "@/components/rentals/property-thumb";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,7 +40,7 @@ import {
   type ManagerApplication,
 } from "@/state/api";
 
-type FilterStatus = "All" | "Pending" | "Approved" | "Denied";
+type FilterStatus = "All" | "Pending" | "Approved" | "Denied" | "Withdrawn";
 
 const statusDetails = {
   Pending: {
@@ -53,6 +54,10 @@ const statusDetails = {
   Denied: {
     icon: XIcon,
     className: "bg-rose-500/10 text-rose-700 border-rose-500/20",
+  },
+  Withdrawn: {
+    icon: XCircleIcon,
+    className: "bg-slate-500/10 text-slate-600 border-slate-500/20",
   },
 };
 
@@ -182,7 +187,7 @@ export default function ManagerApplicationsPage() {
             className="w-full sm:w-auto"
           >
             <TabsList className="w-full justify-start sm:w-auto bg-muted/60 p-1">
-              {(["All", "Pending", "Approved", "Denied"] as FilterStatus[]).map((status) => (
+              {(["All", "Pending", "Approved", "Denied", "Withdrawn"] as FilterStatus[]).map((status) => (
                 <TabsTrigger
                   key={status}
                   value={status}
@@ -271,7 +276,7 @@ export default function ManagerApplicationsPage() {
                       {app.message && (
                         <div className="rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground border">
                           <p className="font-semibold text-foreground/80 mb-0.5">Applicant Note:</p>
-                          <p className="italic">"{app.message}"</p>
+                          <p className="italic">“{app.message}”</p>
                         </div>
                       )}
 
@@ -287,10 +292,10 @@ export default function ManagerApplicationsPage() {
                     {/* Section 2: Property Snapshot */}
                     <div className="flex items-center gap-4 p-5 lg:w-80 bg-muted/10">
                       <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
-                        <img
-                          src={app.property.photoUrls?.[0] || "/singlelisting-1.jpg"}
+                        <PropertyThumb
+                          src={app.property.photoUrls?.[0]}
                           alt={app.property.name}
-                          className="size-full object-cover"
+                          className="size-full"
                         />
                       </div>
                       <div className="min-w-0 flex-1 space-y-1">
@@ -347,6 +352,10 @@ export default function ManagerApplicationsPage() {
                             Deny
                           </Button>
                         </>
+                      ) : app.status === "Withdrawn" ? (
+                        <span className="text-xs text-muted-foreground">
+                          Withdrawn by tenant — awaiting any re-application
+                        </span>
                       ) : (
                         <div className="flex items-center gap-2">
                           <Button
@@ -375,11 +384,11 @@ export default function ManagerApplicationsPage() {
           <Card className="flex flex-col items-center justify-center rounded-2xl border-dashed p-12 text-center">
             <ClipboardListIcon className="size-10 text-muted-foreground/60" />
             <h3 className="mt-4 text-base font-semibold text-foreground">No applications found</h3>
-            <p className="mt-1 text-xs text-muted-foreground max-w-sm">
-              {searchQuery
-                ? `No applications matching "${searchQuery}".`
-                : `You currently have no ${activeStatus !== "All" ? activeStatus.toLowerCase() : ""} applications.`}
-            </p>
+              <p className="mt-1 text-xs text-muted-foreground max-w-sm">
+                {searchQuery
+                  ? `No applications matching “${searchQuery}”.`
+                  : `You currently have no ${activeStatus !== "All" ? activeStatus.toLowerCase() : ""} applications.`}
+              </p>
             {searchQuery && (
               <Button
                 variant="outline"

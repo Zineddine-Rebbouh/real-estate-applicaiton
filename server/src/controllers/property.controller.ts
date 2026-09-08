@@ -35,6 +35,18 @@ function parseCoordinate(value: unknown): number | null | undefined {
   return num;
 }
 
+// ponytail: allowlist instead of blind cast — invalid enum/NaN used to hit Prisma as 500
+const validPropertyTypes = new Set([
+  "Apartment", "House", "Loft", "Condo", "Studio",
+  "Townhouse", "Cottage", "Villa", "Rooms", "Tinyhouse",
+]);
+
+function parseFiniteQuery(value: unknown): number | null {
+  if (value === undefined || value === null || value === "") return null;
+  const num = Number(Array.isArray(value) ? value[0] : value);
+  return Number.isFinite(num) ? num : NaN;
+}
+
 // averageRating/numberOfReviews are computed from Review rows on read —
 // they are not stored on Property. Exported for reuse by other
 // property-embedding reads (e.g. favorites) so they stay consistent.
@@ -63,18 +75,33 @@ export async function getProperties(req: Request, res: Response) {
       where.city = { contains: city, mode: "insensitive" };
     }
     if (propertyType && typeof propertyType === "string") {
+      if (!validPropertyTypes.has(propertyType)) {
+        return res.status(400).json({ error: "Invalid property type" });
+      }
       where.propertyType = propertyType as PropertyType;
     }
-    if (beds) {
-      where.beds = { gte: Number(beds) };
+    const bedsNum = parseFiniteQuery(beds);
+    const bathsNum = parseFiniteQuery(baths);
+    const minNum = parseFiniteQuery(minPrice);
+    const maxNum = parseFiniteQuery(maxPrice);
+    if (
+      Number.isNaN(bedsNum as number) ||
+      Number.isNaN(bathsNum as number) ||
+      Number.isNaN(minNum as number) ||
+      Number.isNaN(maxNum as number)
+    ) {
+      return res.status(400).json({ error: "Invalid numeric filter" });
     }
-    if (baths) {
-      where.baths = { gte: Number(baths) };
+    if (bedsNum !== null && !Number.isNaN(bedsNum)) {
+      where.beds = { gte: bedsNum };
     }
-    if (minPrice || maxPrice) {
+    if (bathsNum !== null && !Number.isNaN(bathsNum)) {
+      where.baths = { gte: bathsNum };
+    }
+    if (minNum !== null || maxNum !== null) {
       const priceFilter: Record<string, number> = {};
-      if (minPrice) priceFilter.gte = Number(minPrice);
-      if (maxPrice) priceFilter.lte = Number(maxPrice);
+      if (minNum !== null) priceFilter.gte = minNum;
+      if (maxNum !== null) priceFilter.lte = maxNum;
       where.pricePerMonth = priceFilter;
     }
 
@@ -115,10 +142,6 @@ export async function getPropertyById(req: Request, res: Response) {
             user: { select: { name: true, email: true } },
           },
         },
-        leases: {
-          take: 5,
-          orderBy: { createdAt: "desc" },
-        },
       },
     });
 
@@ -138,7 +161,6 @@ export async function createProperty(req: Request, res: Response) {
   try {
     const user = (req as AuthenticatedRequest).user;
     const manager = await getOrCreateManager(user.id);
-
     const {
       name,
       description,
@@ -165,6 +187,23 @@ export async function createProperty(req: Request, res: Response) {
 
     if (!name || !pricePerMonth || !address || !city || !state || !country || !postalCode) {
       return res.status(400).json({ error: "Missing required listing fields" });
+    }
+    if (propertyType !== undefined && !validPropertyTypes.has(String(propertyType))) {
+      return res.status(400).json({ error: "Invalid property type" });
+    }
+    const price = Number(pricePerMonth);
+    if (!Number.isFinite(price) || price <= 0) {
+      return res.status(400).json({ error: "pricePerMonth must be a positive number" });
+    }
+    for (const [key, val] of [["beds", beds], ["baths", baths], ["squareFeet", squareFeet]] as const) {
+      if (val !== undefined && (!Number.isFinite(Number(val)) || Number(val) <= 0)) {
+        return res.status(400).json({ error: `${key} must be a positive number` });
+      }
+    }
+    for (const [key, val] of [["securityDeposit", securityDeposit], ["applicationFee", applicationFee]] as const) {
+      if (val !== undefined && (!Number.isFinite(Number(val)) || Number(val) < 0)) {
+        return res.status(400).json({ error: `${key} must be a non-negative number` });
+      }
     }
 
     const lat = parseCoordinate(latitude);
@@ -219,6 +258,9 @@ export async function createProperty(req: Request, res: Response) {
 export async function updateProperty(req: Request, res: Response) {
   try {
     const id = getIdParam(req);
+    if (!isUuid(id)) {
+      return res.status(404).json({ error: "Property not found" });
+    }
     const user = (req as AuthenticatedRequest).user;
     const manager = await getOrCreateManager(user.id);
 
@@ -262,7 +304,12 @@ export async function updateProperty(req: Request, res: Response) {
     const data: Record<string, unknown> = {};
     if (name !== undefined) data.name = String(name);
     if (description !== undefined) data.description = String(description);
-    if (pricePerMonth !== undefined) data.pricePerMonth = sanitizeDecimal(pricePerMonth);
+    if (pricePerMonth !== undefined) {
+      if (!Number.isFinite(Number(pricePerMonth)) || Number(pricePerMonth) <= 0) {
+        return res.status(400).json({ error: "pricePerMonth must be a positive number" });
+      }
+      data.pricePerMonth = sanitizeDecimal(pricePerMonth);
+    }
     if (securityDeposit !== undefined) data.securityDeposit = sanitizeDecimal(securityDeposit);
     if (applicationFee !== undefined) data.applicationFee = sanitizeDecimal(applicationFee);
     if (photoUrls !== undefined) data.photoUrls = Array.isArray(photoUrls) ? photoUrls : [];
@@ -270,10 +317,30 @@ export async function updateProperty(req: Request, res: Response) {
     if (highlights !== undefined) data.highlights = parseEnumArray<HighlightEnum>(highlights);
     if (isPetsAllowed !== undefined) data.isPetsAllowed = Boolean(isPetsAllowed);
     if (isParkingIncluded !== undefined) data.isParkingIncluded = Boolean(isParkingIncluded);
-    if (beds !== undefined) data.beds = Number(beds);
-    if (baths !== undefined) data.baths = Number(baths);
-    if (squareFeet !== undefined) data.squareFeet = Number(squareFeet);
-    if (propertyType !== undefined) data.propertyType = propertyType as PropertyType;
+    if (beds !== undefined) {
+      if (!Number.isFinite(Number(beds)) || Number(beds) <= 0) {
+        return res.status(400).json({ error: "beds must be a positive number" });
+      }
+      data.beds = Number(beds);
+    }
+    if (baths !== undefined) {
+      if (!Number.isFinite(Number(baths)) || Number(baths) <= 0) {
+        return res.status(400).json({ error: "baths must be a positive number" });
+      }
+      data.baths = Number(baths);
+    }
+    if (squareFeet !== undefined) {
+      if (!Number.isFinite(Number(squareFeet)) || Number(squareFeet) <= 0) {
+        return res.status(400).json({ error: "squareFeet must be a positive number" });
+      }
+      data.squareFeet = Number(squareFeet);
+    }
+    if (propertyType !== undefined) {
+      if (!validPropertyTypes.has(String(propertyType))) {
+        return res.status(400).json({ error: "Invalid property type" });
+      }
+      data.propertyType = propertyType as PropertyType;
+    }
     if (address !== undefined) data.address = String(address);
     if (city !== undefined) data.city = String(city);
     if (state !== undefined) data.state = String(state);
@@ -314,6 +381,9 @@ export async function updateProperty(req: Request, res: Response) {
 export async function deleteProperty(req: Request, res: Response) {
   try {
     const id = getIdParam(req);
+    if (!isUuid(id)) {
+      return res.status(404).json({ error: "Property not found" });
+    }
     const user = (req as AuthenticatedRequest).user;
     const manager = await getOrCreateManager(user.id);
 

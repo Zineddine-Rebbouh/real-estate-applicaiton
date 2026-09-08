@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "build": "tsc",
     "seed": "tsx prisma/seed.ts",
     "lint": "eslint . --ext .ts,.tsx"
   },

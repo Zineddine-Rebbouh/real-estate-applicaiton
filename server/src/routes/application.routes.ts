@@ -7,11 +7,12 @@ import {
 import { updateApplicationStatus } from "../controllers/manager.controller.js";
 import { authenticate } from "../middleware/authenticate.js";
 import { authorize } from "../middleware/authorize.js";
+import { writeRateLimiter } from "../middleware/rateLimiter.js";
 
 const router = Router();
 
 router.get("/", authenticate, authorize("TENANT"), getTenantApplications);
-router.post("/", authenticate, authorize("TENANT"), createApplication);
+router.post("/", authenticate, authorize("TENANT"), writeRateLimiter, createApplication);
 router.patch("/:id/withdraw", authenticate, authorize("TENANT"), withdrawApplication);
 router.patch("/:id", authenticate, authorize("MANAGER"), updateApplicationStatus);
 

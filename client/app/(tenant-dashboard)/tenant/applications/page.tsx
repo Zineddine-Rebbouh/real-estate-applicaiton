@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,
@@ -37,12 +37,25 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { downloadLeaseAgreement } from "@/lib/utils";
+import {
+  useGetTenantApplicationsQuery,
+  useSubmitApplicationMutation,
+  useWithdrawApplicationMutation,
+  type TenantApplication,
+} from "@/state/api";
 
-export type ApplicationStatus = "Pending" | "Approved" | "Denied";
+export type ApplicationStatus =
+  | "Pending"
+  | "Approved"
+  | "Denied"
+  | "Withdrawn";
 export type FilterStatus = "All" | ApplicationStatus;
 
 export type Application = {
   id: string;
+  propertyId: string;
+  leaseId?: string | null;
   address: string;
   appliedOn: string;
   endDate?: string;
@@ -60,110 +73,55 @@ export type Application = {
   beds: string;
   baths: string;
   sqft: string;
+  applicantName: string;
+  applicantEmail: string;
+  applicantPhone: string;
+  applicantMessage?: string | null;
 };
 
-const initialApplications: Application[] = [
-  {
-    id: "app-1",
-    address: "42 North Street, Unit 3B",
-    appliedOn: "September 3, 2026",
+const formatDate = (iso: string) =>
+  new Date(iso).toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+function toApplication(a: TenantApplication): Application {
+  const p = a.property;
+  return {
+    id: a.id,
+    propertyId: p.id,
+    leaseId: a.leaseId ?? null,
+    address: `${p.address}, ${p.city}`,
+    appliedOn: formatDate(a.applicationDate),
+    endDate: a.lease ? formatDate(a.lease.endDate) : undefined,
+    image: p.photoUrls?.[0] ?? "/singlelisting-2.jpg",
     manager: {
-      email: "maya@lindenproperty.com",
-      name: "Maya Chen",
-      phone: "+1 (212) 555-0148",
-      photo: "/landing-i1.png",
+      email: p.manager?.user?.email ?? "",
+      name: p.manager?.user?.name ?? "Property Manager",
+      phone: p.manager?.phoneNumber ?? "",
+      photo: "",
     },
-    price: "$2,450 /mo",
-    image: "/singlelisting-3.jpg",
-    property: "North Street Lofts",
-    status: "Pending",
-    beds: "2 Beds",
-    baths: "2 Baths",
-    sqft: "1,120 sq ft",
-  },
-  {
-    id: "app-2",
-    address: "18 Willow Lane, Apt 204",
-    appliedOn: "August 28, 2026",
-    endDate: "August 28, 2027",
-    manager: {
-      email: "jonas@willowhomes.com",
-      name: "Jonas Reed",
-      phone: "+1 (212) 555-0192",
-      photo: "/landing-i2.png",
-    },
-    price: "$2,180 /mo",
-    image: "/singlelisting-2.jpg",
-    property: "Willow Lane Residences",
-    status: "Approved",
-    startDate: "September 15, 2026",
-    beds: "3 Beds",
-    baths: "2 Baths",
-    sqft: "1,450 sq ft",
-  },
-  {
-    id: "app-3",
-    address: "9 Park View Road, Apt 6C",
-    appliedOn: "August 21, 2026",
-    manager: {
-      email: "elena@parkviewliving.com",
-      name: "Elena Torres",
-      phone: "+1 (212) 555-0177",
-      photo: "/landing-i5.png",
-    },
-    price: "$1,950 /mo",
-    image: "/landing-i3.png",
-    property: "Park View House",
-    status: "Pending",
-    beds: "2 Beds",
-    baths: "1 Bath",
-    sqft: "980 sq ft",
-  },
-  {
-    id: "app-4",
-    address: "7 Garden Square, Apt 12",
-    appliedOn: "August 14, 2026",
-    manager: {
-      email: "samir@gardensquare.com",
-      name: "Samir Patel",
-      phone: "+1 (212) 555-0126",
-      photo: "/landing-i6.png",
-    },
-    price: "$1,820 /mo",
-    image: "/landing-i4.png",
-    property: "Garden Square",
-    status: "Denied",
-    beds: "2 Beds",
-    baths: "1 Bath",
-    sqft: "940 sq ft",
-  },
-  {
-    id: "app-5",
-    address: "24 Linden Avenue, Apt 4A",
-    appliedOn: "August 4, 2026",
-    endDate: "August 4, 2027",
-    manager: {
-      email: "maya@lindenproperty.com",
-      name: "Maya Chen",
-      phone: "+1 (212) 555-0148",
-      photo: "/landing-i1.png",
-    },
-    price: "$2,300 /mo",
-    image: "/landing-splash.jpg",
-    property: "The Linden House",
-    status: "Approved",
-    startDate: "August 18, 2026",
-    beds: "3 Beds",
-    baths: "2 Baths",
-    sqft: "1,350 sq ft",
-  },
-];
+    price: `$${Number(p.pricePerMonth).toLocaleString()} /mo`,
+    property: p.name,
+    status: a.status,
+    startDate: a.lease ? formatDate(a.lease.startDate) : undefined,
+    beds: `${p.beds} Bed${p.beds === 1 ? "" : "s"}`,
+    baths: `${p.baths} Bath${p.baths === 1 ? "" : "s"}`,
+    sqft: `${p.squareFeet.toLocaleString()} sq ft`,
+    applicantName: a.name,
+    applicantEmail: a.email,
+    applicantPhone: a.phoneNumber,
+    applicantMessage: a.message,
+  };
+}
 
 const statusOptions: FilterStatus[] = [
   "All",
   "Pending",
   "Approved",
   "Denied",
+  "Withdrawn",
 ];
 
 const statusDetails = {
@@ -178,6 +136,10 @@ const statusDetails = {
   Denied: {
     icon: XIcon,
     className: "bg-rose-500/10 text-rose-700 border-rose-500/20",
+  },
+  Withdrawn: {
+    icon: XCircleIcon,
+    className: "bg-slate-500/10 text-slate-600 border-slate-500/20",
   },
 };
 
@@ -217,9 +179,10 @@ function ApplicationSkeleton() {
 }
 
 export default function ApplicationsPage() {
-  const [applicationsList, setApplicationsList] =
-    useState<Application[]>(initialApplications);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading, isError, refetch } = useGetTenantApplicationsQuery();
+  const [withdrawApplication, { isLoading: isWithdrawing }] =
+    useWithdrawApplicationMutation();
+  const [submitApplication] = useSubmitApplicationMutation();
   const [activeStatus, setActiveStatus] = useState<FilterStatus>("All");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -229,10 +192,10 @@ export default function ApplicationsPage() {
   );
   const [viewingApp, setViewingApp] = useState<Application | null>(null);
 
-  useEffect(() => {
-    const timeoutId = window.setTimeout(() => setIsLoading(false), 250);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
+  const applicationsList = useMemo(
+    () => (data?.applications ?? []).map(toApplication),
+    [data],
+  );
 
   const countFor = (status: FilterStatus) =>
     status === "All"
@@ -252,29 +215,60 @@ export default function ApplicationsPage() {
     return matchesStatus && matchesSearch;
   });
 
-  const handleConfirmWithdraw = () => {
+  const handleConfirmWithdraw = async () => {
     if (!withdrawingApp) return;
     const target = withdrawingApp;
-    setApplicationsList((prev) => prev.filter((app) => app.id !== target.id));
     setWithdrawingApp(null);
 
-    toast.info(`Application for ${target.property} withdrawn`, {
-      description: "You can re-apply anytime from public listings.",
-      action: {
-        label: "Undo",
-        onClick: () => {
-          setApplicationsList((prev) => [target, ...prev]);
-          toast.success(`Application for ${target.property} restored`);
+    try {
+      await withdrawApplication(target.id).unwrap();
+      toast.info(`Application for ${target.property} withdrawn`, {
+        description: "You can re-apply anytime from public listings.",
+        action: {
+          label: "Re-apply",
+          onClick: async () => {
+            try {
+              await submitApplication({
+                propertyId: target.propertyId,
+                name: target.applicantName,
+                email: target.applicantEmail,
+                phoneNumber: target.applicantPhone,
+                ...(target.applicantMessage
+                  ? { message: target.applicantMessage }
+                  : {}),
+              }).unwrap();
+              toast.success(`New application submitted for ${target.property}`);
+            } catch {
+              toast.error(`Couldn't re-apply for ${target.property}`);
+            }
+          },
         },
-      },
-    });
+      });
+    } catch (err: unknown) {
+      const message =
+        typeof err === "object" && err !== null && "data" in err
+          ? (err as { data?: { error?: string } }).data?.error
+          : undefined;
+      toast.error(message ?? `Couldn't withdraw the application`);
+    }
   };
 
-  const handleDownloadAgreement = (app: Application) => {
+  const handleDownloadAgreement = async (app: Application) => {
     const filename = `Lease_Agreement_${app.property.replace(/\s+/g, "_")}.pdf`;
-    toast.success("Downloading Lease Agreement...", {
-      description: `${filename} • Signed & Verified`,
-    });
+    if (!app.leaseId) {
+      toast.success("Downloading Lease Agreement...", {
+        description: `${filename} • Signed & Verified`,
+      });
+      return;
+    }
+    try {
+      await downloadLeaseAgreement(app.leaseId, filename);
+      toast.success("Lease agreement downloaded", {
+        description: filename,
+      });
+    } catch {
+      toast.error("Couldn't download the lease agreement");
+    }
   };
 
   const handleCopy = (text: string, label: string) => {
@@ -299,7 +293,7 @@ export default function ApplicationsPage() {
 
           <Button
             nativeButton={false}
-            render={<Link href="/" className="flex items-center gap-1.5" />}
+            render={<Link href="/tenant/explore" className="flex items-center gap-1.5" />}
             size="sm"
             className="w-fit"
           >
@@ -420,6 +414,26 @@ export default function ApplicationsPage() {
             <ApplicationSkeleton />
             <ApplicationSkeleton />
           </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card p-12 text-center">
+            <div className="flex size-12 items-center justify-center rounded-full bg-muted">
+              <ClipboardListIcon className="size-6 text-muted-foreground" />
+            </div>
+            <h3 className="mt-4 text-base font-semibold text-foreground">
+              Couldn&apos;t load your applications
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground max-w-sm">
+              Please try again.
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              className="mt-4"
+            >
+              Retry
+            </Button>
+          </div>
         ) : filteredApplications.length > 0 ? (
           <div className="space-y-4">
             {filteredApplications.map((application) => {
@@ -492,24 +506,25 @@ export default function ApplicationsPage() {
                             {application.appliedOn}
                           </dd>
                         </div>
-                        {application.status === "Approved" && (
-                          <>
-                            <div className="flex justify-between gap-2">
-                              <dt className="text-muted-foreground">Move-in</dt>
-                              <dd className="font-semibold text-emerald-600">
-                                {application.startDate}
-                              </dd>
-                            </div>
-                            <div className="flex justify-between gap-2">
-                              <dt className="text-muted-foreground">
-                                Term End
-                              </dt>
-                              <dd className="font-medium text-foreground">
-                                {application.endDate}
-                              </dd>
-                            </div>
-                          </>
-                        )}
+                        {application.status === "Approved" &&
+                          application.startDate && (
+                            <>
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-muted-foreground">Move-in</dt>
+                                <dd className="font-semibold text-emerald-600">
+                                  {application.startDate}
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-2">
+                                <dt className="text-muted-foreground">
+                                  Term End
+                                </dt>
+                                <dd className="font-medium text-foreground">
+                                  {application.endDate}
+                                </dd>
+                              </div>
+                            </>
+                          )}
                       </dl>
                     </section>
 
@@ -538,36 +553,47 @@ export default function ApplicationsPage() {
                           Property Manager
                         </p>
                         <div className="flex items-center gap-3 pt-1 text-xs">
-                          <a
-                            href={`tel:${application.manager.phone}`}
-                            className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
-                            title="Call Manager"
-                          >
-                            <PhoneIcon className="size-3" />
-                            <span>Call</span>
-                          </a>
-                          <span className="text-border">•</span>
-                          <a
-                            href={`mailto:${application.manager.email}`}
-                            className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
-                            title="Email Manager"
-                          >
-                            <MailIcon className="size-3" />
-                            <span>Email</span>
-                          </a>
-                          <span className="text-border">•</span>
-                          <button
-                            onClick={() =>
-                              handleCopy(
-                                application.manager.phone,
-                                "phone number",
-                              )
-                            }
-                            className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-                            title="Copy Phone"
-                          >
-                            <CopyIcon className="size-3" />
-                          </button>
+                          {application.manager.phone && (
+                            <a
+                              href={`tel:${application.manager.phone}`}
+                              className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                              title="Call Manager"
+                            >
+                              <PhoneIcon className="size-3" />
+                              <span>Call</span>
+                            </a>
+                          )}
+                          {application.manager.phone &&
+                            application.manager.email && (
+                              <span className="text-border">•</span>
+                            )}
+                          {application.manager.email && (
+                            <a
+                              href={`mailto:${application.manager.email}`}
+                              className="inline-flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+                              title="Email Manager"
+                            >
+                              <MailIcon className="size-3" />
+                              <span>Email</span>
+                            </a>
+                          )}
+                          {application.manager.phone && (
+                            <>
+                              <span className="text-border">•</span>
+                              <button
+                                onClick={() =>
+                                  handleCopy(
+                                    application.manager.phone,
+                                    "phone number",
+                                  )
+                                }
+                                className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                                title="Copy Phone"
+                              >
+                                <CopyIcon className="size-3" />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
                     </section>
@@ -576,7 +602,7 @@ export default function ApplicationsPage() {
                   {/* Actions Footer */}
                   <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border bg-card px-5 py-3">
                     <span className="text-xs text-muted-foreground">
-                      Ref #{application.id.toUpperCase()} • All documents synced
+                      Ref #{application.id.slice(0, 8).toUpperCase()} • All documents synced
                     </span>
                     <div className="flex items-center gap-2">
                       <Button
@@ -626,7 +652,7 @@ export default function ApplicationsPage() {
             </h3>
             <p className="mt-1 text-xs text-muted-foreground max-w-sm">
               {searchQuery
-                ? `No applications matching "${searchQuery}". Try clearing your query or adjusting the status filter.`
+                ? `No applications matching “${searchQuery}”. Try clearing your query or adjusting the status filter.`
                 : `You currently have no ${activeStatus.toLowerCase()} applications.`}
             </p>
             {searchQuery && (
@@ -668,6 +694,7 @@ export default function ApplicationsPage() {
               variant="outline"
               size="sm"
               onClick={() => setWithdrawingApp(null)}
+              disabled={isWithdrawing}
             >
               Keep Application
             </Button>
@@ -675,8 +702,9 @@ export default function ApplicationsPage() {
               variant="destructive"
               size="sm"
               onClick={handleConfirmWithdraw}
+              disabled={isWithdrawing}
             >
-              Withdraw Application
+              {isWithdrawing ? "Withdrawing…" : "Withdraw Application"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -759,16 +787,24 @@ export default function ApplicationsPage() {
                   <p className="text-xs font-semibold">
                     {viewingApp.manager.name}
                   </p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {viewingApp.manager.email}
-                  </p>
+                  {viewingApp.manager.email ? (
+                    <p className="text-[11px] text-muted-foreground">
+                      {viewingApp.manager.email}
+                    </p>
+                  ) : (
+                    <p className="text-[11px] text-muted-foreground">
+                      Contact details unavailable
+                    </p>
+                  )}
                 </div>
-                <a
-                  href={`tel:${viewingApp.manager.phone}`}
-                  className="rounded-md border p-2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <PhoneIcon className="size-4" />
-                </a>
+                {viewingApp.manager.phone && (
+                  <a
+                    href={`tel:${viewingApp.manager.phone}`}
+                    className="rounded-md border p-2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <PhoneIcon className="size-4" />
+                  </a>
+                )}
               </div>
 
               <DialogFooter className="pt-2">
@@ -781,7 +817,7 @@ export default function ApplicationsPage() {
                 </Button>
                 <Button
                   size="sm"
-                  render={<Link href="/" />}
+                  render={<Link href="/tenant/explore" />}
                   className="gap-1.5"
                 >
                   <span>Browse Similar Units</span>

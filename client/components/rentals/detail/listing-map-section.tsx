@@ -17,7 +17,17 @@ import {
   FootprintsIcon,
 } from "lucide-react";
 import { PointOfInterest } from "@/src/data/rental-details-data";
+import type { RentalProperty } from "@/src/data/rentals-data";
 import { formatPriceValue } from "@/lib/utils";
+import dynamic from "next/dynamic";
+
+const GoogleMap = dynamic(
+  () => import("../google-map").then((m) => m.GoogleMap),
+  { ssr: false },
+);
+
+const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
 
 interface ListingMapSectionProps {
   propertyTitle: string;
@@ -27,6 +37,7 @@ interface ListingMapSectionProps {
   price: number;
   coords: { x: number; y: number; lat: number; lng: number };
   pois: PointOfInterest[];
+  listing?: RentalProperty;
 }
 
 type POICategory = "all" | "hotel" | "restaurant" | "bank" | "school" | "shop" | "fitness";
@@ -49,20 +60,64 @@ export function ListingMapSection({
   price,
   coords,
   pois,
+  listing,
 }: ListingMapSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<POICategory>("all");
   const [activePoiId, setActivePoiId] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
 
-  const filteredPois =
-    selectedCategory === "all"
-      ? pois
-      : pois.filter((poi) => poi.category === selectedCategory);
+  const hasRealCoords = coords.lat !== 0 || coords.lng !== 0;
+  const useRealMap = Boolean(GOOGLE_MAPS_KEY && hasRealCoords && listing);
 
   const openGoogleMapsDirections = () => {
     const query = encodeURIComponent(`${address}, ${neighborhood}, ${city}`);
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   };
+
+  if (useRealMap && listing) {
+    return (
+      <div id="location-map" className="space-y-4 pt-6 border-t border-border/80 scroll-mt-20">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
+              Location &amp; Surrounding Area
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+              {address}, {neighborhood}, {city}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={openGoogleMapsDirections}
+            className="flex min-h-[44px] items-center gap-1.5 rounded-lg border border-border/80 bg-card px-3.5 py-2 text-xs sm:text-sm font-semibold text-foreground shadow-xs transition-colors hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <NavigationIcon className="size-4 text-primary" />
+            <span>Get Directions</span>
+            <ExternalLinkIcon className="size-3 text-muted-foreground ml-0.5" />
+          </button>
+        </div>
+
+        <div className="relative h-[340px] sm:h-[420px] w-full overflow-hidden rounded-xl border border-border/80 shadow-inner">
+          <GoogleMap
+            properties={[listing]}
+            selectedPropertyId={listing.id}
+            hoveredPropertyId={null}
+            onSelectProperty={() => {}}
+            onHoverProperty={() => {}}
+          />
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          Map data © Google Maps
+        </p>
+      </div>
+    );
+  }
+
+  const filteredPois =
+    selectedCategory === "all"
+      ? pois
+      : pois.filter((poi) => poi.category === selectedCategory);
 
   return (
     <div id="location-map" className="space-y-4 pt-6 border-t border-border/80 scroll-mt-20">
@@ -72,7 +127,7 @@ export function ListingMapSection({
             Location & Surrounding Area
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            {address}, {neighborhood}, {city} — WalkScore: 96 (Walker&apos;s Paradise)
+            {address}, {neighborhood}, {city}
           </p>
         </div>
 
@@ -226,7 +281,7 @@ export function ListingMapSection({
 
         {/* Map watermark / badge bottom-left */}
         <div className="absolute bottom-2.5 left-2.5 z-20 rounded-md bg-background/80 px-2 py-1 text-[10px] font-medium text-muted-foreground backdrop-blur-xs border border-border/60">
-          Interactive Neighborhood Basemap · Stare Miasto
+          Interactive Neighborhood Basemap · {neighborhood}
         </div>
       </div>
 

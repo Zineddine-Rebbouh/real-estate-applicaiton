@@ -27,114 +27,185 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import {
+  useAddPaymentMethodMutation,
+  useGetPaymentMethodsQuery,
+  useGetTenantPaymentsQuery,
+  useRemovePaymentMethodMutation,
+  useUpdatePaymentMethodMutation,
+  type PaymentMethod as SavedMethod,
+} from "@/state/api";
 
-type PaymentMethod = {
+type UiMethod = {
   id: string;
-  brand: "Visa" | "Mastercard" | "Bank";
+  brand: string;
   last4: string;
   expiry: string;
-  type: string;
+  holder: string;
   isDefault: boolean;
-  autoPay: boolean;
-  nextCharge: string;
+  isBank: boolean;
 };
 
-const initialMethods: PaymentMethod[] = [
-  {
-    id: "method-1",
-    brand: "Visa",
-    last4: "4242",
-    expiry: "08/28",
-    type: "Personal card",
-    isDefault: true,
-    autoPay: true,
-    nextCharge: "Oct 1, 2026",
-  },
-  {
-    id: "method-2",
-    brand: "Mastercard",
-    last4: "8210",
-    expiry: "12/27",
-    type: "Backup card",
-    isDefault: false,
-    autoPay: false,
-    nextCharge: "Not scheduled",
-  },
-  {
-    id: "method-3",
-    brand: "Bank",
-    last4: "1138",
-    expiry: "Verified",
-    type: "ACH bank account",
-    isDefault: false,
-    autoPay: false,
-    nextCharge: "Not scheduled",
-  },
-];
+function toUiMethod(m: SavedMethod): UiMethod {
+  const isBank = m.type === "Bank";
+  return {
+    id: m.id,
+    brand: m.brand ?? (isBank ? "Bank" : "Card"),
+    last4: m.last4,
+    expiry: isBank
+      ? "Verified"
+      : m.expMonth && m.expYear
+        ? `${String(m.expMonth).padStart(2, "0")}/${String(m.expYear).slice(-2)}`
+        : "—",
+    holder: m.accountHolder,
+    isDefault: m.isDefault,
+    isBank,
+  };
+}
 
-function BrandMark({ brand }: { brand: PaymentMethod["brand"] }) {
+function detectBrand(digits: string): string {
+  if (/^4/.test(digits)) return "Visa";
+  if (/^(5[1-5]|2(2[2-9]|[3-6]|7[0-1]|720))/.test(digits)) return "Mastercard";
+  return "Card";
+}
+
+function parseExpiry(raw: string): { month: number; year: number } | null {
+  const m = raw.replace(/\s/g, "").match(/^(\d{1,2})\/(\d{2}|\d{4})$/);
+  if (!m) return null;
+  const month = Number(m[1]);
+  const year = m[2].length === 2 ? 2000 + Number(m[2]) : Number(m[2]);
+  if (month < 1 || month > 12) return null;
+  return { month, year };
+}
+
+function BrandMark({ brand }: { brand: string }) {
+  const isBank = brand === "Bank";
   return (
     <div
-      className={`flex size-11 items-center justify-center rounded-lg text-xs font-bold ${brand === "Visa" ? "bg-blue-600 text-white" : brand === "Mastercard" ? "bg-slate-900 text-white" : "bg-emerald-600 text-white"}`}
+      className={`flex size-11 items-center justify-center rounded-lg text-xs font-bold ${brand === "Visa" ? "bg-blue-600 text-white" : brand === "Mastercard" ? "bg-slate-900 text-white" : isBank ? "bg-emerald-600 text-white" : "bg-muted text-foreground"}`}
     >
-      {brand === "Bank" ? <Building2Icon className="size-5" /> : brand}
+      {isBank ? <Building2Icon className="size-5" /> : brand}
     </div>
   );
 }
 
 export default function PaymentMethodsPage() {
-  const [methods, setMethods] = useState(initialMethods);
+  const { data, isLoading, isError, refetch } = useGetPaymentMethodsQuery();
+  const { data: paymentsData } = useGetTenantPaymentsQuery();
+  const [addPaymentMethod] = useAddPaymentMethodMutation();
+  const [updatePaymentMethod] = useUpdatePaymentMethodMutation();
+  const [removePaymentMethod] = useRemovePaymentMethodMutation();
   const [addOpen, setAddOpen] = useState(false);
-  const [editing, setEditing] = useState<PaymentMethod | null>(null);
-  const [removing, setRemoving] = useState<PaymentMethod | null>(null);
+  const [editing, setEditing] = useState<UiMethod | null>(null);
+  const [removing, setRemoving] = useState<UiMethod | null>(null);
   const [methodType, setMethodType] = useState<"card" | "bank">("card");
 
-  const addMethod = (event: React.FormEvent<HTMLFormElement>) => {
+  const methods = (data?.paymentMethods ?? []).map(toUiMethod);
+  const defaultMethod = methods.find((m) => m.isDefault) ?? null;
+  const overdueCount = (paymentsData?.payments ?? []).filter(
+    (p) => p.paymentStatus === "Overdue",
+  ).length;
+
+  // Only references (brand/last4/expiry/holder) ever leave the browser —
+  // full numbers, CVCs, and IBANs are derived locally and discarded.
+  const addMethod = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const newMethod: PaymentMethod = {
-      id: `method-${Date.now()}`,
-      brand: methodType === "card" ? "Visa" : "Bank",
-      last4: methodType === "card" ? "9012" : "7744",
-      expiry: methodType === "card" ? "09/29" : "Verified",
-      type: methodType === "card" ? "New payment card" : "ACH bank account",
-      isDefault: methods.length === 0,
-      autoPay: false,
-      nextCharge: "Not scheduled",
-    };
-    setMethods((current) => [...current, newMethod]);
-    setAddOpen(false);
-    toast.success("Payment method added", {
-      description: "Your payment details are encrypted and ready to use.",
-    });
+    const form = new FormData(event.currentTarget);
+    const holder = ((form.get("holder") as string) || "").trim();
+    if (!holder) return;
+
+    try {
+      if (methodType === "card") {
+        const digits = ((form.get("number") as string) || "").replace(
+          /\D/g,
+          "",
+        );
+        const parsed = parseExpiry((form.get("expiry") as string) || "");
+        if (digits.length < 12 || !parsed) {
+          toast.error("Enter a valid card number and expiry (MM / YY).");
+          return;
+        }
+        await addPaymentMethod({
+          type: "Card",
+          brand: detectBrand(digits),
+          last4: digits.slice(-4),
+          expMonth: parsed.month,
+          expYear: parsed.year,
+          accountHolder: holder,
+        }).unwrap();
+      } else {
+        const digits = ((form.get("iban") as string) || "").replace(/\D/g, "");
+        if (digits.length < 4) {
+          toast.error("Enter a valid IBAN.");
+          return;
+        }
+        await addPaymentMethod({
+          type: "Bank",
+          brand: "Bank",
+          last4: digits.slice(-4),
+          accountHolder: holder,
+        }).unwrap();
+      }
+      setAddOpen(false);
+      toast.success("Payment method added", {
+        description: "Your payment details are encrypted and ready to use.",
+      });
+    } catch {
+      toast.error("Couldn't save this payment method. Please try again.");
+    }
   };
 
-  const toggleAutoPay = (id: string, checked: boolean) =>
-    setMethods((current) =>
-      current.map((method) =>
-        method.id === id
-          ? {
-              ...method,
-              autoPay: checked,
-              nextCharge: checked ? "Oct 1, 2026" : "Not scheduled",
-            }
-          : method,
-      ),
-    );
-  const makeDefault = (id: string) => {
-    setMethods((current) =>
-      current.map((method) => ({ ...method, isDefault: method.id === id })),
-    );
-    toast.success("Default payment method updated");
+  const makeDefault = async (id: string) => {
+    try {
+      await updatePaymentMethod({ id, data: { isDefault: true } }).unwrap();
+      toast.success("Default payment method updated");
+    } catch {
+      toast.error("Couldn't update the default method.");
+    }
   };
-  const confirmRemove = () => {
+
+  const saveEdit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editing) return;
+    const form = new FormData(event.currentTarget);
+    const accountHolder = ((form.get("edit-holder") as string) || "").trim();
+    const expiryRaw = ((form.get("edit-expiry") as string) || "").trim();
+    try {
+      if (!editing.isBank) {
+        const parsed = parseExpiry(expiryRaw);
+        if (!accountHolder || !parsed) {
+          toast.error("Enter a valid holder name and expiry (MM / YY).");
+          return;
+        }
+        await updatePaymentMethod({
+          id: editing.id,
+          data: { accountHolder, expMonth: parsed.month, expYear: parsed.year },
+        }).unwrap();
+      } else {
+        if (!accountHolder) return;
+        await updatePaymentMethod({
+          id: editing.id,
+          data: { accountHolder },
+        }).unwrap();
+      }
+      setEditing(null);
+      toast.success("Payment method updated");
+    } catch {
+      toast.error("Couldn't save your changes. Please try again.");
+    }
+  };
+
+  const confirmRemove = async () => {
     if (!removing) return;
-    setMethods((current) =>
-      current.filter((method) => method.id !== removing.id),
-    );
-    setRemoving(null);
-    toast.success("Payment method removed");
+    try {
+      await removePaymentMethod(removing.id).unwrap();
+      setRemoving(null);
+      toast.success("Payment method removed");
+    } catch {
+      toast.error("Couldn't remove this payment method.");
+    }
   };
 
   return (
@@ -155,39 +226,43 @@ export default function PaymentMethodsPage() {
               Manage the cards and bank accounts you use for rent.
             </p>
           </div>
-          <Button
+          {/* <Button
             className="min-h-11 gap-2 self-start sm:self-auto"
             onClick={() => setAddOpen(true)}
           >
             <PlusIcon className="size-4" />
             Add payment method
-          </Button>
+          </Button> */}
         </header>
 
-        <div className="flex flex-col justify-between gap-4 rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-rose-500/10 p-2 text-rose-700">
-              <AlertCircleIcon className="size-5" />
+        {overdueCount > 0 && (
+          <div className="flex flex-col justify-between gap-4 rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 sm:flex-row sm:items-center">
+            <div className="flex items-start gap-3">
+              <div className="rounded-lg bg-rose-500/10 p-2 text-rose-700">
+                <AlertCircleIcon className="size-5" />
+              </div>
+              <div>
+                <p className="font-semibold">
+                  {overdueCount === 1
+                    ? "One payment is overdue"
+                    : `${overdueCount} payments are overdue`}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Update your default method to avoid further late payments.
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="font-semibold">
-                Your last payment could not be processed
-              </p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Update your default method before Oct 1 to avoid a late payment.
-              </p>
-            </div>
+            <Button
+              variant="outline"
+              className="min-h-11 shrink-0 border-rose-500/30 text-rose-700 hover:bg-rose-500/10"
+              onClick={() =>
+                defaultMethod ? setEditing(defaultMethod) : setAddOpen(true)
+              }
+            >
+              Update payment method
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            className="min-h-11 shrink-0 border-rose-500/30 text-rose-700 hover:bg-rose-500/10"
-            onClick={() =>
-              setEditing(methods.find((method) => method.isDefault) ?? null)
-            }
-          >
-            Update payment method
-          </Button>
-        </div>
+        )}
 
         <section
           className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_300px]"
@@ -201,93 +276,102 @@ export default function PaymentMethodsPage() {
                   {methods.length} methods on file
                 </p>
               </div>
-              <Button
+              {/* <Button
                 variant="outline"
                 className="min-h-11 gap-2"
                 onClick={() => setAddOpen(true)}
               >
                 <PlusIcon className="size-4" />
                 Add new
-              </Button>
+              </Button> */}
             </div>
-            {methods.map((method) => (
-              <Card key={method.id} className="p-5">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <BrandMark brand={method.brand} />
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold">
-                          {method.brand === "Bank"
-                            ? "Bank account"
-                            : `${method.brand} ending in ${method.last4}`}
-                        </p>
-                        {method.isDefault && (
-                          <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
-                            Default
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {method.type} ·{" "}
-                        {method.brand === "Bank"
-                          ? method.expiry
-                          : `Expires ${method.expiry}`}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 self-start sm:self-auto">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-11"
-                      aria-label={`Edit ${method.brand} ending in ${method.last4}`}
-                      onClick={() => setEditing(method)}
-                    >
-                      <PencilIcon className="size-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-11 text-muted-foreground hover:text-destructive"
-                      aria-label={`Remove ${method.brand} ending in ${method.last4}`}
-                      onClick={() => setRemoving(method)}
-                    >
-                      <Trash2Icon className="size-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-3">
-                    <Switch
-                      checked={method.autoPay}
-                      onCheckedChange={(checked) =>
-                        toggleAutoPay(method.id, checked)
-                      }
-                      aria-label={`Enable autopay for ${method.brand} ending in ${method.last4}`}
-                    />
-                    <div>
-                      <p className="text-sm font-medium">Autopay</p>
-                      <p className="text-xs text-muted-foreground">
-                        {method.autoPay
-                          ? `Next charge ${method.nextCharge}`
-                          : "Pay manually when due"}
-                      </p>
-                    </div>
-                  </div>
-                  {!method.isDefault && (
-                    <Button
-                      variant="link"
-                      className="min-h-11 justify-start px-0 text-sm"
-                      onClick={() => makeDefault(method.id)}
-                    >
-                      Make default
-                    </Button>
-                  )}
-                </div>
+            {isLoading ? (
+              <>
+                <Skeleton className="h-36 w-full rounded-xl" />
+                <Skeleton className="h-36 w-full rounded-xl" />
+              </>
+            ) : isError ? (
+              <Card className="flex flex-col items-center p-10 text-center">
+                <WalletCardsIcon className="size-8 text-muted-foreground" />
+                <h3 className="mt-3 font-semibold">
+                  Couldn&apos;t load your payment methods
+                </h3>
+                <Button
+                  variant="outline"
+                  className="mt-5 min-h-11"
+                  onClick={() => refetch()}
+                >
+                  Retry
+                </Button>
               </Card>
-            ))}
-            {methods.length === 0 && (
+            ) : (
+              methods.map((method) => (
+                <Card key={method.id} className="p-5">
+                  <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <BrandMark brand={method.brand} />
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-semibold">
+                            {method.brand === "Bank"
+                              ? "Bank account"
+                              : `${method.brand} ending in ${method.last4}`}
+                          </p>
+                          {method.isDefault && (
+                            <Badge className="bg-primary/10 text-primary hover:bg-primary/10">
+                              Default
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {method.holder} ·{" "}
+                          {method.isBank
+                            ? method.expiry
+                            : `Expires ${method.expiry}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 self-start sm:self-auto">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-11"
+                        aria-label={`Edit ${method.brand} ending in ${method.last4}`}
+                        onClick={() => setEditing(method)}
+                      >
+                        <PencilIcon className="size-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-11 text-muted-foreground hover:text-destructive"
+                        aria-label={`Remove ${method.brand} ending in ${method.last4}`}
+                        onClick={() => setRemoving(method)}
+                      >
+                        <Trash2Icon className="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xs text-muted-foreground">
+                      {method.isBank
+                        ? "Verified for ACH debits"
+                        : "Verified for rent payments"}
+                    </p>
+                    {!method.isDefault && (
+                      <Button
+                        variant="link"
+                        className="min-h-11 justify-start px-0 text-sm"
+                        onClick={() => makeDefault(method.id)}
+                      >
+                        Make default
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              ))
+            )}
+            {!isLoading && !isError && methods.length === 0 && (
               <Card className="flex flex-col items-center p-10 text-center">
                 <WalletCardsIcon className="size-8 text-muted-foreground" />
                 <h3 className="mt-3 font-semibold">No payment methods yet</h3>
@@ -352,6 +436,7 @@ export default function PaymentMethodsPage() {
                 <Label htmlFor="holder">Account holder name</Label>
                 <Input
                   id="holder"
+                  name="holder"
                   placeholder="Alex Morgan"
                   required
                   className="min-h-11"
@@ -363,6 +448,7 @@ export default function PaymentMethodsPage() {
                     <Label htmlFor="number">Card number</Label>
                     <Input
                       id="number"
+                      name="number"
                       inputMode="numeric"
                       placeholder="4242 4242 4242 4242"
                       required
@@ -374,6 +460,7 @@ export default function PaymentMethodsPage() {
                       <Label htmlFor="expiry">Expiry</Label>
                       <Input
                         id="expiry"
+                        name="expiry"
                         placeholder="MM / YY"
                         required
                         className="min-h-11"
@@ -396,12 +483,17 @@ export default function PaymentMethodsPage() {
                   <Label htmlFor="iban">IBAN</Label>
                   <Input
                     id="iban"
+                    name="iban"
                     placeholder="DE89 3704 0044 0532 0130 00"
                     required
                     className="min-h-11"
                   />
                 </div>
               )}
+              <p className="text-[11px] text-muted-foreground">
+                Only the last 4 digits leave your browser — full numbers are
+                never stored.
+              </p>
               <DialogFooter>
                 <Button
                   type="button"
@@ -426,29 +518,36 @@ export default function PaymentMethodsPage() {
             <DialogHeader>
               <DialogTitle>Update payment method</DialogTitle>
               <DialogDescription>
-                Replace the details for {editing?.brand} ending in{" "}
-                {editing?.last4}.
+                Update the holder name
+                {editing && !editing.isBank ? " or expiry " : " "}
+                for {editing?.brand} ending in {editing?.last4}. To change the
+                card or account itself, remove and re-add it.
               </DialogDescription>
             </DialogHeader>
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                setEditing(null);
-                toast.success("Payment method updated");
-              }}
-              className="space-y-4"
-            >
+            <form onSubmit={saveEdit} className="space-y-4">
               <div className="grid gap-2">
-                <Label htmlFor="updated-number">
-                  New card or account details
-                </Label>
+                <Label htmlFor="edit-holder">Account holder name</Label>
                 <Input
-                  id="updated-number"
-                  placeholder="Enter updated details"
+                  id="edit-holder"
+                  name="edit-holder"
+                  defaultValue={editing?.holder ?? ""}
                   required
                   className="min-h-11"
                 />
               </div>
+              {editing && !editing.isBank && (
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-expiry">Expiry</Label>
+                  <Input
+                    id="edit-expiry"
+                    name="edit-expiry"
+                    defaultValue={editing.expiry}
+                    placeholder="MM / YY"
+                    required
+                    className="min-h-11"
+                  />
+                </div>
+              )}
               <DialogFooter>
                 <Button
                   type="button"
@@ -474,10 +573,8 @@ export default function PaymentMethodsPage() {
               <DialogTitle>Remove payment method?</DialogTitle>
               <DialogDescription>
                 {removing?.isDefault
-                  ? "This is your default payment method. Removing it will pause autopay until you select another method."
-                  : removing?.autoPay
-                    ? "Autopay is enabled for this method. Removing it will stop future automatic charges."
-                    : "This method will no longer be available for rent payments."}
+                  ? "This is your default payment method. Removing it will promote your most recent remaining method to default."
+                  : "This method will no longer be available for rent payments."}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>

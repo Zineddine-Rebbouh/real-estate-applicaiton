@@ -3,18 +3,25 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  CompassIcon,
-  LayersIcon,
-  LocateFixedIcon,
   MinusIcon,
   PlusIcon,
   RotateCcwIcon,
   SearchIcon,
-  StarIcon,
   XIcon,
 } from "lucide-react";
 import { RentalProperty } from "@/src/data/rentals-data";
 import { formatPriceValue } from "@/lib/utils";
+import dynamic from "next/dynamic";
+
+const GoogleMap = dynamic(
+  () => import("./google-map").then((m) => m.GoogleMap),
+  { ssr: false },
+);
+
+// Set NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to render real Google Maps tiles;
+// without it the custom SVG vector map below is used (Google Maps JS stays
+// out of the bundle entirely via the dynamic import above).
+const GOOGLE_MAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
 interface InteractiveMapProps {
   properties: RentalProperty[];
@@ -38,7 +45,18 @@ type MarkerItem =
   | { isCluster: false; property: RentalProperty; x: number; y: number }
   | ClusterItem;
 
-export function InteractiveMap({
+export function InteractiveMap(props: InteractiveMapProps) {
+  const hasGeo = props.properties.some(
+    (p) => p.coords.lat !== 0 || p.coords.lng !== 0,
+  );
+  if (GOOGLE_MAPS_KEY && hasGeo) {
+    return <GoogleMap {...props} />;
+  }
+  return <CustomInteractiveMap {...props} />;
+}
+
+
+function CustomInteractiveMap({
   properties,
   selectedPropertyId,
   hoveredPropertyId,

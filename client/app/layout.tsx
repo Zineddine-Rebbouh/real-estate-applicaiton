@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   title: "Habitat | Find a place worth coming home to",
   description:
     "Curated homes, apartments, and spaces for the way you want to live.",
+  icons: { icon: "/new-logo-habitat.png" },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
