@@ -49,7 +49,11 @@ async function clearAll() {
   console.log("Clearing existing data…");
   await prisma.review.deleteMany();
   await prisma.favorite.deleteMany();
+  await prisma.maintenanceRequest.deleteMany();
+  await prisma.tourRequest.deleteMany();
+  await prisma.contactMessage.deleteMany();
   await prisma.payment.deleteMany();
+  await prisma.paymentMethod.deleteMany();
   await prisma.application.deleteMany();
   await prisma.lease.deleteMany();
   await prisma.property.deleteMany();
@@ -105,6 +109,19 @@ async function main() {
   // 10. Manager invite codes (unused — ready for manager signup)
   console.log("Seeding invite codes…");
   await seedModel("managerInviteCode", load("invite-codes.json"));
+
+  // 11. Payment method references (no PANs — brand/last4 only)
+  console.log("Seeding payment methods…");
+  await seedModel("paymentMethod", load("payment-method.json"));
+
+  // 12. Maintenance requests
+  console.log("Seeding maintenance…");
+  await seedModel("maintenanceRequest", load("maintenance.json"));
+
+  // 13. Tour requests + contact messages
+  console.log("Seeding inquiries…");
+  await seedModel("tourRequest", load("tour.json"));
+  await seedModel("contactMessage", load("message.json"));
 
   console.log("\n✅ Seed complete.");
 }

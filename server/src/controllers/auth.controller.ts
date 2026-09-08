@@ -44,12 +44,16 @@ export async function signup(req: Request, res: Response) {
   const inviteCode = parsed.data.inviteCode?.trim() || "";
   if (role === "MANAGER") {
     if (!inviteCode)
-      return res.status(400).json({ error: "Manager signup requires an invite code" });
+      return res
+        .status(400)
+        .json({ error: "Manager signup requires an invite code" });
     const code = await prisma.managerInviteCode.findUnique({
       where: { code: inviteCode },
     });
     if (!code || code.usedAt)
-      return res.status(403).json({ error: "Invalid or already-used invite code" });
+      return res
+        .status(403)
+        .json({ error: "Invalid or already-used invite code" });
   }
   try {
     const user = await prisma.$transaction(async (tx) => {
@@ -100,17 +104,33 @@ export async function signup(req: Request, res: Response) {
 
 export async function login(req: Request, res: Response) {
   const parsed = loginSchema.safeParse(req.body);
-  if (!parsed.success)
+  if (!parsed.success) {
+    // Log keys only — never password values.
+    console.warn("Login validation failed", {
+      bodyKeys: Object.keys(req.body ?? {}),
+      issues: parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`),
+    });
     return res.status(401).json({ error: invalidCredentials });
+  }
 
   const user = await prisma.user.findUnique({
     where: { email: parsed.data.email },
   });
+
   const passwordMatches = user
     ? await bcrypt.compare(parsed.data.password, user.passwordHash)
     : false;
-  if (!user || !passwordMatches)
+
+  if (!user || !passwordMatches) {
+    // Never log the submitted password — only account diagnostics.
+    console.warn("Login rejected: invalid email or password", {
+      email: parsed.data.email,
+      userFound: Boolean(user),
+      storedHashPrefix: user ? user.passwordHash?.slice(0, 7) : null,
+      storedHashLength: user ? user.passwordHash?.length : null,
+    });
     return res.status(401).json({ error: invalidCredentials });
+  }
 
   const refreshToken = setAuthCookies(res, user.id, user.refreshTokenVersion);
   await prisma.user.update({
@@ -204,7 +224,10 @@ export async function me(req: Request, res: Response) {
           select: { phoneNumber: true },
         });
   return res.json({
-    user: { ...toPublicUser(authUser), phoneNumber: profile?.phoneNumber ?? null },
+    user: {
+      ...toPublicUser(authUser),
+      phoneNumber: profile?.phoneNumber ?? null,
+    },
   });
 }
 
@@ -220,7 +243,11 @@ export async function updateMe(req: Request, res: Response) {
         : undefined;
   if (name !== undefined && (name.length < 2 || name.length > 100))
     return res.status(400).json({ error: "Name must be 2–100 characters" });
-  if (phoneNumber !== undefined && phoneNumber !== null && phoneNumber.length > 30)
+  if (
+    phoneNumber !== undefined &&
+    phoneNumber !== null &&
+    phoneNumber.length > 30
+  )
     return res.status(400).json({ error: "Phone number is too long" });
   if (name === undefined && phoneNumber === undefined)
     return res.status(400).json({ error: "Nothing to update" });

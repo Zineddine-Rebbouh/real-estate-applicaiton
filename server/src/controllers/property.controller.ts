@@ -8,6 +8,10 @@ function getIdParam(req: Request): string {
   return Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
 }
 
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
+
 function sanitizeDecimal(value: unknown): number | string {
   if (typeof value === "number" || typeof value === "string") return value;
   return 0;
@@ -98,6 +102,9 @@ export async function getProperties(req: Request, res: Response) {
 export async function getPropertyById(req: Request, res: Response) {
   try {
     const id = getIdParam(req);
+    if (!isUuid(id)) {
+      return res.status(404).json({ error: "Property not found" });
+    }
     const property = await prisma.property.findUnique({
       where: { id },
       include: {

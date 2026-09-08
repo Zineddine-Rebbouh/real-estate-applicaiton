@@ -1,0 +1,10 @@
+[
+  {
+    "id": "5b000000-0000-0000-0000-000000000001",
+    "propertyId": "cc000000-0000-0000-0000-000000000001",
+    "tenantId": "bb000000-0000-0000-0000-000000000002",
+    "name": "Bob Green",
+    "email": "bob.green@example.com",
+    "message": "Is this apartment still available? Can I lease for 6 months instead of 12?"
+  }
+]

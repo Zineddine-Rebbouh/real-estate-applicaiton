@@ -1,0 +1,14 @@
+[
+  {
+    "id": "5c000000-0000-0000-0000-000000000001",
+    "propertyId": "cc000000-0000-0000-0000-000000000001",
+    "tenantId": "bb000000-0000-0000-0000-000000000002",
+    "name": "Bob Green",
+    "email": "bob.green@example.com",
+    "tourType": "InPerson",
+    "preferredDate": "Saturday, Sep 12",
+    "preferredTime": "11:30 AM",
+    "note": "Bringing my partner along.",
+    "status": "Pending"
+  }
+]

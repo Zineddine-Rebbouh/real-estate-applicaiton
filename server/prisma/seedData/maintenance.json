@@ -1,0 +1,19 @@
+[
+  {
+    "id": "5d000000-0000-0000-0000-000000000001",
+    "propertyId": "cc000000-0000-0000-0000-000000000001",
+    "tenantId": "bb000000-0000-0000-0000-000000000001",
+    "leaseId": "dd000000-0000-0000-0000-000000000001",
+    "title": "Kitchen faucet leaking",
+    "description": "Steady drip from the kitchen faucet, worse at night. Shutoff valve works.",
+    "status": "Open"
+  },
+  {
+    "id": "5d000000-0000-0000-0000-000000000002",
+    "propertyId": "cc000000-0000-0000-0000-000000000003",
+    "tenantId": "bb000000-0000-0000-0000-000000000001",
+    "title": "Bedroom window stuck",
+    "description": "Bedroom window would not open during the last tenancy.",
+    "status": "Resolved"
+  }
+]

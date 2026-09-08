@@ -118,6 +118,11 @@ export async function updateApplicationStatus(req: Request, res: Response) {
       return res.status(404).json({ error: "Application not found" });
     }
 
+    // A withdrawn application is final — the tenant must submit a new one.
+    if (application.status === "Withdrawn") {
+      return res.status(409).json({ error: "Application was withdrawn by the tenant" });
+    }
+
     const property = await prisma.property.findUnique({
       where: { id: application.propertyId },
     });

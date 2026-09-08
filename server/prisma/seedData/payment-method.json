@@ -1,0 +1,22 @@
+[
+  {
+    "id": "5e000000-0000-0000-0000-000000000001",
+    "tenantId": "bb000000-0000-0000-0000-000000000001",
+    "type": "Card",
+    "brand": "Visa",
+    "last4": "4242",
+    "expMonth": 8,
+    "expYear": 2028,
+    "accountHolder": "Carol White",
+    "isDefault": true
+  },
+  {
+    "id": "5e000000-0000-0000-0000-000000000002",
+    "tenantId": "bb000000-0000-0000-0000-000000000001",
+    "type": "Bank",
+    "brand": "Bank",
+    "last4": "1138",
+    "accountHolder": "Carol White",
+    "isDefault": false
+  }
+]
