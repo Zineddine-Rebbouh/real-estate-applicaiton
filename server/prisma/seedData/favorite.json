@@ -1,117 +1,314 @@
 [
   {
-    "id": "fa000000-0000-0000-0000-000000000001",
-    "tenantId": "bb000000-0000-0000-0000-000000000002",
-    "propertyId": "cc000000-0000-0000-0000-000000000002"
+    "id": "1e10d7fd-7878-4215-acb8-c99b0357c5c3",
+    "tenantId": "1ed5607b-5cd6-43e8-a364-897f7f0b4a3a",
+    "propertyId": "9dc91ff3-8b37-4ce8-9f6e-3fb78922069b",
+    "createdAt": "2026-09-06T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000002",
-    "tenantId": "bb000000-0000-0000-0000-000000000004",
-    "propertyId": "cc000000-0000-0000-0000-000000000004"
+    "id": "9e75afcc-5031-4cfb-afef-585b877c6e03",
+    "tenantId": "1ed5607b-5cd6-43e8-a364-897f7f0b4a3a",
+    "propertyId": "6608c5da-fc7f-440a-86ef-649a13cc366b",
+    "createdAt": "2026-09-01T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000003",
-    "tenantId": "bb000000-0000-0000-0000-000000000004",
-    "propertyId": "cc000000-0000-0000-0000-000000000005"
+    "id": "23be9969-752a-430c-98e8-3e5733d4c25b",
+    "tenantId": "1ed5607b-5cd6-43e8-a364-897f7f0b4a3a",
+    "propertyId": "57a5835c-d9fa-4abc-aebd-72c21a359b23",
+    "createdAt": "2026-08-27T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000004",
-    "tenantId": "bb000000-0000-0000-0000-000000000005",
-    "propertyId": "cc000000-0000-0000-0000-000000000001"
+    "id": "b5de3aec-8248-44fc-8663-9d11c24e163f",
+    "tenantId": "1ed5607b-5cd6-43e8-a364-897f7f0b4a3a",
+    "propertyId": "b868acd8-6ca2-4b3f-b5e2-1425c4c311b6",
+    "createdAt": "2026-08-22T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000005",
-    "tenantId": "bb000000-0000-0000-0000-000000000005",
-    "propertyId": "cc000000-0000-0000-0000-000000000005"
+    "id": "a4c5a6e5-6a02-46eb-96d7-d16001f130f8",
+    "tenantId": "1ed5607b-5cd6-43e8-a364-897f7f0b4a3a",
+    "propertyId": "a794e90f-232b-4520-a72e-97398a44eefd",
+    "createdAt": "2026-08-17T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000006",
-    "tenantId": "bb000000-0000-0000-0000-000000000005",
-    "propertyId": "cc000000-0000-0000-0000-000000000006"
+    "id": "f4f07cd1-5c3a-40c8-9534-26eef2ac99a2",
+    "tenantId": "36d16d7a-e904-4eb4-9c33-8598b8ba8184",
+    "propertyId": "d2a515de-d4b3-489e-9374-e2974d0af671",
+    "createdAt": "2026-08-12T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000007",
-    "tenantId": "bb000000-0000-0000-0000-000000000007",
-    "propertyId": "cc000000-0000-0000-0000-000000000003"
+    "id": "2a188546-ff49-46c9-94d7-3ba47f3dd25f",
+    "tenantId": "36d16d7a-e904-4eb4-9c33-8598b8ba8184",
+    "propertyId": "132dbbb5-58d6-480c-b29c-929cee7679d0",
+    "createdAt": "2026-08-07T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000008",
-    "tenantId": "bb000000-0000-0000-0000-000000000007",
-    "propertyId": "cc000000-0000-0000-0000-000000000007"
+    "id": "2fbdbc3f-7097-4b33-a173-3c555d82d187",
+    "tenantId": "36d16d7a-e904-4eb4-9c33-8598b8ba8184",
+    "propertyId": "b2c91fa9-07de-4196-b930-60aa0ed082ea",
+    "createdAt": "2026-08-02T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000009",
-    "tenantId": "bb000000-0000-0000-0000-000000000009",
-    "propertyId": "cc000000-0000-0000-0000-000000000007"
+    "id": "90d2ef41-c4d3-4239-a57f-4bbb188e4ea8",
+    "tenantId": "36d16d7a-e904-4eb4-9c33-8598b8ba8184",
+    "propertyId": "a308da66-3e4d-4d9e-9f7e-ea0aed1bd800",
+    "createdAt": "2026-07-28T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000010",
-    "tenantId": "bb000000-0000-0000-0000-000000000009",
-    "propertyId": "cc000000-0000-0000-0000-000000000009"
+    "id": "0f89dfa1-1fbc-40b7-af0b-a7cb3cda0e0c",
+    "tenantId": "36d16d7a-e904-4eb4-9c33-8598b8ba8184",
+    "propertyId": "cfe1630d-53a1-4783-b2f7-98a528db7db1",
+    "createdAt": "2026-07-23T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000011",
-    "tenantId": "bb000000-0000-0000-0000-000000000010",
-    "propertyId": "cc000000-0000-0000-0000-000000000002"
+    "id": "46d38cc1-dce8-4497-bafb-5adca436cc82",
+    "tenantId": "3f9a6710-66c5-4058-b3b7-8bbdb7dd44d2",
+    "propertyId": "ce5c3a57-1dfc-4fc3-86d7-e289223009ed",
+    "createdAt": "2026-07-18T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000012",
-    "tenantId": "bb000000-0000-0000-0000-000000000010",
-    "propertyId": "cc000000-0000-0000-0000-000000000010"
+    "id": "abd3bc8f-92c2-4adf-8dc2-fc0efb190fef",
+    "tenantId": "3f9a6710-66c5-4058-b3b7-8bbdb7dd44d2",
+    "propertyId": "3a87272c-784e-4e04-b59a-a705b2e9a698",
+    "createdAt": "2026-07-13T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000013",
-    "tenantId": "bb000000-0000-0000-0000-000000000011",
-    "propertyId": "cc000000-0000-0000-0000-000000000001"
+    "id": "19a09b46-f64b-4d0a-a7cf-2183baac68ca",
+    "tenantId": "3f9a6710-66c5-4058-b3b7-8bbdb7dd44d2",
+    "propertyId": "c96f22a8-a597-4534-9044-c952c93cd659",
+    "createdAt": "2026-09-06T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000014",
-    "tenantId": "bb000000-0000-0000-0000-000000000011",
-    "propertyId": "cc000000-0000-0000-0000-000000000004"
+    "id": "81e5940e-3a29-4d7d-b9c8-95cb17a1c26a",
+    "tenantId": "3f9a6710-66c5-4058-b3b7-8bbdb7dd44d2",
+    "propertyId": "a6e71ab7-6e25-4df7-9aae-14f4b3481439",
+    "createdAt": "2026-09-01T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000015",
-    "tenantId": "bb000000-0000-0000-0000-000000000011",
-    "propertyId": "cc000000-0000-0000-0000-000000000007"
+    "id": "a93ca067-b06a-4ace-af48-c9ba051bfca8",
+    "tenantId": "3f9a6710-66c5-4058-b3b7-8bbdb7dd44d2",
+    "propertyId": "92264539-1219-48d4-b285-6adc704ed66d",
+    "createdAt": "2026-08-27T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000016",
-    "tenantId": "bb000000-0000-0000-0000-000000000012",
-    "propertyId": "cc000000-0000-0000-0000-000000000003"
+    "id": "577104bd-7b3f-4cbb-ab1e-a6f0c2d1968e",
+    "tenantId": "9073d34d-bf51-455c-977d-0e0508d0761b",
+    "propertyId": "31628a80-1cb1-4455-af98-8e565906182b",
+    "createdAt": "2026-08-22T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000017",
-    "tenantId": "bb000000-0000-0000-0000-000000000012",
-    "propertyId": "cc000000-0000-0000-0000-000000000006"
+    "id": "b710d850-6a2f-4189-8fdd-b67bea23fcef",
+    "tenantId": "9073d34d-bf51-455c-977d-0e0508d0761b",
+    "propertyId": "7bb82cbc-fedf-4bea-ae45-c70a99de32cb",
+    "createdAt": "2026-08-17T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000018",
-    "tenantId": "bb000000-0000-0000-0000-000000000012",
-    "propertyId": "cc000000-0000-0000-0000-000000000009"
+    "id": "e4c3fe80-62a1-406f-969d-9d1d58b6b8a5",
+    "tenantId": "9073d34d-bf51-455c-977d-0e0508d0761b",
+    "propertyId": "34a0b360-deef-4381-a08a-9286bee0354c",
+    "createdAt": "2026-08-12T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000019",
-    "tenantId": "bb000000-0000-0000-0000-000000000014",
-    "propertyId": "cc000000-0000-0000-0000-000000000001"
+    "id": "81255a88-c4be-495a-a6d0-07261f6d8997",
+    "tenantId": "9073d34d-bf51-455c-977d-0e0508d0761b",
+    "propertyId": "a93068c1-9175-4011-9ffd-563874af1a7d",
+    "createdAt": "2026-08-07T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000020",
-    "tenantId": "bb000000-0000-0000-0000-000000000014",
-    "propertyId": "cc000000-0000-0000-0000-000000000010"
+    "id": "7e7a5c9f-a2c6-4dd5-bda4-f097dd87ff17",
+    "tenantId": "9073d34d-bf51-455c-977d-0e0508d0761b",
+    "propertyId": "b8af358f-103d-4444-a397-3336d1e9a440",
+    "createdAt": "2026-08-02T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000021",
-    "tenantId": "bb000000-0000-0000-0000-000000000015",
-    "propertyId": "cc000000-0000-0000-0000-000000000004"
+    "id": "278834a0-19ce-4e4e-8e5c-185b91a7a5d5",
+    "tenantId": "967dd9a7-d2a4-4821-a5b2-c4056bb97b40",
+    "propertyId": "65a5e8a8-6a35-4e6d-9686-abbd1cbb257e",
+    "createdAt": "2026-07-28T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000022",
-    "tenantId": "bb000000-0000-0000-0000-000000000015",
-    "propertyId": "cc000000-0000-0000-0000-000000000007"
+    "id": "8c08f8dc-f0e7-449d-a94f-3b409a3aed81",
+    "tenantId": "967dd9a7-d2a4-4821-a5b2-c4056bb97b40",
+    "propertyId": "7d5f822f-c5e1-4a00-8212-0c8a1684b8bb",
+    "createdAt": "2026-07-23T12:00:00.000Z"
   },
   {
-    "id": "fa000000-0000-0000-0000-000000000023",
-    "tenantId": "bb000000-0000-0000-0000-000000000015",
-    "propertyId": "cc000000-0000-0000-0000-000000000009"
+    "id": "848b014b-1a1b-4757-b6b4-08875e2a180d",
+    "tenantId": "967dd9a7-d2a4-4821-a5b2-c4056bb97b40",
+    "propertyId": "580e7056-50b9-4781-8266-4524d4870f84",
+    "createdAt": "2026-07-18T12:00:00.000Z"
+  },
+  {
+    "id": "86da1346-447b-4529-b7e9-fc1926a7367b",
+    "tenantId": "967dd9a7-d2a4-4821-a5b2-c4056bb97b40",
+    "propertyId": "aa29cbee-ed69-488d-afab-cdfac569a508",
+    "createdAt": "2026-07-13T12:00:00.000Z"
+  },
+  {
+    "id": "70ccb057-7201-49c1-b27a-3c547d927f27",
+    "tenantId": "967dd9a7-d2a4-4821-a5b2-c4056bb97b40",
+    "propertyId": "3ce8fd99-cc3a-478b-bd0d-69aedc84d3bd",
+    "createdAt": "2026-09-06T12:00:00.000Z"
+  },
+  {
+    "id": "a0aa7dd9-a271-4d79-af38-0438b7b24b30",
+    "tenantId": "ab2d454c-7093-470b-9e8f-b145670230a9",
+    "propertyId": "eecfb0b1-6840-4c31-8a4e-df46829dfa96",
+    "createdAt": "2026-09-01T12:00:00.000Z"
+  },
+  {
+    "id": "d17e2379-7289-4fbc-b840-26dc9f9d995d",
+    "tenantId": "05801c28-5cc4-4b5d-8d0b-c241dc0ec1d4",
+    "propertyId": "e4cece50-f39c-43e1-9fcb-14495e4f3ae6",
+    "createdAt": "2026-08-27T12:00:00.000Z"
+  },
+  {
+    "id": "633c35e5-15db-4634-a210-87083eaa680e",
+    "tenantId": "224fc291-16fe-4eee-9a82-0e5e811d2891",
+    "propertyId": "b868acd8-6ca2-4b3f-b5e2-1425c4c311b6",
+    "createdAt": "2026-08-22T12:00:00.000Z"
+  },
+  {
+    "id": "437bd410-a6a9-4168-83db-51fa1902f98f",
+    "tenantId": "70e56e7a-fc8e-469d-b44e-f35b6d62f185",
+    "propertyId": "a308da66-3e4d-4d9e-9f7e-ea0aed1bd800",
+    "createdAt": "2026-08-17T12:00:00.000Z"
+  },
+  {
+    "id": "8087d600-4036-436e-a0be-e50d578cefa9",
+    "tenantId": "711c2cce-5a92-4338-88f8-dc13a346d7fc",
+    "propertyId": "a6e71ab7-6e25-4df7-9aae-14f4b3481439",
+    "createdAt": "2026-08-12T12:00:00.000Z"
+  },
+  {
+    "id": "09e06a6b-1f29-4459-8fa9-a7c5932a44ff",
+    "tenantId": "699f3c97-244e-46a4-8629-56cee818bfa5",
+    "propertyId": "a93068c1-9175-4011-9ffd-563874af1a7d",
+    "createdAt": "2026-08-07T12:00:00.000Z"
+  },
+  {
+    "id": "58c91f6c-0788-4b65-b828-93333f536e85",
+    "tenantId": "4bd10f39-67e6-492b-a854-b8e24ed442d8",
+    "propertyId": "aa29cbee-ed69-488d-afab-cdfac569a508",
+    "createdAt": "2026-08-02T12:00:00.000Z"
+  },
+  {
+    "id": "06c8f204-b5ac-4e3a-ac26-ff4cd6f16185",
+    "tenantId": "3724a6ac-4fb3-4f3b-b581-c56e32619124",
+    "propertyId": "5a8864e8-6371-4360-b091-8605d5173c37",
+    "createdAt": "2026-07-28T12:00:00.000Z"
+  },
+  {
+    "id": "31319903-8dff-462a-a00f-95bf439f1113",
+    "tenantId": "e6fd55b4-10ab-4605-933d-e76432ca7f17",
+    "propertyId": "7ed695de-1e5a-4b62-aadc-07945f949646",
+    "createdAt": "2026-07-23T12:00:00.000Z"
+  },
+  {
+    "id": "f89680af-7404-4b42-868f-21baedf98cc3",
+    "tenantId": "bef7038e-9da7-4049-bee5-56e104dda8f4",
+    "propertyId": "9a857e84-40ee-4cb9-89ba-366d983c266f",
+    "createdAt": "2026-07-18T12:00:00.000Z"
+  },
+  {
+    "id": "ae25812d-153d-4c60-83cb-5fd1936b326e",
+    "tenantId": "be574dc8-8552-422f-91f6-7e754917681e",
+    "propertyId": "c1ae8d53-ebcf-4df9-89eb-92ebd186f387",
+    "createdAt": "2026-07-13T12:00:00.000Z"
+  },
+  {
+    "id": "758f6036-718c-42ed-9375-6939e0a3a18d",
+    "tenantId": "8b69e772-72f3-43de-9641-24948d8327e8",
+    "propertyId": "761af1f3-4e3f-4fda-a516-0e72e6dd33bf",
+    "createdAt": "2026-09-06T12:00:00.000Z"
+  },
+  {
+    "id": "b673c648-533e-45d5-9a66-e731ac579882",
+    "tenantId": "2c3821b3-e401-48dd-82ea-3f0b0ce4c0d1",
+    "propertyId": "242d1c23-fe88-4017-a48d-b0ce3ed224ad",
+    "createdAt": "2026-09-01T12:00:00.000Z"
+  },
+  {
+    "id": "67f30135-59d3-4816-b7cb-5dcd53a382b6",
+    "tenantId": "b185e27d-5131-4b9f-b1e1-52168cede7ec",
+    "propertyId": "6183c45a-e550-4ac6-98ce-f06e9cc9d3da",
+    "createdAt": "2026-08-27T12:00:00.000Z"
+  },
+  {
+    "id": "d0545656-f2b4-4bc1-a8ea-f3a8c4e984a7",
+    "tenantId": "260761d5-9ff4-4951-a740-17cfdbafa0a7",
+    "propertyId": "e0ed7698-7fe1-4a51-8bc5-4343cdaa05fe",
+    "createdAt": "2026-08-22T12:00:00.000Z"
+  },
+  {
+    "id": "72dd3994-512e-4d9a-b01a-7cddc8f4af7b",
+    "tenantId": "f3db5f9f-b355-45cb-ba12-56735707635a",
+    "propertyId": "2622e0f4-028a-439e-b58d-ddcdacb3770c",
+    "createdAt": "2026-08-17T12:00:00.000Z"
+  },
+  {
+    "id": "1611dbc8-dfee-4f14-8150-adcc752f92fb",
+    "tenantId": "cf0e985e-7854-487e-b2c9-983c8952d20d",
+    "propertyId": "0113e4af-32a0-42e5-8625-be9760b6c363",
+    "createdAt": "2026-08-12T12:00:00.000Z"
+  },
+  {
+    "id": "2d66f35e-b6ad-41d0-a327-d9170afc9511",
+    "tenantId": "6a7abc31-5064-4c30-ba35-942e1f2e171e",
+    "propertyId": "3b37bc93-c684-4aaa-a7e6-e24caa59cb0f",
+    "createdAt": "2026-08-07T12:00:00.000Z"
+  },
+  {
+    "id": "d26cef7b-98be-4ba6-9e0e-d0c40ede9aa3",
+    "tenantId": "dbe9f1eb-22a0-401f-bce6-d2e1c486c4d5",
+    "propertyId": "00cc3afd-4c36-4cc4-a32e-45729e70e532",
+    "createdAt": "2026-08-02T12:00:00.000Z"
+  },
+  {
+    "id": "8bc28386-15d7-4ed8-8314-5942f1bfda00",
+    "tenantId": "0fdecd06-7ef5-4f19-96ca-f887f0d02a3e",
+    "propertyId": "876eb121-ef59-4189-adc1-9f4cf13bfe73",
+    "createdAt": "2026-07-28T12:00:00.000Z"
+  },
+  {
+    "id": "b131fe17-5e7b-4040-83c7-232b24a03e89",
+    "tenantId": "c78719b1-cf64-4597-b46c-82abedf4021e",
+    "propertyId": "44b186c5-2709-4db6-b5b6-5c516d49a2cf",
+    "createdAt": "2026-07-23T12:00:00.000Z"
+  },
+  {
+    "id": "011365b4-4be2-49b8-966d-1c9e315d01c4",
+    "tenantId": "7bfa9d1f-dc29-4bd8-a493-7e862497a1e9",
+    "propertyId": "e5960cf1-d820-45aa-8c50-a79e23e11e8b",
+    "createdAt": "2026-07-18T12:00:00.000Z"
+  },
+  {
+    "id": "c0210aac-ed1c-467d-800e-7750fe114f92",
+    "tenantId": "e3433856-2065-4060-b4b5-48634dd95f36",
+    "propertyId": "38211dde-547d-4e49-aa4f-18b4c479f285",
+    "createdAt": "2026-07-13T12:00:00.000Z"
+  },
+  {
+    "id": "a84fd9c4-592c-47be-b680-43ac0a75d36d",
+    "tenantId": "3b572efd-9c70-4c16-add3-f1a065d53887",
+    "propertyId": "f3197a39-c833-41c6-be0f-5401fd45e911",
+    "createdAt": "2026-09-06T12:00:00.000Z"
+  },
+  {
+    "id": "ef7f25b5-1910-44fe-af59-b8fb3f14abff",
+    "tenantId": "0805d718-66c6-4204-9d4f-3be8cd2c2b3d",
+    "propertyId": "53498f1a-86b7-4bb2-97f8-1368a4b3c9bd",
+    "createdAt": "2026-09-01T12:00:00.000Z"
+  },
+  {
+    "id": "934dca2e-158c-4a6a-88a1-8335d9d0c7a1",
+    "tenantId": "edd3317f-8b7b-4509-a1ef-5ce7f79f4189",
+    "propertyId": "6ba144f7-c990-4d37-9605-056fcded8f2c",
+    "createdAt": "2026-08-27T12:00:00.000Z"
+  },
+  {
+    "id": "928461ef-349d-4181-8f07-09ad6324c3df",
+    "tenantId": "7fe63ba8-c901-4031-b05f-9e844b6c10c0",
+    "propertyId": "9db9e926-5243-46f6-8366-63e442df1051",
+    "createdAt": "2026-08-22T12:00:00.000Z"
   }
 ]

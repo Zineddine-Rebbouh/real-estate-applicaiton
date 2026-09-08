@@ -1,8 +1,156 @@
 [
   {
-    "code": "HAB-DEMO-0001"
+    "id": "a85bb41e-9930-4f9b-b2ab-7ef631d682d8",
+    "code": "HAB-MGR-1001",
+    "usedAt": "2026-08-09T12:00:00.000Z",
+    "usedByUserId": "031f6a0a-3cfc-4101-b5fb-6eb8bc13eca0",
+    "createdAt": "2026-08-07T12:00:00.000Z"
   },
   {
-    "code": "HAB-DEMO-0002"
+    "id": "0a5e9946-2d88-408f-9903-d5eda62f5c08",
+    "code": "HAB-MGR-1002",
+    "usedAt": "2026-07-02T12:00:00.000Z",
+    "usedByUserId": "ec9156ec-8909-414d-aed1-ecc7f9694bf8",
+    "createdAt": "2026-06-30T12:00:00.000Z"
+  },
+  {
+    "id": "19df6f62-b7a9-416a-a062-9e6fa90b2576",
+    "code": "HAB-MGR-1003",
+    "usedAt": "2026-05-25T12:00:00.000Z",
+    "usedByUserId": "1cd840ea-b53b-467d-b568-9e4cbc6d9834",
+    "createdAt": "2026-05-23T12:00:00.000Z"
+  },
+  {
+    "id": "857189cd-4210-4a29-a89b-9c7e3226bf86",
+    "code": "HAB-MGR-1004",
+    "usedAt": "2026-04-17T12:00:00.000Z",
+    "usedByUserId": "3b9d56cd-830c-4819-9a24-ed426c530dfd",
+    "createdAt": "2026-04-15T12:00:00.000Z"
+  },
+  {
+    "id": "1c9958c9-7925-413f-8ae1-1989efc49f0c",
+    "code": "HAB-MGR-1005",
+    "usedAt": "2026-03-10T12:00:00.000Z",
+    "usedByUserId": "0957fb67-878e-4b0d-937d-758d0f3fae09",
+    "createdAt": "2026-03-08T12:00:00.000Z"
+  },
+  {
+    "id": "640ecdbb-f400-4209-8c35-a4475c55a467",
+    "code": "HAB-MGR-1006",
+    "usedAt": "2026-01-31T12:00:00.000Z",
+    "usedByUserId": "d802f43b-e95a-4214-842b-be7ff951a14c",
+    "createdAt": "2026-01-29T12:00:00.000Z"
+  },
+  {
+    "id": "14dd957e-4337-44f1-9f9a-9fda441750a7",
+    "code": "HAB-MGR-1007",
+    "usedAt": "2025-12-24T12:00:00.000Z",
+    "usedByUserId": "497cd2d3-f38b-4bb2-89be-3f3c8e7e877d",
+    "createdAt": "2025-12-22T12:00:00.000Z"
+  },
+  {
+    "id": "b79a8d84-524b-47ac-86e4-a690c3b1591f",
+    "code": "HAB-MGR-1008",
+    "usedAt": "2025-11-16T12:00:00.000Z",
+    "usedByUserId": "446e9abe-8062-43ca-a707-91284407a8db",
+    "createdAt": "2025-11-14T12:00:00.000Z"
+  },
+  {
+    "id": "86869de3-b496-4beb-941a-d47a35434121",
+    "code": "HAB-MGR-1009",
+    "usedAt": "2025-10-09T12:00:00.000Z",
+    "usedByUserId": "26e05277-e8b1-44cf-8273-b1d48d276756",
+    "createdAt": "2025-10-07T12:00:00.000Z"
+  },
+  {
+    "id": "daa57863-695d-4caa-a2b5-6fad5d4930c3",
+    "code": "HAB-MGR-1010",
+    "usedAt": "2025-09-01T12:00:00.000Z",
+    "usedByUserId": "c821740c-c311-4009-8a87-e064d37943d6",
+    "createdAt": "2025-08-30T12:00:00.000Z"
+  },
+  {
+    "id": "ef1be237-a411-4fa9-aad2-a3b0425c20ba",
+    "code": "HAB-MGR-1011",
+    "usedAt": "2025-07-25T12:00:00.000Z",
+    "usedByUserId": "a77da09a-1b49-42ad-a9f7-90051af62221",
+    "createdAt": "2025-07-23T12:00:00.000Z"
+  },
+  {
+    "id": "9b9f9b18-8f6f-40f2-9243-b7e9d429d8b4",
+    "code": "HAB-MGR-1012",
+    "usedAt": "2025-06-17T12:00:00.000Z",
+    "usedByUserId": "46bba375-468c-4b8f-9021-854f4d5c0742",
+    "createdAt": "2025-06-15T12:00:00.000Z"
+  },
+  {
+    "id": "89d2ff30-ea94-46cd-8d63-88e58e02160f",
+    "code": "HAB-MGR-1013",
+    "usedAt": "2025-05-10T12:00:00.000Z",
+    "usedByUserId": "90a5c6fd-ebf5-41af-89f1-59c1a7737f64",
+    "createdAt": "2025-05-08T12:00:00.000Z"
+  },
+  {
+    "id": "f4827afd-3d28-4022-afb6-baba211708ee",
+    "code": "HAB-MGR-1014",
+    "usedAt": "2025-04-02T12:00:00.000Z",
+    "usedByUserId": "7885be56-2284-400e-ae87-9ec58fa2dad3",
+    "createdAt": "2025-03-31T12:00:00.000Z"
+  },
+  {
+    "id": "b34395aa-1088-402f-8903-bda6046a2055",
+    "code": "HAB-MGR-1015",
+    "usedAt": "2025-02-23T12:00:00.000Z",
+    "usedByUserId": "798e3493-b9c9-4f88-bc63-d641e0b6227e",
+    "createdAt": "2025-02-21T12:00:00.000Z"
+  },
+  {
+    "id": "5544cc44-fbdc-40c2-8adf-d2602a443b70",
+    "code": "HAB-MGR-1016",
+    "usedAt": "2025-01-16T12:00:00.000Z",
+    "usedByUserId": "120735ad-afd7-4007-88bd-f1a2d5b21ec9",
+    "createdAt": "2025-01-14T12:00:00.000Z"
+  },
+  {
+    "id": "b4f5d718-b9c2-4084-a410-b71e40e0de17",
+    "code": "HAB-MGR-1017",
+    "usedAt": "2024-12-09T12:00:00.000Z",
+    "usedByUserId": "9e2499ba-b43e-4726-bf88-c60d46c21a75",
+    "createdAt": "2024-12-07T12:00:00.000Z"
+  },
+  {
+    "id": "c4ad109e-4def-455e-af40-060725f1be21",
+    "code": "HAB-MGR-1018",
+    "usedAt": "2024-11-01T12:00:00.000Z",
+    "usedByUserId": "bbfdf730-b49d-4963-9aa4-b3345761c40f",
+    "createdAt": "2024-10-30T12:00:00.000Z"
+  },
+  {
+    "id": "1c154ef7-9a7a-43aa-adbb-998d44104dab",
+    "code": "HAB-UNCLAIMED-2001",
+    "usedAt": null,
+    "usedByUserId": null,
+    "createdAt": "2026-08-29T12:00:00.000Z"
+  },
+  {
+    "id": "f63e4cd8-87db-4c3a-84fd-8e984d86139c",
+    "code": "HAB-UNCLAIMED-2002",
+    "usedAt": null,
+    "usedByUserId": null,
+    "createdAt": "2026-08-29T12:00:00.000Z"
+  },
+  {
+    "id": "055c4b92-94cd-4a83-97ff-40078df556bb",
+    "code": "HAB-UNCLAIMED-2003",
+    "usedAt": null,
+    "usedByUserId": null,
+    "createdAt": "2026-08-29T12:00:00.000Z"
+  },
+  {
+    "id": "656fc677-6dd8-4676-bc6d-b89a0fd8ce27",
+    "code": "HAB-UNCLAIMED-2004",
+    "usedAt": null,
+    "usedByUserId": null,
+    "createdAt": "2026-08-29T12:00:00.000Z"
   }
 ]

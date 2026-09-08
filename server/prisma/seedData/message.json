@@ -1,10 +1,128 @@
 [
   {
-    "id": "5b000000-0000-0000-0000-000000000001",
-    "propertyId": "cc000000-0000-0000-0000-000000000001",
-    "tenantId": "bb000000-0000-0000-0000-000000000002",
-    "name": "Bob Green",
-    "email": "bob.green@example.com",
-    "message": "Is this apartment still available? Can I lease for 6 months instead of 12?"
+    "id": "4c379fbc-5092-40c2-8c38-66408513c98e",
+    "propertyId": "c96f22a8-a597-4534-9044-c952c93cd659",
+    "tenantId": "be574dc8-8552-422f-91f6-7e754917681e",
+    "name": "Farhan Akhtar",
+    "email": "farhanakhtar.16@example.com",
+    "message": "Hello, is the parking space included in the monthly rent, or is there an additional monthly garage fee?",
+    "createdAt": "2026-09-07T12:00:00.000Z"
+  },
+  {
+    "id": "eb97a82f-c613-4703-8c82-cedc27e644d6",
+    "propertyId": "b868acd8-6ca2-4b3f-b5e2-1425c4c311b6",
+    "tenantId": "8b69e772-72f3-43de-9641-24948d8327e8",
+    "name": "Fatou Sow",
+    "email": "fatousow.17@example.com",
+    "message": "Hi there, does the building allow two small domestic cats with a pet deposit?",
+    "createdAt": "2026-09-04T12:00:00.000Z"
+  },
+  {
+    "id": "f0a87c80-f30a-4a5d-91ed-d88a10ed0c61",
+    "propertyId": "cceca425-8a43-4680-ac31-83b4cd1fc617",
+    "tenantId": "2c3821b3-e401-48dd-82ea-3f0b0ce4c0d1",
+    "name": "Gabriel Silva",
+    "email": "gabrielsilva.18@example.com",
+    "message": "Good morning! Is this listing still accepting applications for an October 1st move-in date?",
+    "createdAt": "2026-09-01T12:00:00.000Z"
+  },
+  {
+    "id": "57fce075-87fc-420e-8b80-c02e0298fe9d",
+    "propertyId": "34a0b360-deef-4381-a08a-9286bee0354c",
+    "tenantId": "b185e27d-5131-4b9f-b1e1-52168cede7ec",
+    "name": "Grace O'Malley",
+    "email": "graceomalley.19@example.com",
+    "message": "Does this unit come equipped with high-speed fiber internet infrastructure or coaxial only?",
+    "createdAt": "2026-08-29T12:00:00.000Z"
+  },
+  {
+    "id": "580b1cf1-3655-41da-b5fc-6b7e9ab260d0",
+    "propertyId": "a308da66-3e4d-4d9e-9f7e-ea0aed1bd800",
+    "tenantId": "260761d5-9ff4-4951-a740-17cfdbafa0a7",
+    "name": "Hana Al-Hassan",
+    "email": "hanaalhassan.20@example.com",
+    "message": "Are short-term or 6-month leases considered, or is a 12-month lease strictly required?",
+    "createdAt": "2026-08-26T12:00:00.000Z"
+  },
+  {
+    "id": "fce5721c-7512-43c0-91ba-0962685c0411",
+    "propertyId": "64b82003-dabc-4da4-b092-2e8234a167e4",
+    "tenantId": "f3db5f9f-b355-45cb-ba12-56735707635a",
+    "name": "Hiroshi Yamamoto",
+    "email": "hiroshiyamamoto.21@example.com",
+    "message": "Hello, is there dedicated bike storage in the building basement or courtyard?",
+    "createdAt": "2026-08-23T12:00:00.000Z"
+  },
+  {
+    "id": "bd69d6b2-bafd-4994-be04-287844aa046e",
+    "propertyId": "580e7056-50b9-4781-8266-4524d4870f84",
+    "tenantId": "cf0e985e-7854-487e-b2c9-983c8952d20d",
+    "name": "Imani Brooks",
+    "email": "imanibrooks.22@example.com",
+    "message": "Hi, I am moving from out of state. Can we arrange a video walkthrough before I submit an application?",
+    "createdAt": "2026-08-20T12:00:00.000Z"
+  },
+  {
+    "id": "3c20d267-091c-4560-bd8d-3b9a004bfe1d",
+    "propertyId": "a6e71ab7-6e25-4df7-9aae-14f4b3481439",
+    "tenantId": "6a7abc31-5064-4c30-ba35-942e1f2e171e",
+    "name": "Ingrid Bergman",
+    "email": "ingridbergman.23@example.com",
+    "message": "Does the unit have central air conditioning or ductless mini-splits?",
+    "createdAt": "2026-08-17T12:00:00.000Z"
+  },
+  {
+    "id": "baee77f1-0840-4e1c-ad56-d57127047419",
+    "propertyId": "a794e90f-232b-4520-a72e-97398a44eefd",
+    "tenantId": "dbe9f1eb-22a0-401f-bce6-d2e1c486c4d5",
+    "name": "Jaden Miller",
+    "email": "jadenmiller.24@example.com",
+    "message": "Are utilities (water, sewage, trash) included in the base rent?",
+    "createdAt": "2026-08-14T12:00:00.000Z"
+  },
+  {
+    "id": "85073c68-04d7-4823-a4dd-3aebb6a3b551",
+    "propertyId": "581dd6d1-602f-45fb-a80c-48ad4afd6aee",
+    "tenantId": "0fdecd06-7ef5-4f19-96ca-f887f0d02a3e",
+    "name": "Javier Hernandez",
+    "email": "javierhernandez.25@example.com",
+    "message": "Hello! Is the washer/dryer in-unit or shared on the floor?",
+    "createdAt": "2026-08-11T12:00:00.000Z"
+  },
+  {
+    "id": "9e3705e6-9e15-42cd-9434-016f91ef3fb4",
+    "propertyId": "a93068c1-9175-4011-9ffd-563874af1a7d",
+    "tenantId": "c78719b1-cf64-4597-b46c-82abedf4021e",
+    "name": "Jin-Woo Park",
+    "email": "jinwoopark.26@example.com",
+    "message": "Can the security deposit be split across the first two months?",
+    "createdAt": "2026-08-08T12:00:00.000Z"
+  },
+  {
+    "id": "031d3d91-9e42-4b54-b18d-78083eaded5e",
+    "propertyId": "cfe1630d-53a1-4783-b2f7-98a528db7db1",
+    "tenantId": "7bfa9d1f-dc29-4bd8-a493-7e862497a1e9",
+    "name": "Kareem Abdul-Jabbar",
+    "email": "kareemabduljabbar.27@example.com",
+    "message": "Is there an EV charging station in the building parking structure?",
+    "createdAt": "2026-08-05T12:00:00.000Z"
+  },
+  {
+    "id": "9503c4c8-ff37-4e8f-8501-ac946de411f2",
+    "propertyId": "513e2d64-6fc0-425e-a418-827c16caa7b7",
+    "tenantId": "e3433856-2065-4060-b4b5-48634dd95f36",
+    "name": "Katrina Novak",
+    "email": "katrinanovak.28@example.com",
+    "message": "Hi, what is the policy regarding guest parking overnight?",
+    "createdAt": "2026-08-02T12:00:00.000Z"
+  },
+  {
+    "id": "03f8a67f-90c4-4b09-9f85-0080614e5c57",
+    "propertyId": "aa29cbee-ed69-488d-afab-cdfac569a508",
+    "tenantId": "3b572efd-9c70-4c16-add3-f1a065d53887",
+    "name": "Keanu Reeves",
+    "email": "keanureeves.29@example.com",
+    "message": "Hello, are there any move-in fees or elevator reservation fees?",
+    "createdAt": "2026-07-30T12:00:00.000Z"
   }
 ]

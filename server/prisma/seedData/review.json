@@ -1,16 +1,272 @@
 [
   {
-    "id": "be000000-0000-0000-0000-000000000001",
-    "propertyId": "cc000000-0000-0000-0000-000000000001",
-    "tenantId": "bb000000-0000-0000-0000-000000000001",
+    "id": "b65da1ca-28ce-4495-bbde-524fe9ddd622",
+    "propertyId": "9dc91ff3-8b37-4ce8-9f6e-3fb78922069b",
+    "tenantId": "1ed5607b-5cd6-43e8-a364-897f7f0b4a3a",
     "rating": 5,
-    "comment": "Sunny, quiet, and the manager responds fast."
+    "comment": "Absolute dream apartment! Natural sunlight fills every room, the manager responded in under an hour for anything we needed, and move-in was seamless.",
+    "createdAt": "2026-08-24T12:00:00.000Z",
+    "updatedAt": "2026-08-24T12:00:00.000Z"
   },
   {
-    "id": "be000000-0000-0000-0000-000000000002",
-    "propertyId": "cc000000-0000-0000-0000-000000000002",
-    "tenantId": "bb000000-0000-0000-0000-000000000002",
+    "id": "f6293c32-9a2f-43b1-8963-ee9a82c82639",
+    "propertyId": "9dc91ff3-8b37-4ce8-9f6e-3fb78922069b",
+    "tenantId": "61962372-d852-43c8-a4a1-53a2300d43c8",
+    "rating": 5,
+    "comment": "Fantastic location right next to the metro and cafes. Quiet neighborhood and secure building access.",
+    "createdAt": "2026-08-14T12:00:00.000Z",
+    "updatedAt": "2026-08-14T12:00:00.000Z"
+  },
+  {
+    "id": "05f6e28a-48a3-4601-9b29-8a67bd73e840",
+    "propertyId": "9dc91ff3-8b37-4ce8-9f6e-3fb78922069b",
+    "tenantId": "21fdeeea-ab3e-46fb-8c5a-001bbab11269",
+    "rating": 5,
+    "comment": "Lived here for a year and loved every moment. The finishes are high-end and the amenities are maintained flawlessly.",
+    "createdAt": "2026-08-04T12:00:00.000Z",
+    "updatedAt": "2026-08-04T12:00:00.000Z"
+  },
+  {
+    "id": "af236d82-4f28-4105-bb09-ae07bfceb9b3",
+    "propertyId": "9dc91ff3-8b37-4ce8-9f6e-3fb78922069b",
+    "tenantId": "4ddfbb33-c43b-4a7e-97e5-c31178038e1a",
+    "rating": 5,
+    "comment": "Clean, spacious, and very well managed. Never had an issue with noise or packages.",
+    "createdAt": "2026-07-25T12:00:00.000Z",
+    "updatedAt": "2026-07-25T12:00:00.000Z"
+  },
+  {
+    "id": "5f02581d-86fb-45d8-b2fe-53b313b85b20",
+    "propertyId": "9dc91ff3-8b37-4ce8-9f6e-3fb78922069b",
+    "tenantId": "ee69eb79-4c9f-4b77-ad2d-331f3507187f",
+    "rating": 5,
+    "comment": "Best rental experience I've had in the city. Fast maintenance and transparent billing.",
+    "createdAt": "2026-07-15T12:00:00.000Z",
+    "updatedAt": "2026-07-15T12:00:00.000Z"
+  },
+  {
+    "id": "d801dae6-c1c7-4c9b-abb9-e2874c2db2e6",
+    "propertyId": "045f38f1-0ca5-4865-84c5-d8eb09c0e98a",
+    "tenantId": "36d16d7a-e904-4eb4-9c33-8598b8ba8184",
+    "rating": 5,
+    "comment": "Superb property! High ceilings, great insulation, and modern appliances that actually work well.",
+    "createdAt": "2026-07-30T12:00:00.000Z",
+    "updatedAt": "2026-07-30T12:00:00.000Z"
+  },
+  {
+    "id": "bd783e44-8456-4bbd-a223-5da1985876ea",
+    "propertyId": "76dbeb2d-e795-474e-8496-db6bcf9b192d",
+    "tenantId": "3f9a6710-66c5-4058-b3b7-8bbdb7dd44d2",
+    "rating": 5,
+    "comment": "Management is friendly and professional. The shared garden and patio area was a wonderful perk in the summer.",
+    "createdAt": "2026-07-24T12:00:00.000Z",
+    "updatedAt": "2026-07-24T12:00:00.000Z"
+  },
+  {
+    "id": "98f69467-14c4-4ab3-991b-b3cc45d67807",
+    "propertyId": "d2a515de-d4b3-489e-9374-e2974d0af671",
+    "tenantId": "9073d34d-bf51-455c-977d-0e0508d0761b",
+    "rating": 5,
+    "comment": "Quiet, peaceful, and well-designed layout. Highly recommended for anyone working remotely.",
+    "createdAt": "2026-07-18T12:00:00.000Z",
+    "updatedAt": "2026-07-18T12:00:00.000Z"
+  },
+  {
+    "id": "87169c40-d5bb-41e0-8aaf-718442abd337",
+    "propertyId": "87395257-1a82-4c41-b162-c67606353dbf",
+    "tenantId": "967dd9a7-d2a4-4821-a5b2-c4056bb97b40",
+    "rating": 5,
+    "comment": "Great value for the square footage. Safe building with parking included as promised.",
+    "createdAt": "2026-07-12T12:00:00.000Z",
+    "updatedAt": "2026-07-12T12:00:00.000Z"
+  },
+  {
+    "id": "ce6dab05-0a01-454c-a8ea-9667ae2a5bac",
+    "propertyId": "85366634-68a6-4baf-9998-d9a6255c3b93",
+    "tenantId": "ab2d454c-7093-470b-9e8f-b145670230a9",
+    "rating": 5,
+    "comment": "Five stars without question. Modern fixtures, hardwood floors in great shape, and zero surprise fees.",
+    "createdAt": "2026-07-06T12:00:00.000Z",
+    "updatedAt": "2026-07-06T12:00:00.000Z"
+  },
+  {
+    "id": "4addd946-716b-4ed9-8b7b-b8991d8dbc9b",
+    "propertyId": "ce5c3a57-1dfc-4fc3-86d7-e289223009ed",
+    "tenantId": "05801c28-5cc4-4b5d-8d0b-c241dc0ec1d4",
     "rating": 4,
-    "comment": "Great ocean breeze, parking is tight."
+    "comment": "Overall great apartment. Street parking can be competitive on weekends, but the unit itself is peaceful and well-insulated.",
+    "createdAt": "2026-06-30T12:00:00.000Z",
+    "updatedAt": "2026-06-30T12:00:00.000Z"
+  },
+  {
+    "id": "d58ff4fc-dd59-489d-bdbf-e83f6e1efeb9",
+    "propertyId": "6608c5da-fc7f-440a-86ef-649a13cc366b",
+    "tenantId": "224fc291-16fe-4eee-9a82-0e5e811d2891",
+    "rating": 4,
+    "comment": "Spacious layout and good water pressure. Minor delay during move-in walkthrough but management handled it graciously.",
+    "createdAt": "2026-06-24T12:00:00.000Z",
+    "updatedAt": "2026-06-24T12:00:00.000Z"
+  },
+  {
+    "id": "d972c76b-d3bc-4498-bb72-7bfad839354d",
+    "propertyId": "b732e056-805e-4126-8034-6265853de93f",
+    "tenantId": "70e56e7a-fc8e-469d-b44e-f35b6d62f185",
+    "rating": 4,
+    "comment": "Solid place to live. Heating works great in winter. Wish the gym had slightly newer equipment, but everything else is excellent.",
+    "createdAt": "2026-06-18T12:00:00.000Z",
+    "updatedAt": "2026-06-18T12:00:00.000Z"
+  },
+  {
+    "id": "e493764b-9c83-41c5-aabd-4e95505dfa7d",
+    "propertyId": "31628a80-1cb1-4455-af98-8e565906182b",
+    "tenantId": "711c2cce-5a92-4338-88f8-dc13a346d7fc",
+    "rating": 4,
+    "comment": "Really nice finishes and quiet neighbors. Trash chute was jammed once but fixed within 24 hours.",
+    "createdAt": "2026-06-12T12:00:00.000Z",
+    "updatedAt": "2026-06-12T12:00:00.000Z"
+  },
+  {
+    "id": "9d1338b9-6adc-4705-a818-b2155f57e1c0",
+    "propertyId": "132dbbb5-58d6-480c-b29c-929cee7679d0",
+    "tenantId": "699f3c97-244e-46a4-8629-56cee818bfa5",
+    "rating": 4,
+    "comment": "Loved the balcony and natural light. Kitchen counter space is slightly tight if you cook elaborate meals, but otherwise top notch.",
+    "createdAt": "2026-06-06T12:00:00.000Z",
+    "updatedAt": "2026-06-06T12:00:00.000Z"
+  },
+  {
+    "id": "7388aa8a-2c8c-4182-9e3a-8c0272dbe629",
+    "propertyId": "eedb0bbf-712b-4661-a7fb-7e6475b8d2c5",
+    "tenantId": "4bd10f39-67e6-492b-a854-b8e24ed442d8",
+    "rating": 4,
+    "comment": "Very communicative property manager. Great neighborhood walkability and plenty of nearby grocery stores.",
+    "createdAt": "2026-05-31T12:00:00.000Z",
+    "updatedAt": "2026-05-31T12:00:00.000Z"
+  },
+  {
+    "id": "b38dc854-b7e2-483c-8a73-2613ab117744",
+    "propertyId": "65a5e8a8-6a35-4e6d-9686-abbd1cbb257e",
+    "tenantId": "3724a6ac-4fb3-4f3b-b581-c56e32619124",
+    "rating": 4,
+    "comment": "Comfortable, clean, and safe. A bit pricey, but the location and quality justify it.",
+    "createdAt": "2026-05-25T12:00:00.000Z",
+    "updatedAt": "2026-05-25T12:00:00.000Z"
+  },
+  {
+    "id": "73e77ad1-8a59-4adb-a51b-39aac20ac145",
+    "propertyId": "3a87272c-784e-4e04-b59a-a705b2e9a698",
+    "tenantId": "e6fd55b4-10ab-4605-933d-e76432ca7f17",
+    "rating": 4,
+    "comment": "Good experience over our 12-month lease. Returned the security deposit promptly.",
+    "createdAt": "2026-05-19T12:00:00.000Z",
+    "updatedAt": "2026-05-19T12:00:00.000Z"
+  },
+  {
+    "id": "361c2c3f-b7b8-4372-966e-ae0b7932e342",
+    "propertyId": "57a5835c-d9fa-4abc-aebd-72c21a359b23",
+    "tenantId": "1ed5607b-5cd6-43e8-a364-897f7f0b4a3a",
+    "rating": 4,
+    "comment": "Prompt maintenance responses. Building corridors are kept tidy and clean.",
+    "createdAt": "2026-05-13T12:00:00.000Z",
+    "updatedAt": "2026-05-13T12:00:00.000Z"
+  },
+  {
+    "id": "c57f118e-14fe-4977-bc27-bc3e4a477b20",
+    "propertyId": "eecfb0b1-6840-4c31-8a4e-df46829dfa96",
+    "tenantId": "36d16d7a-e904-4eb4-9c33-8598b8ba8184",
+    "rating": 4,
+    "comment": "Four solid stars. Reliable internet connectivity and plenty of storage space in the closets.",
+    "createdAt": "2026-05-07T12:00:00.000Z",
+    "updatedAt": "2026-05-07T12:00:00.000Z"
+  },
+  {
+    "id": "55f947d7-bdc2-4068-a130-945bcbee7834",
+    "propertyId": "7bb82cbc-fedf-4bea-ae45-c70a99de32cb",
+    "tenantId": "3f9a6710-66c5-4058-b3b7-8bbdb7dd44d2",
+    "rating": 3,
+    "comment": "Decent apartment, but street traffic noise can get loud during morning rush hour. Unit itself is okay.",
+    "createdAt": "2026-05-01T12:00:00.000Z",
+    "updatedAt": "2026-05-01T12:00:00.000Z"
+  },
+  {
+    "id": "93bf206f-025e-43db-b9ef-35f974fd7ca3",
+    "propertyId": "b2c91fa9-07de-4196-b930-60aa0ed082ea",
+    "tenantId": "9073d34d-bf51-455c-977d-0e0508d0761b",
+    "rating": 3,
+    "comment": "Average experience. The AC struggled a bit during heatwaves, though a tech came out twice to inspect it.",
+    "createdAt": "2026-04-25T12:00:00.000Z",
+    "updatedAt": "2026-04-25T12:00:00.000Z"
+  },
+  {
+    "id": "51fa0e41-5d20-4eee-bd23-63559f9326f9",
+    "propertyId": "e4cece50-f39c-43e1-9fcb-14495e4f3ae6",
+    "tenantId": "bef7038e-9da7-4049-bee5-56e104dda8f4",
+    "rating": 3,
+    "comment": "Location is prime, but the washer/dryer in unit was smaller than expected. Rent is slightly steep for what's provided.",
+    "createdAt": "2026-04-19T12:00:00.000Z",
+    "updatedAt": "2026-04-19T12:00:00.000Z"
+  },
+  {
+    "id": "236e98dd-2e8b-443e-8f8d-27406a9a5030",
+    "propertyId": "7d5f822f-c5e1-4a00-8212-0c8a1684b8bb",
+    "tenantId": "be574dc8-8552-422f-91f6-7e754917681e",
+    "rating": 3,
+    "comment": "Acceptable for a short stay. Thin walls between the adjacent bedroom, but management did issue reminders to quiet down.",
+    "createdAt": "2026-04-13T12:00:00.000Z",
+    "updatedAt": "2026-04-13T12:00:00.000Z"
+  },
+  {
+    "id": "0b46c912-0daa-454a-a9ad-f01ce898c3a5",
+    "propertyId": "c96f22a8-a597-4534-9044-c952c93cd659",
+    "tenantId": "8b69e772-72f3-43de-9641-24948d8327e8",
+    "rating": 2,
+    "comment": "Disappointed with how long it took to fix the hallway heater in January. Took almost two weeks of follow-ups before a technician finally showed up.",
+    "createdAt": "2026-04-07T12:00:00.000Z",
+    "updatedAt": "2026-04-07T12:00:00.000Z"
+  },
+  {
+    "id": "765a8892-6773-43f1-8931-8485caa05b03",
+    "propertyId": "b868acd8-6ca2-4b3f-b5e2-1425c4c311b6",
+    "tenantId": "2c3821b3-e401-48dd-82ea-3f0b0ce4c0d1",
+    "rating": 2,
+    "comment": "Walls are paper thin — could hear everything from the unit above. Also had recurring issues with the hot water pressure during peak hours.",
+    "createdAt": "2026-04-01T12:00:00.000Z",
+    "updatedAt": "2026-04-01T12:00:00.000Z"
+  },
+  {
+    "id": "56196300-1801-49a4-9478-2f649fba5978",
+    "propertyId": "cceca425-8a43-4680-ac31-83b4cd1fc617",
+    "tenantId": "b185e27d-5131-4b9f-b1e1-52168cede7ec",
+    "rating": 2,
+    "comment": "Parking space assigned to me was frequently blocked by delivery vans and management was slow to address it. Unit looks better in photos than in reality.",
+    "createdAt": "2026-03-26T12:00:00.000Z",
+    "updatedAt": "2026-03-26T12:00:00.000Z"
+  },
+  {
+    "id": "82aee499-a696-45e1-a3b2-052733c82bb5",
+    "propertyId": "34a0b360-deef-4381-a08a-9286bee0354c",
+    "tenantId": "260761d5-9ff4-4951-a740-17cfdbafa0a7",
+    "rating": 1,
+    "comment": "Constant plumbing leaks under the sink that were only patched rather than properly repaired. Frustrating experience dealing with ongoing water damage.",
+    "createdAt": "2026-03-20T12:00:00.000Z",
+    "updatedAt": "2026-03-20T12:00:00.000Z"
+  },
+  {
+    "id": "43f62ec4-ae56-417d-a90a-c62cef7f3034",
+    "propertyId": "a308da66-3e4d-4d9e-9f7e-ea0aed1bd800",
+    "tenantId": "f3db5f9f-b355-45cb-ba12-56735707635a",
+    "rating": 1,
+    "comment": "Unresponsive management when the main building lock broke. Felt unsafe for nearly 5 days. Would not recommend leasing here.",
+    "createdAt": "2026-03-14T12:00:00.000Z",
+    "updatedAt": "2026-03-14T12:00:00.000Z"
+  },
+  {
+    "id": "4c082a75-0734-4ba1-b757-1a903fcdd3d0",
+    "propertyId": "64b82003-dabc-4da4-b092-2e8234a167e4",
+    "tenantId": "cf0e985e-7854-487e-b2c9-983c8952d20d",
+    "rating": 1,
+    "comment": "Horrible noise from nearby construction that was never disclosed prior to signing. Dusty windows and no rent concession offered.",
+    "createdAt": "2026-03-08T12:00:00.000Z",
+    "updatedAt": "2026-03-08T12:00:00.000Z"
   }
 ]
