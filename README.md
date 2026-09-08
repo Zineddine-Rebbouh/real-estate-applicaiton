@@ -31,48 +31,46 @@ Habitat is a real-estate rental web app: a marketing landing page paired with a 
 
 ## Overview
 
-Habitat targets renters/tenants first. A `MANAGER` role is defined in the data model, but the current build focuses entirely on the tenant experience, property manager tooling is on the roadmap, not yet implemented.
+Habitat targets renters/tenants first, with a working manager side alongside it. Both dashboards are wired to a live REST API — no mock data in the request path.
 
 **Where things stand today:**
-- The frontend is a fully designed, polished tenant experience, currently running on **local mock data** for listings, favorites, applications, billing, and residence.
-- The backend currently implements **authentication only**: signup, login, logout, session, and silent token refresh, backed by a real PostgreSQL database.
-- No property, booking, or payment endpoints exist yet, that's the next major phase of work.
-
-This repo is intentionally transparent about that split, since it's actively being built out feature by feature.
+- The frontend is a fully designed tenant + manager experience running on **live RTK Query data**: browse/search listings, property detail, favorites (persisted), applications (submit/withdraw), residence, billing, and payment methods.
+- The backend implements **13 route groups (~44 endpoints)**: auth, properties, manager, applications, favorites, tenant, reviews, leases (signed PDF agreements/receipts), uploads, payment-methods, maintenance, tours, and messages — backed by PostgreSQL via Prisma 7.
+- Seeding is schema-safe (`npm run seed`, upsert-with-skip) and Docker Compose boots the full stack (db + api + web) with migrations + seed.
 
 ## Feature Status
 
 | Feature | Status | Notes |
 |---|---|---|
 | Landing page | ✅ UI complete | Navbar, hero, featured listing, property grid & filters, discover section, gallery, how-it-works, CTA, footer |
-| Authentication | ✅ Live | Signup / login / logout / session / silent refresh, httpOnly cookies, rate-limited |
-| Tenant dashboard shell | 🎨 UI complete | Sidebar + routing scaffold for all dashboard sections |
-| Browse & filter listings | 🎨 UI complete (mock data) | Split/map/list views, filter sidebar & drawer, interactive map (custom coordinate clustering) |
-| Listing detail | 🎨 UI complete (mock data) | Gallery, key facts, fees/policies, reviews, contact & tour modals, similar listings |
-| Favorites | 🎨 UI complete (mock data) | No persistence yet |
-| Applications | 🎨 UI complete (mock data) | Validation schema ready, no submission endpoint |
-| Residence / Billing / Payment methods | 🎨 UI complete (mock data) | No lease, invoicing, or payment gateway wired up yet |
-| Manager dashboard | 🔜 Not started | `MANAGER` role exists in the schema; no UI or API yet |
-| Image uploads | 🔜 Not started | FilePond, Multer, and AWS S3 SDK are installed but not wired |
-| Live map (Mapbox) | 🔜 Not started | `mapbox-gl` installed; map currently renders mock coordinates |
-| Real payments | 🔜 Not started | No payment gateway integrated |
+| Authentication | ✅ Live | Signup / login / logout / session / silent refresh, httpOnly cookies (`Path: /`), rate-limited; manager signup gated by single-use invite code |
+| Tenant dashboard | ✅ Live | Overview, explore, rentals + detail, applications (submit/withdraw), residence, billing, payment-methods, favorites — all RTK Query |
+| Browse & filter listings | ✅ Live | `useGetPropertiesQuery`; filter vocabulary (`FilterState`, `INITIAL_FILTERS`) still type-imported from `src/data/rentals-data` |
+| Listing detail | ✅ Live | Server component fetching `/api/properties/[id]` + live reviews/tour/message sections; has `loading.tsx` |
+| Favorites | ✅ Live | Heart toggles in cards/gallery persist via `addFavorite`/`removeFavorite` (optimistic) |
+| Applications | ✅ Live | Tenant submit/withdraw + manager approve/deny (approval mints the lease, overlap-checked) |
+| Residence / Billing / Payment methods | ✅ Live | Current lease, invoices + pay flow, PDF statements/receipts, brand/last4 method references (no PANs) |
+| Manager dashboard | ✅ Live | Overview, properties CRUD, applications, leases + manual invoicing, inquiries (tours/messages), maintenance queue |
+| Image uploads | ✅ Live | Multer (10×5MB, image-only) straight to Cloudinary; returns `secure_url`s for `photoUrls`; upload rate-limited |
+| Live map | ✅ Partial | Google Maps where keys set, graceful SVG fallback otherwise; POI toggles currently empty |
+| Real payments | 🔜 Not started | Manual invoicing only — no payment gateway integrated |
 
 ## Tech Stack
 
-**Frontend** (`client/`, `real-estate-app`)
+**Frontend** (`client/`)
 - Next.js 16 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4, shadcn (`base-nova`), Radix-alternative `@base-ui/react`, `lucide-react`
-- Redux Toolkit + RTK Query (auth endpoints, with automatic 401 refresh-and-retry)
+- Redux Toolkit + RTK Query (full API slice with automatic 401 refresh-and-retry)
 - React Hook Form + Zod for forms and validation
-- Framer Motion, `next-themes`, Sonner (toasts), Mapbox GL (installed, not yet wired)
+- Framer Motion, `next-themes`, Sonner (toasts), Google Maps (with SVG fallback when keys are absent)
 
 **Backend** (`server/`, Express + Prisma)
 - Express 5, Helmet, Morgan, CORS, cookie-based sessions
 - Prisma 7 + PostgreSQL (via `pg` and the Prisma Pg adapter)
-- JWT access/refresh tokens (httpOnly cookies), bcrypt password hashing, rate limiting
-- Zod for request validation
-
-**Installed for upcoming work:** AWS S3 SDK + Multer (uploads), Mapbox GL (live maps), not yet connected to any route.
+- JWT access/refresh tokens (httpOnly cookies, `Secure` in prod, `SameSite: lax`), bcrypt password hashing
+- Rate limiting: login/signup/refresh + a shared write limiter on tenant POSTs + a stricter upload limiter
+- Zod for auth/env validation; inline validators elsewhere (enum allowlists, finite/positive number checks, UUID guards)
+- pdfkit for lease-agreement / statement / receipt PDFs; Cloudinary for image uploads
 
 ## Architecture
 
@@ -98,23 +96,27 @@ Client (Next.js, :3000)  ──REST/JSON, credentials: include──►  Server 
 ```
 real-estate-applicaiton/
 ├── client/
-│   ├── app/                 # Routes: landing, sign-in/up, (tenant-dashboard)/*
+│   ├── app/                 # Routes: landing, sign-in/up, (tenant-dashboard)/*, (manager-dashboard)/*
 │   ├── components/          # ui/, landing/, rentals/, tenant-dashboard/, auth/
-│   ├── lib/                 # utils, constants, zod schemas
-│   ├── state/                # RTK Query API slice, Redux store
-│   ├── src/data/             # Mock listing data (to be replaced by live API)
+│   ├── lib/                 # utils (incl. lease/receipt download helpers), listings adapters
+│   ├── state/               # RTK Query API slice, Redux store
+│   ├── src/data/            # Legacy filter vocabulary + types (value-level mocks removed)
 │   └── types/
 ├── server/
 │   ├── src/
-│   │   ├── routes/           # auth.routes.ts (currently the only router)
-│   │   ├── controllers/      # auth.controller.ts
-│   │   ├── middleware/       # authenticate, authorize (unused), rateLimiter
-│   │   ├── lib/               # Prisma client, JWT/token helpers
-│   │   └── config/            # env validation (zod)
+│   │   ├── routes/           # 13 routers: auth, properties, manager, applications, favorites,
+│   │   │                     # tenant, reviews, leases, uploads, payment-methods, maintenance, tours, messages
+│   │   ├── controllers/      # One controller per domain; ownership checks live here
+│   │   ├── middleware/       # authenticate, authorize, rateLimiter
+│   │   ├── lib/              # Prisma client, JWT/token + cookie helpers, Cloudinary
+│   │   └── config/           # env validation (zod)
 │   └── prisma/
-│       ├── schema.prisma      # Current model: User (Role: TENANT | MANAGER)
-│       └── seed.ts            # Legacy seeder, currently out of sync with schema
-└── PROJECT_OVERVIEW.md         # Full technical audit of the codebase
+│       ├── schema.prisma      # User (TENANT | MANAGER) + Manager/Tenant profiles, Property, Lease,
+│       │                      # Application, Payment, Review, favorites, payment-methods, maintenance, tours, messages
+│       ├── seed.ts            # Schema-safe seeder (dependency order, upsert-with-skip)
+│       └── seedData/*.json    # 14 seed files; photoUrls resolve to client/public/
+├── compose.yml                # Local full-stack run: postgres + api + web
+└── PROJECT_OVERVIEW.md        # Full technical audit of the codebase
 ```
 
 > See [`PROJECT_OVERVIEW.md`](./PROJECT_OVERVIEW.md) for a complete, line-by-line technical breakdown of the codebase, data models, and API surface.
@@ -134,16 +136,23 @@ cd server
 cp .env.example .env   # fill in your own values, see below
 npm install
 npx prisma migrate dev
+npm run seed            # schema-safe, upsert-with-skip; re-runnable
 npm run dev             # runs on http://localhost:3002
 ```
 
 **Frontend**
 ```bash
 cd client
-echo "NEXT_PUBLIC_API_BASE_URL=http://localhost:3002" > .env.local
+cp .env.example .env.local   # or: NEXT_PUBLIC_API_BASE_URL=http://localhost:3002
 npm install
-npm run dev             # runs on http://localhost:3000
+npm run dev                  # runs on http://localhost:3000
 ```
+
+**Full stack (Docker)**
+```bash
+docker compose up --build   # postgres + api (migrate + seed) + web
+```
+> Replace the `JWT_*_SECRET` placeholders in `compose.yml` before any non-local use.
 
 ## Environment Variables
 
@@ -155,28 +164,28 @@ JWT_ACCESS_SECRET="a-random-secret-at-least-32-characters"
 JWT_REFRESH_SECRET="a-different-random-secret-at-least-32-characters"
 NODE_ENV="development"
 PORT="3002"
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-api-key"
+CLOUDINARY_API_SECRET="your-api-secret"
+CLOUDINARY_FOLDER="real-estate/listings"
 ```
 
 **`client/.env.local`**
 ```
 NEXT_PUBLIC_API_BASE_URL="http://localhost:3002"
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
+NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=""
 ```
-
-> Note: `server/prisma/seed.ts` currently targets a legacy schema (property/lease/payment models that no longer exist) and will fail against the current `User`-only schema until it's rewritten.
 
 ## Roadmap
 
-Ordered by dependency, based on the current state of the schema, mock UI, and installed-but-unused dependencies:
+What's left, ordered by dependency:
 
-1. **Domain schema**, design `Location / Property / Tenant / Manager / Lease / Application / Payment` models and migrate.
-2. **Fix the seeder**, rewrite `seed.ts` to match the new schema.
-3. **Property APIs**, listing search/filter + detail endpoints, replacing `MOCK_RENTALS` with real RTK Query calls.
-4. **Favorites & applications**, persistence and a manager review flow.
-5. **Leases, residence, billing, payments**, connect the existing dashboard UI to real data and pick a payment gateway.
-6. **Uploads**, wire Multer + S3 to the existing property-creation form and FilePond UI.
-7. **Live maps**, connect Mapbox GL using the lat/lng already present in the mock data.
-8. **Manager role**, enable manager signup/assignment and a manager dashboard.
-9. **Hygiene & testing**, remove duplicate/dead files, add test coverage, document deployment.
+1. **Seed + click-through testing**, run `npm run seed` (or compose) and exercise tenant + manager flows end to end against real data.
+2. **Map POIs**, `nearbyPOIs` is currently always empty — wire a places source or drop the toggles.
+3. **Payment gateway**, invoicing is manual; pick a provider if online collection is needed.
+4. **Split-domain cookies**, `SameSite: lax` fits same-site deploys; move to `None; Secure` only if the frontend and API end up on different domains.
+5. **Hygiene**, remaining `TODO`s are near-zero; `src/data/rentals-data` survives as type-only filter vocabulary.
 
 ## License
 
