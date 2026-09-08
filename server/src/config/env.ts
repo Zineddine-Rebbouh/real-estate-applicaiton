@@ -12,6 +12,10 @@ const envSchema = z.object({
     .enum(["development", "test", "production"])
     .default("development"),
   PORT: z.coerce.number().int().positive().default(3002),
+  CLOUDINARY_CLOUD_NAME: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1),
+  CLOUDINARY_API_SECRET: z.string().min(1),
+  CLOUDINARY_FOLDER: z.string().min(1).default("real-estate/listings"),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
