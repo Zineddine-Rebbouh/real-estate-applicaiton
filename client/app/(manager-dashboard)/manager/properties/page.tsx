@@ -196,12 +196,12 @@ export default function ManagerPropertiesPage() {
                     size="sm"
                     variant="outline"
                     nativeButton={false}
-                    render={<Link href={`/tenant/rentals/${property.id}`} />}
+                    render={<Link href={`/manager/browse/${property.id}`} />}
                     className="text-xs gap-1"
-                    title="View public listing page"
+                    title="Spectate your listing (owned only)"
                   >
                     <EyeIcon className="size-3.5" />
-                    <span>Public View</span>
+                    <span>Spectate</span>
                   </Button>
 
                   <div className="flex items-center gap-1.5">

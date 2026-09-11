@@ -33,12 +33,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useCreateLeasePaymentMutation, useGetManagerPropertiesQuery } from "@/state/api";
+import {
+  useCreateLeasePaymentMutation,
+  useGetManagerPropertiesQuery,
+} from "@/state/api";
 import { downloadLeaseAgreement } from "@/lib/utils";
 
 export default function ManagerLeasesPage() {
   const { data, isLoading } = useGetManagerPropertiesQuery();
-  const [createPayment, { isLoading: isCreating }] = useCreateLeasePaymentMutation();
+  const [createPayment, { isLoading: isCreating }] =
+    useCreateLeasePaymentMutation();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [invoiceFor, setInvoiceFor] = React.useState<{
     propertyId: string;
@@ -53,7 +57,7 @@ export default function ManagerLeasesPage() {
 
   // Flatten active leases from manager properties or show occupied properties
   const propertiesWithLeases = properties.filter(
-    (p) => p.activeLeasesCount && p.activeLeasesCount > 0
+    (p) => p.activeLeasesCount && p.activeLeasesCount > 0,
   );
 
   const filteredProperties = properties.filter((p) => {
@@ -65,7 +69,10 @@ export default function ManagerLeasesPage() {
     );
   });
 
-  const handleDownload = async (leaseId: string | undefined, propertyName: string) => {
+  const handleDownload = async (
+    leaseId: string | undefined,
+    propertyName: string,
+  ) => {
     if (!leaseId) {
       toast.info(`No active lease for ${propertyName} yet.`);
       return;
@@ -78,7 +85,11 @@ export default function ManagerLeasesPage() {
     }
   };
 
-  const openInvoice = (propertyId: string, leaseId: string, rent: number | string) =>
+  const openInvoice = (
+    propertyId: string,
+    leaseId: string,
+    rent: number | string,
+  ) =>
     setInvoiceFor({
       propertyId,
       leaseId,
@@ -115,12 +126,18 @@ export default function ManagerLeasesPage() {
               Lease Agreements
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Monitor active leases, tenant occupancy, and rent collection terms across your portfolio.
+              Monitor active leases, tenant occupancy, and rent collection terms
+              across your portfolio.
             </p>
           </div>
           <Button
             nativeButton={false}
-            render={<Link href="/manager/applications" className="flex items-center gap-1.5" />}
+            render={
+              <Link
+                href="/manager/applications"
+                className="flex items-center gap-1.5"
+              />
+            }
             size="sm"
           >
             <UserCheckIcon className="size-4" />
@@ -129,43 +146,15 @@ export default function ManagerLeasesPage() {
         </header>
 
         {/* Stats */}
-        <section className="grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Lease metrics">
+        <section
+          className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+          aria-label="Lease metrics"
+        >
           <Card className="p-4 shadow-2xs">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Total Listings</span>
-              <Building2Icon className="size-4 text-muted-foreground" />
-            </div>
-            <p className="mt-2 text-2xl font-bold text-foreground">{properties.length}</p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">Portfolio units</p>
-          </Card>
-
-          <Card className="p-4 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Occupancy Rate</span>
-              <CheckCircle2Icon className="size-4 text-emerald-500" />
-            </div>
-            <p className="mt-2 text-2xl font-bold text-emerald-600">
-              {properties.length > 0
-                ? `${Math.round((propertiesWithLeases.length / properties.length) * 100)}%`
-                : "0%"}
-            </p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">Units currently leased</p>
-          </Card>
-
-          <Card className="p-4 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Active Leases</span>
-              <FileTextIcon className="size-4 text-primary" />
-            </div>
-            <p className="mt-2 text-2xl font-bold text-foreground">
-              {properties.reduce((sum, p) => sum + (p.activeLeasesCount || 0), 0)}
-            </p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">Executed agreements</p>
-          </Card>
-
-          <Card className="p-4 shadow-2xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Monthly Roll</span>
+              <span className="text-xs font-medium text-muted-foreground">
+                Monthly Roll
+              </span>
               <DollarSignIcon className="size-4 text-primary" />
             </div>
             <p className="mt-2 text-2xl font-bold text-foreground">
@@ -174,7 +163,58 @@ export default function ManagerLeasesPage() {
                 .reduce((sum, p) => sum + Number(p.pricePerMonth || 0), 0)
                 .toLocaleString()}
             </p>
-            <p className="mt-0.5 text-[11px] text-muted-foreground">Contracted revenue</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Contracted revenue
+            </p>
+          </Card>
+          <Card className="p-4 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">
+                Total Listings
+              </span>
+              <Building2Icon className="size-4 text-muted-foreground" />
+            </div>
+            <p className="mt-2 text-2xl font-bold text-foreground">
+              {properties.length}
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Portfolio units
+            </p>
+          </Card>
+
+          <Card className="p-4 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">
+                Occupancy Rate
+              </span>
+              <CheckCircle2Icon className="size-4 text-emerald-500" />
+            </div>
+            <p className="mt-2 text-2xl font-bold text-emerald-600">
+              {properties.length > 0
+                ? `${Math.round((propertiesWithLeases.length / properties.length) * 100)}%`
+                : "0%"}
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Units currently leased
+            </p>
+          </Card>
+
+          <Card className="p-4 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">
+                Active Leases
+              </span>
+              <FileTextIcon className="size-4 text-primary" />
+            </div>
+            <p className="mt-2 text-2xl font-bold text-foreground">
+              {properties.reduce(
+                (sum, p) => sum + (p.activeLeasesCount || 0),
+                0,
+              )}
+            </p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">
+              Executed agreements
+            </p>
           </Card>
         </section>
 
@@ -244,14 +284,19 @@ export default function ManagerLeasesPage() {
                         </p>
                         <p className="mt-2 text-sm font-bold text-foreground">
                           ${Number(property.pricePerMonth).toLocaleString()}
-                          <span className="text-xs font-normal text-muted-foreground"> / mo</span>
+                          <span className="text-xs font-normal text-muted-foreground">
+                            {" "}
+                            / mo
+                          </span>
                         </p>
                       </div>
                     </div>
 
                     {/* Status & terms */}
                     <div className="space-y-2 bg-muted/10 p-5 lg:w-72 text-xs">
-                      <p className="font-semibold text-foreground">Lease Status</p>
+                      <p className="font-semibold text-foreground">
+                        Lease Status
+                      </p>
                       <div className="flex justify-between text-muted-foreground">
                         <span>Active Agreements:</span>
                         <span className="font-medium text-foreground">
@@ -261,7 +306,10 @@ export default function ManagerLeasesPage() {
                       <div className="flex justify-between text-muted-foreground">
                         <span>Security Deposit:</span>
                         <span className="font-medium text-foreground">
-                          ${Number(property.securityDeposit || 0).toLocaleString()}
+                          $
+                          {Number(
+                            property.securityDeposit || 0,
+                          ).toLocaleString()}
                         </span>
                       </div>
                       <div className="flex justify-between text-muted-foreground">
@@ -283,7 +331,9 @@ export default function ManagerLeasesPage() {
                         variant="outline"
                         size="sm"
                         nativeButton={false}
-                        render={<Link href={`/manager/properties/${property.id}`} />}
+                        render={
+                          <Link href={`/manager/properties/${property.id}`} />
+                        }
                         className="text-xs gap-1"
                       >
                         <EyeIcon className="size-3.5" />
@@ -292,7 +342,12 @@ export default function ManagerLeasesPage() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => handleDownload((property.leases ?? [])[0]?.id, property.name)}
+                        onClick={() =>
+                          handleDownload(
+                            (property.leases ?? [])[0]?.id,
+                            property.name,
+                          )
+                        }
                         className="text-xs gap-1"
                       >
                         <DownloadIcon className="size-3.5" />
@@ -323,9 +378,12 @@ export default function ManagerLeasesPage() {
         ) : (
           <Card className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border-dashed">
             <CreditCardIcon className="size-10 text-muted-foreground/60" />
-            <h3 className="mt-4 text-base font-semibold text-foreground">No leases or listings found</h3>
+            <h3 className="mt-4 text-base font-semibold text-foreground">
+              No leases or listings found
+            </h3>
             <p className="mt-1 text-xs text-muted-foreground max-w-sm">
-              Create listings to start receiving applications and issuing lease agreements.
+              Create listings to start receiving applications and issuing lease
+              agreements.
             </p>
           </Card>
         )}
@@ -348,7 +406,10 @@ export default function ManagerLeasesPage() {
             <div className="grid gap-4 py-2">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="invoice-due" className="text-xs font-semibold">
+                  <Label
+                    htmlFor="invoice-due"
+                    className="text-xs font-semibold"
+                  >
                     Amount due *
                   </Label>
                   <Input
@@ -367,7 +428,10 @@ export default function ManagerLeasesPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="invoice-paid" className="text-xs font-semibold">
+                  <Label
+                    htmlFor="invoice-paid"
+                    className="text-xs font-semibold"
+                  >
                     Amount paid
                   </Label>
                   <Input
@@ -388,7 +452,10 @@ export default function ManagerLeasesPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="invoice-date" className="text-xs font-semibold">
+                  <Label
+                    htmlFor="invoice-date"
+                    className="text-xs font-semibold"
+                  >
                     Due date *
                   </Label>
                   <Input
@@ -405,7 +472,10 @@ export default function ManagerLeasesPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="invoice-status" className="text-xs font-semibold">
+                  <Label
+                    htmlFor="invoice-status"
+                    className="text-xs font-semibold"
+                  >
                     Status
                   </Label>
                   <select
@@ -416,7 +486,8 @@ export default function ManagerLeasesPage() {
                         prev
                           ? {
                               ...prev,
-                              paymentStatus: e.target.value as typeof prev.paymentStatus,
+                              paymentStatus: e.target
+                                .value as typeof prev.paymentStatus,
                             }
                           : prev,
                       )
@@ -442,7 +513,11 @@ export default function ManagerLeasesPage() {
             >
               Cancel
             </Button>
-            <Button size="sm" onClick={handleCreateInvoice} disabled={isCreating}>
+            <Button
+              size="sm"
+              onClick={handleCreateInvoice}
+              disabled={isCreating}
+            >
               {isCreating ? "Creating…" : "Create invoice"}
             </Button>
           </DialogFooter>
@@ -451,4 +526,3 @@ export default function ManagerLeasesPage() {
     </main>
   );
 }
-

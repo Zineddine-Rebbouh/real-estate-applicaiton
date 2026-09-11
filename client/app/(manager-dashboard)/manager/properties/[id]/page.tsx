@@ -82,10 +82,10 @@ export default function EditPropertyPage() {
             variant="outline"
             size="sm"
             nativeButton={false}
-            render={<Link href={`/tenant/rentals/${property.id}`} />}
+            render={<Link href={`/manager/browse/${property.id}`} />}
             className="text-xs"
           >
-            Preview Public Page
+            Preview Owned Listing
           </Button>
         </div>
 

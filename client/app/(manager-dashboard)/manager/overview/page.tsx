@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {
   Building2Icon,
   CheckCircle2Icon,
@@ -12,8 +11,6 @@ import {
   FileTextIcon,
   MapPinIcon,
   PlusIcon,
-  UsersIcon,
-  XCircleIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,18 +24,7 @@ import {
   useGetManagerPropertiesQuery,
   useUpdateApplicationStatusMutation,
 } from "@/state/api";
-
-const statusDetails = {
-  Pending: {
-    className: "bg-amber-500/10 text-amber-700 border-amber-500/20",
-  },
-  Approved: {
-    className: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20",
-  },
-  Denied: {
-    className: "bg-rose-500/10 text-rose-700 border-rose-500/20",
-  },
-};
+import { AnalyticsDashboard } from "@/components/manager/analytics-dashboard";
 
 export default function ManagerOverviewPage() {
   const { data: propertiesData, isLoading: loadingProps } = useGetManagerPropertiesQuery();
@@ -53,7 +39,7 @@ export default function ManagerOverviewPage() {
 
   const totalMonthlyRent = properties.reduce(
     (sum, p) => sum + Number(p.pricePerMonth || 0),
-    0
+    0,
   );
 
   const handleAction = async (id: string, status: "Approved" | "Denied") => {
@@ -63,7 +49,7 @@ export default function ManagerOverviewPage() {
         status === "Approved" ? "Application Approved" : "Application Denied",
         {
           description: `Applicant has been notified.`,
-        }
+        },
       );
     } catch {
       toast.error("Failed to update application status");
@@ -154,6 +140,13 @@ export default function ManagerOverviewPage() {
           </Card>
         </section>
 
+        {/* Recharts Manager Analytics Dashboard */}
+        <AnalyticsDashboard
+          properties={properties}
+          applications={applications}
+          isLoading={isLoading}
+        />
+
         {/* Section: Pending Inquiries Queue */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
@@ -181,7 +174,10 @@ export default function ManagerOverviewPage() {
           ) : pendingApps.length > 0 ? (
             <div className="grid gap-3">
               {pendingApps.slice(0, 3).map((app) => (
-                <Card key={app.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4">
+                <Card
+                  key={app.id}
+                  className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-4"
+                >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary font-semibold text-sm shrink-0">
                       {app.name.slice(0, 2).toUpperCase()}
@@ -189,7 +185,11 @@ export default function ManagerOverviewPage() {
                     <div className="min-w-0">
                       <p className="font-semibold text-sm text-foreground truncate">{app.name}</p>
                       <p className="text-xs text-muted-foreground truncate">
-                        Applied for <span className="font-medium text-foreground">{app.property.name}</span> (${app.property.pricePerMonth}/mo)
+                        Applied for{" "}
+                        <span className="font-medium text-foreground">
+                          {app.property.name}
+                        </span>{" "}
+                        (${app.property.pricePerMonth}/mo)
                       </p>
                       <p className="text-[11px] text-muted-foreground/80 mt-0.5">
                         {app.email} • {app.phoneNumber}
@@ -257,7 +257,10 @@ export default function ManagerOverviewPage() {
           ) : properties.length > 0 ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {properties.slice(0, 3).map((prop) => (
-                <Card key={prop.id} className="overflow-hidden flex flex-col justify-between">
+                <Card
+                  key={prop.id}
+                  className="overflow-hidden flex flex-col justify-between"
+                >
                   <div>
                     <div className="relative aspect-16/9 w-full bg-muted">
                       <PropertyThumb
