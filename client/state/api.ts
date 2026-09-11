@@ -85,6 +85,17 @@ export const apiSlice = createApi({
       query: (body) => ({ url: "/api/auth/me", method: "PATCH", body }),
       invalidatesTags: ["Auth"],
     }),
+    updateTenantPreferences: build.mutation<
+      { tenant: TenantPreferences },
+      Partial<TenantPreferences>
+    >({
+      query: (body) => ({
+        url: "/api/tenant/me/preferences",
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
 
     // Properties Endpoints
     getProperties: build.query<{ properties: Property[] }, Record<string, unknown> | void>({
@@ -130,6 +141,10 @@ export const apiSlice = createApi({
     getManagerProperties: build.query<{ properties: Property[] }, void>({
       query: () => "/api/manager/properties",
       providesTags: ["ManagerProperties"],
+    }),
+    getManagerPropertyById: build.query<{ property: Property }, string>({
+      query: (id) => `/api/manager/properties/${id}`,
+      providesTags: (_result, _error, id) => [{ type: "ManagerProperties", id }],
     }),
     getManagerApplications: build.query<{ applications: ManagerApplication[] }, void>({
       query: () => "/api/manager/applications",
@@ -326,12 +341,43 @@ export const apiSlice = createApi({
 
 export const api = apiSlice;
 
+export type MoveInTimeline =
+  | "ASAP"
+  | "Within30Days"
+  | "Within90Days"
+  | "JustBrowsing";
+
+export type TenantPreferences = {
+  minBudget?: number | null;
+  maxBudget?: number | null;
+  desiredBeds?: number | null;
+  desiredBaths?: number | null;
+  householdSize?: number | null;
+  hasPets?: boolean | null;
+  petType?: string | null;
+  needsParking?: boolean | null;
+  moveInTimeline?: MoveInTimeline | null;
+  preferredCity?: string | null;
+  onboardingCompletedAt?: string | null;
+};
+
 export type AuthUser = {
   id: string;
   email: string;
   name: string;
   role: "TENANT" | "MANAGER";
   phoneNumber?: string | null;
+  minBudget?: number | null;
+  maxBudget?: number | null;
+  desiredBeds?: number | null;
+  desiredBaths?: number | null;
+  householdSize?: number | null;
+  hasPets?: boolean | null;
+  petType?: string | null;
+  needsParking?: boolean | null;
+  moveInTimeline?: MoveInTimeline | null;
+  preferredCity?: string | null;
+  onboardingCompletedAt?: string | null;
 };
 export type MaintenanceRequest = {
   id: string;
@@ -631,12 +677,14 @@ export const {
   useRefreshMutation,
   useGetMeQuery,
   useUpdateMeMutation,
+  useUpdateTenantPreferencesMutation,
   useGetPropertiesQuery,
   useGetPropertyByIdQuery,
   useCreatePropertyMutation,
   useUpdatePropertyMutation,
   useDeletePropertyMutation,
   useGetManagerPropertiesQuery,
+  useGetManagerPropertyByIdQuery,
   useGetManagerApplicationsQuery,
   useUpdateApplicationStatusMutation,
   useGetTenantApplicationsQuery,

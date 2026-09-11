@@ -154,7 +154,7 @@ export default function SignUpPage() {
           : { name, email, password, role },
       ).unwrap();
       router.push(
-        res.user.role === "MANAGER" ? "/manager/overview" : "/tenant/overview",
+        res.user.role === "MANAGER" ? "/manager/overview" : "/tenant/explore",
       );
     } catch {
       setErrors({ form: "Unable to create your account. Please try again." });
@@ -286,23 +286,25 @@ export default function SignUpPage() {
                 Choose role
               </Label>
               <div className="flex gap-4">
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2 text-sm text-foreground">
                   <input
                     type="radio"
                     name="role"
                     value="TENANT"
                     checked={role === "TENANT"}
                     onChange={() => setRole("TENANT")}
+                    className="size-4 accent-primary"
                   />
                   Tenant
                 </label>
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2 text-sm text-foreground">
                   <input
                     type="radio"
                     name="role"
                     value="MANAGER"
                     checked={role === "MANAGER"}
                     onChange={() => setRole("MANAGER")}
+                    className="size-4 accent-primary"
                   />
                   Manager
                 </label>

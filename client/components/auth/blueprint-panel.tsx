@@ -18,14 +18,14 @@ export function BlueprintPanel({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 p-12",
+        "relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#0F1B2E] via-[#1E3A5F] to-[#0F1B2E] p-12 lg:border-l lg:border-border dark:from-card dark:via-muted/40 dark:to-card",
         className,
       )}
     >
       {/* Architectural line-art illustration */}
       <svg
         viewBox="0 0 800 1000"
-        className="w-full h-full max-w-lg opacity-20"
+        className="w-full h-full max-w-lg text-white opacity-20 dark:opacity-10"
         xmlns="http://www.w3.org/2000/svg"
         aria-hidden="true"
       >
@@ -34,7 +34,7 @@ export function BlueprintPanel({ className }: { className?: string }) {
             {`
               .blueprint-line {
                 fill: none;
-                stroke: white;
+                stroke: currentColor;
                 stroke-width: 1.5;
                 stroke-linecap: round;
                 stroke-linejoin: round;
@@ -163,11 +163,11 @@ export function BlueprintPanel({ className }: { className?: string }) {
 
       {/* Subtle grid overlay */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 text-white opacity-[0.03] dark:opacity-[0.06]"
         style={{
           backgroundImage: `
-            linear-gradient(white 1px, transparent 1px),
-            linear-gradient(90deg, white 1px, transparent 1px)
+            linear-gradient(currentColor 1px, transparent 1px),
+            linear-gradient(90deg, currentColor 1px, transparent 1px)
           `,
           backgroundSize: "50px 50px",
         }}

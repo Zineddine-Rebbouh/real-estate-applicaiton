@@ -71,8 +71,8 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
     }
   };
 
-  // Browse/map entry points are tenant-only; hide Listings link for managers.
-  const visibleNavLinks = isManager ? navLinks : navLinks;
+  // Dashboard header shows search for tenants, nothing centered for managers.
+  // Landing nav links never render inside a dashboard (anchor links are dead there).
 
   // The dashboard header is always solid; the landing header is transparent
   // over the hero until the user scrolls.
@@ -99,7 +99,7 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
       <header
         className={
           isDashboard
-            ? "fixed top-0 inset-x-0 z-50 border-b border-white/10 bg-neutral-900"
+            ? "fixed top-0 inset-x-0 z-50 border-b border-white/10 bg-neutral-900 dark:border-sidebar-border dark:bg-sidebar"
             : `fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
                 scrolled
                   ? "bg-background/80 backdrop-blur-md border-b border-border"
@@ -120,32 +120,40 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
                   <SidebarTrigger className="-ml-1 text-white hover:bg-white/10 hover:text-white" />
                 </div>
               )}
-              <Link href="/" className="flex items-center" aria-label="Habitat home">
+              <Link
+                href="/"
+                className="flex items-center"
+                aria-label="Habitat home"
+              >
                 <Logo light={isDashboard || !scrolled} className="h-10" />
               </Link>
             </div>
 
-            {/* Search — tenant dashboard only (managers search their portfolio in-page) */}
-            {isDashboard && !isManager ? (
-              <div className="hidden w-full max-w-2xl flex-1 px-2 md:block">
-                <form onSubmit={handleSearchSubmit} className="relative">
-                  <Search
-                    className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-white/60"
-                    aria-hidden="true"
-                  />
-                  <Input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    aria-label="Search rentals"
-                    placeholder="Search Rentals (press Enter to browse)..."
-                    className="h-10 rounded-full border-white/10 bg-white/10 pl-10 text-white placeholder:text-white/60 focus-visible:bg-white/15 focus-visible:ring-white/20"
-                  />
-                </form>
-              </div>
+            {/* Search — tenant dashboard only (managers get an empty spacer) */}
+            {isDashboard ? (
+              !isManager ? (
+                <div className="hidden w-full max-w-2xl flex-1 px-2 md:block">
+                  <form onSubmit={handleSearchSubmit} className="relative">
+                    <Search
+                      className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-white/60"
+                      aria-hidden="true"
+                    />
+                    <Input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      aria-label="Search rentals"
+                      placeholder="Search Rentals (press Enter to browse)..."
+                      className="h-10 rounded-full border-white/10 bg-white/10 pl-10 text-white placeholder:text-white/60 focus-visible:bg-white/15 focus-visible:ring-white/20"
+                    />
+                  </form>
+                </div>
+              ) : (
+                <div className="hidden flex-1 md:block" aria-hidden="true" />
+              )
             ) : (
               <nav className="hidden lg:flex items-center gap-8">
-                {visibleNavLinks.map((link) => (
+                {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -304,11 +312,7 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
                         }
                       >
                         <UserRound className="size-4" />
-                        <span>
-                          {user.role === "MANAGER"
-                            ? "Manager Dashboard"
-                            : "Dashboard"}
-                        </span>
+                        <span>Dashboard</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setSettingsOpen(true)}
@@ -402,7 +406,7 @@ export function Navbar({ isDashboard = false }: NavbarProps) {
                   </SheetTrigger>
                   <SheetContent>
                     <nav className="flex flex-col gap-6 mt-8">
-                      {visibleNavLinks.map((link) => (
+                      {navLinks.map((link) => (
                         <Link
                           key={link.href}
                           href={link.href}

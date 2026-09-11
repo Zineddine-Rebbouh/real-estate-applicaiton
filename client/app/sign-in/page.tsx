@@ -114,15 +114,15 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="flex min-h-screen flex-col lg:flex-row">
       {/* Left side - Form */}
       <div
         className={cn(
-          "flex-1 flex items-center justify-center p-8 bg-background",
+          "flex min-h-screen flex-1 items-start justify-center overflow-y-auto bg-background px-5 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-8 xl:px-20",
           mounted && "animate-in fade-in slide-in-from-left-4 duration-500",
         )}
       >
-        <div className="w-full max-w-md space-y-8">
+        <div className="m-auto w-full max-w-md space-y-5">
           {/* Logo */}
           <div
             className={cn(
@@ -143,15 +143,15 @@ export default function SignInPage() {
           {/* Heading */}
           <div
             className={cn(
-              "space-y-4 opacity-100",
+              "space-y-1.5 opacity-100",
               mounted &&
                 "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-40",
             )}
           >
-            <h1 className="font-display text-4xl font-bold tracking-tight leading-tight">
+            <h1 className="font-display text-2xl font-bold tracking-tight leading-tight sm:text-3xl">
               Welcome back
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               Sign in to your account to continue
             </p>
           </div>
@@ -160,16 +160,16 @@ export default function SignInPage() {
           <form
             onSubmit={handleSubmit}
             className={cn(
-              "auth-form space-y-6 opacity-100",
+              "auth-form space-y-4 opacity-100",
               mounted &&
                 "animate-in fade-in slide-in-from-bottom-2 duration-500 delay-80",
             )}
           >
             {/* Email field */}
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               <Label
                 htmlFor="email"
-                className="text-base font-semibold text-foreground"
+                className="text-sm font-semibold text-foreground"
               >
                 Email address
               </Label>
@@ -181,7 +181,7 @@ export default function SignInPage() {
                 autoComplete="email"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
-                className="h-12 text-base"
+                className="h-10 text-sm"
                 onBlur={(e) => handleBlur("email", e.target.value)}
                 disabled={isLoading}
               />
@@ -197,16 +197,16 @@ export default function SignInPage() {
             </div>
 
             {/* Password field */}
-            <div className="space-y-2.5">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <Label
                   htmlFor="password"
-                  className="text-base font-semibold text-foreground"
+                  className="text-sm font-semibold text-foreground"
                 >
                   Password
                 </Label>
                 <span
-                  className="text-base font-medium text-muted-foreground/60"
+                  className="text-sm font-medium text-muted-foreground/60"
                   title="Coming soon"
                 >
                   Forgot password?{" "}
@@ -224,14 +224,14 @@ export default function SignInPage() {
                   aria-describedby={
                     errors.password ? "password-error" : undefined
                   }
-                  className="h-12 text-base pr-10"
+                  className="h-10 pr-10 text-sm"
                   onBlur={(e) => handleBlur("password", e.target.value)}
                   disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded transition-colors touch-manipulation"
+                  className="absolute right-1 top-1/2 flex size-9 -translate-y-1/2 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring touch-manipulation"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
@@ -255,7 +255,7 @@ export default function SignInPage() {
             {/* Submit button */}
             <Button
               type="submit"
-              className="w-full h-12 text-base font-semibold touch-manipulation"
+              className="w-full h-10 text-sm font-semibold touch-manipulation"
               disabled={isLoading}
               size="lg"
             >
@@ -268,15 +268,57 @@ export default function SignInPage() {
             )}
 
             {/* Sign up link */}
-            <p className="text-center text-base text-muted-foreground">
-              Don't have an account?{" "}
+            <p className="text-center text-sm text-muted-foreground">
+              Don&apos;t have an account?{" "}
               <Link
                 href="/sign-up"
-                className="font-semibold text-base text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
+                className="font-semibold text-sm text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded"
               >
                 Sign up
               </Link>
             </p>
+            {/* Demo accounts */}
+            <details className="rounded-lg border border-dashed border-border bg-card p-4 text-sm text-card-foreground">
+              <summary className="cursor-pointer font-semibold">
+                Try a demo account
+              </summary>
+              <p className="mt-2 text-muted-foreground">
+                Password for all demo accounts:{" "}
+                <code className="rounded bg-muted px-1 font-mono text-foreground">Habitat2026!</code>
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (emailRef.current)
+                      emailRef.current.value =
+                        "aaravpatel.1@example.com";
+                    if (passwordRef.current)
+                      passwordRef.current.value = "Habitat2026!";
+                    setErrors({});
+                  }}
+                >
+                  Fill tenant demo
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (emailRef.current)
+                      emailRef.current.value =
+                        "eleanor.vance@habitat-properties.com";
+                    if (passwordRef.current)
+                      passwordRef.current.value = "Habitat2026!";
+                    setErrors({});
+                  }}
+                >
+                  Fill manager demo
+                </Button>
+              </div>
+            </details>
           </form>
         </div>
       </div>
