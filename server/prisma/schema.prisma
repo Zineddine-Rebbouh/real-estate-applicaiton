@@ -76,6 +76,13 @@ enum PaymentStatus {
   Overdue
 }
 
+enum MoveInTimeline {
+  ASAP
+  Within30Days
+  Within90Days
+  JustBrowsing
+}
+
 // ---------------------------------------------------------------------------
 // Auth / identity
 // ---------------------------------------------------------------------------
@@ -116,10 +123,21 @@ model Manager {
 }
 
 model Tenant {
-  id          String   @id @default(uuid()) @db.Uuid
-  userId      String   @unique @db.Uuid
-  phoneNumber String?
-  createdAt   DateTime @default(now())
+  id                    String          @id @default(uuid()) @db.Uuid
+  userId                String          @unique @db.Uuid
+  phoneNumber           String?
+  minBudget             Decimal?        @db.Decimal(10, 2)
+  maxBudget             Decimal?        @db.Decimal(10, 2)
+  desiredBeds           Int?
+  desiredBaths          Int?
+  householdSize         Int?
+  hasPets               Boolean?
+  petType               String?
+  needsParking          Boolean?
+  moveInTimeline        MoveInTimeline?
+  preferredCity         String?
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime        @default(now())
   updatedAt   DateTime @updatedAt
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
