@@ -62,7 +62,7 @@ export default function TenantDashboardLayout({
           content is offset with pt-[72px]. */}
       <Navbar isDashboard />
       <AppSidebar />
-      <SidebarInset className="dashboard-shell min-h-[calc(100svh-72px)] bg-muted/30 pt-[72px]">
+      <SidebarInset className="dashboard-shell min-h-[calc(100svh-72px)] bg-muted/30 pt-[72px] dark:bg-sidebar">
         {children}
       </SidebarInset>
       <Toaster richColors position="top-right" />

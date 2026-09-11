@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import type { RentalDetail } from "@/src/data/rental-details-data";
+import {
+  generateNearbyPOIs,
+  type RentalDetail,
+} from "@/src/data/rental-details-data";
 import { mapPropertyToListing, formatHighlights } from "@/lib/listings";
 import { ListingGallery } from "@/components/rentals/detail/listing-gallery";
 import { ListingHeader } from "@/components/rentals/detail/listing-header";
@@ -85,7 +88,9 @@ function toRentalDetail(p: Property): RentalDetail {
     policies: {
       petPolicy: {
         allowed: p.isPetsAllowed,
-        summary: p.isPetsAllowed ? "Pets are welcome at this property." : "Pets are not allowed at this property.",
+        summary: p.isPetsAllowed
+          ? "Pets are welcome at this property."
+          : "Pets are not allowed at this property.",
         rules: [],
       },
       parkingPolicy: {
@@ -112,7 +117,16 @@ function toRentalDetail(p: Property): RentalDetail {
       viewingHours: { weekdays: "By appointment", weekends: "By appointment" },
       verified: true,
     },
-    nearbyPOIs: [],
+    nearbyPOIs: generateNearbyPOIs({
+      id: p.id,
+      name: p.name,
+      city: p.city,
+      address: p.address,
+      coords: {
+        lat: Number(p.latitude || 0),
+        lng: Number(p.longitude || 0),
+      },
+    }),
     reviews: {
       overall: listing.rating,
       totalReviews: listing.reviewCount,
@@ -128,7 +142,9 @@ function toRentalDetail(p: Property): RentalDetail {
   };
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { id } = await params;
   const property = await fetchProperty(id);
   if (!property) return { title: "Listing Not Found" };
@@ -153,7 +169,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
     .map(mapPropertyToListing);
 
   return (
-    <div className="min-h-full bg-muted/20 pb-20 sm:pb-16">
+    <div className="min-h-full bg-muted/20 pb-20 sm:pb-16 dark:bg-sidebar">
       <main className="mx-auto w-full max-w-7xl px-3 py-5 sm:px-4 sm:py-8 lg:px-6 space-y-6 sm:space-y-8">
         {/* 1. PHOTO GALLERY (Hero 60% + 2x2 Grid 40% on desktop; Swipeable on mobile) */}
         <section aria-label="Photo gallery">
@@ -219,6 +235,7 @@ export default async function RentalDetailPage({ params }: PageProps) {
               coords={property.coords}
               pois={property.nearbyPOIs}
               listing={property}
+              nearbyProperties={similar}
             />
 
             {/* Tenant reviews from real review data */}

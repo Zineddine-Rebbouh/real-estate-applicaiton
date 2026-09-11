@@ -229,7 +229,7 @@ export default function BillingHistoryPage() {
   };
 
   return (
-    <main className="min-h-full bg-muted/30">
+    <main className="min-h-full bg-muted/30 dark:bg-sidebar">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
         <header className="flex flex-col justify-between gap-4 border-b border-border/60 pb-6 sm:flex-row sm:items-end">
           <div>

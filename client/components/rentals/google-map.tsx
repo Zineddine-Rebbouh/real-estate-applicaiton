@@ -1,7 +1,8 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { BedDoubleIcon, BathIcon, XIcon } from "lucide-react";
 import {
   APIProvider,
@@ -16,13 +17,29 @@ import { formatPriceValue } from "@/lib/utils";
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
 const GOOGLE_MAPS_MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "";
 
+export interface MapPoi {
+  id: string;
+  name: string;
+  category: string;
+  coords?: { lat?: number; lng?: number; x?: number; y?: number };
+  distance?: string;
+  walkTime?: string;
+}
+
 export interface GoogleMapProps {
   properties: RentalProperty[];
   selectedPropertyId: string | null;
   hoveredPropertyId: string | null;
   onSelectProperty: (property: RentalProperty) => void;
   onHoverProperty: (id: string | null) => void;
+  onDeselectProperty?: () => void;
+  detailsHref?: (property: RentalProperty) => string;
   className?: string;
+  pois?: MapPoi[];
+  activePoiId?: string | null;
+  onHoverPoi?: (id: string | null) => void;
+  selectedPoiId?: string | null;
+  onSelectPoi?: (id: string | null) => void;
 }
 
 const hasGeo = (p: RentalProperty) => p.coords.lat !== 0 || p.coords.lng !== 0;
@@ -59,12 +76,12 @@ function MapController({
 
 function PropertyInfoCard({
   property,
+  href,
   onClose,
-  onViewListing,
 }: {
   property: RentalProperty;
+  href: string;
   onClose: () => void;
-  onViewListing: (p: RentalProperty) => void;
 }) {
   return (
     <div className="w-60 rounded-xl overflow-hidden bg-card text-foreground shadow-none">
@@ -122,13 +139,12 @@ function PropertyInfoCard({
               /mo
             </span>
           </span>
-          <button
-            type="button"
-            onClick={() => onViewListing(property)}
+          <Link
+            href={href}
             className="rounded-md bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary hover:bg-primary/20 transition-colors"
           >
             View Listing
-          </button>
+          </Link>
         </div>
       </div>
     </div>
@@ -139,24 +155,16 @@ function PricePillMarker({
   property,
   isSelected,
   isHovered,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
 }: {
   property: RentalProperty;
   isSelected: boolean;
   isHovered: boolean;
-  onClick: () => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
 }) {
   const active = isSelected || isHovered;
+  // Visual only: click/hover handlers live on AdvancedMarker itself, since
+  // @vis.gl disables pointer events on marker content without them.
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+    <div
       className={[
         "relative flex items-center rounded-full px-2.5 py-1 text-xs font-bold",
         "shadow-md transition-all duration-150 cursor-pointer",
@@ -173,7 +181,7 @@ function PricePillMarker({
           active ? "border-t-primary" : "border-t-card",
         ].join(" ")}
       />
-    </button>
+    </div>
   );
 }
 
@@ -183,18 +191,30 @@ export function GoogleMap({
   hoveredPropertyId,
   onSelectProperty,
   onHoverProperty,
+  onDeselectProperty,
+  detailsHref = (p) => `/tenant/rentals/${p.id}`,
   className = "",
+  pois = [],
+  activePoiId = null,
+  onHoverPoi,
+  selectedPoiId = null,
+  onSelectPoi,
 }: GoogleMapProps) {
-  const [activeInfoWindow, setActiveInfoWindow] = useState<RentalProperty | null>(null);
+  // Card is derived from the selection: X clears the selection so the card
+  // stays hidden until the next marker click. hiddenId covers callers that
+  // don't wire onDeselectProperty.
+  const [hiddenId, setHiddenId] = useState<string | null>(null);
 
-  const geo = properties.filter(hasGeo);
+  // Memoized so MapController's fitBounds only refires when the result
+  // set actually changes — not on every selection/hover rerender (which
+  // would snap the zoom back to default on each pin click).
+  const geo = useMemo(() => properties.filter(hasGeo), [properties]);
   const skipped = properties.length - geo.length;
 
-  useEffect(() => {
-    if (!selectedPropertyId) return;
-    const match = geo.find((p) => p.id === selectedPropertyId);
-    setActiveInfoWindow(match ?? null);
-  }, [selectedPropertyId, geo]);
+  const activeInfoWindow =
+    selectedPropertyId && selectedPropertyId !== hiddenId
+      ? (geo.find((p) => p.id === selectedPropertyId) ?? null)
+      : null;
 
   const defaultCenter =
     geo.length > 0
@@ -205,13 +225,38 @@ export function GoogleMap({
       : { lat: 51.1079, lng: 17.0385 };
 
   const handleMarkerClick = (property: RentalProperty) => {
-    setActiveInfoWindow(property);
+    setHiddenId(null);
     onSelectProperty(property);
   };
 
   const handleCloseInfo = () => {
-    setActiveInfoWindow(null);
+    setHiddenId(selectedPropertyId);
+    onDeselectProperty?.();
   };
+
+  // POI position: real lat/lng when available, otherwise offset from the
+  // first listing (same math as the fallback vector map's x/y placement).
+  const getPoiPosition = (poi: MapPoi) => {
+    const anchor = geo[0];
+    const lat =
+      poi.coords?.lat ??
+      (anchor
+        ? anchor.coords.lat + ((poi.coords?.y ?? 50) - 50) * 0.0003
+        : 0);
+    const lng =
+      poi.coords?.lng ??
+      (anchor
+        ? anchor.coords.lng + ((poi.coords?.x ?? 50) - 50) * 0.0004
+        : 0);
+    return lat && lng ? { lat, lng } : null;
+  };
+
+  const selectedPoi = selectedPoiId
+    ? (pois.find((p) => p.id === selectedPoiId) ?? null)
+    : null;
+  const selectedPoiPosition = selectedPoi
+    ? getPoiPosition(selectedPoi)
+    : null;
 
   return (
     <div className={`relative h-full w-full ${className}`}>
@@ -237,15 +282,48 @@ export function GoogleMap({
                 key={property.id}
                 position={{ lat: property.coords.lat, lng: property.coords.lng }}
                 zIndex={isSelected || isHovered ? 30 : 10}
+                onClick={() => handleMarkerClick(property)}
+                onMouseEnter={() => onHoverProperty(property.id)}
+                onMouseLeave={() => onHoverProperty(null)}
               >
                 <PricePillMarker
                   property={property}
                   isSelected={isSelected}
                   isHovered={isHovered}
-                  onClick={() => handleMarkerClick(property)}
-                  onMouseEnter={() => onHoverProperty(property.id)}
-                  onMouseLeave={() => onHoverProperty(null)}
                 />
+              </AdvancedMarker>
+            );
+          })}
+
+          {pois.map((poi) => {
+            const position = getPoiPosition(poi);
+            if (!position) return null;
+            const isEmphasized =
+              poi.id === selectedPoiId || poi.id === activePoiId;
+
+            return (
+              <AdvancedMarker
+                key={poi.id}
+                position={position}
+                zIndex={isEmphasized ? 40 : 15}
+                onClick={() => {
+                  if (onSelectPoi)
+                    onSelectPoi(selectedPoiId === poi.id ? null : poi.id);
+                  else onHoverPoi?.(activePoiId === poi.id ? null : poi.id);
+                }}
+                onMouseEnter={() => onHoverPoi?.(poi.id)}
+                onMouseLeave={() => onHoverPoi?.(null)}
+              >
+                <div
+                  className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold shadow-md transition-all cursor-pointer ${
+                    isEmphasized
+                      ? "bg-foreground text-background scale-110 ring-2 ring-primary ring-offset-1"
+                      : "bg-card/95 text-foreground border border-border/80 backdrop-blur-xs hover:bg-card hover:scale-105"
+                  }`}
+                >
+                  <span className="size-2 rounded-full bg-primary inline-block shrink-0" />
+                  <span className="truncate max-w-[120px]">{poi.name}</span>
+                </div>
               </AdvancedMarker>
             );
           })}
@@ -262,12 +340,41 @@ export function GoogleMap({
             >
               <PropertyInfoCard
                 property={activeInfoWindow}
+                href={detailsHref(activeInfoWindow)}
                 onClose={handleCloseInfo}
-                onViewListing={(p) => {
-                  onSelectProperty(p);
-                  handleCloseInfo();
-                }}
               />
+            </InfoWindow>
+          )}
+
+          {selectedPoi && selectedPoiPosition && (
+            <InfoWindow
+              position={selectedPoiPosition}
+              onCloseClick={() => onSelectPoi?.(null)}
+              pixelOffset={[0, -32]}
+              disableAutoPan={false}
+            >
+              <div className="w-52 p-2.5 space-y-1 bg-card text-foreground">
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className="text-xs font-semibold truncate">
+                    {selectedPoi.name}
+                  </h4>
+                  <button
+                    type="button"
+                    aria-label="Close place preview"
+                    onClick={() => onSelectPoi?.(null)}
+                    className="size-6 shrink-0 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+                  >
+                    <XIcon className="size-3.5" />
+                  </button>
+                </div>
+                <p className="text-[11px] text-muted-foreground capitalize">
+                  {selectedPoi.category}
+                  {selectedPoi.distance
+                    ? ` · ${selectedPoi.distance}`
+                    : ""}
+                  {selectedPoi.walkTime ? ` · ${selectedPoi.walkTime}` : ""}
+                </p>
+              </div>
             </InfoWindow>
           )}
         </Map>

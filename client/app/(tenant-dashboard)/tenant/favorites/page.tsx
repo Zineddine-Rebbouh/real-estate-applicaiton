@@ -240,7 +240,7 @@ export default function FavoritesPage() {
   };
 
   return (
-    <main className="min-h-full bg-muted/30">
+    <main className="min-h-full bg-muted/30 dark:bg-sidebar">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
         {/* Page Header */}
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center border-b pb-6">

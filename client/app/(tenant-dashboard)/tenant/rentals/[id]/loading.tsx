@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RentalDetailLoading() {
   return (
-    <div className="min-h-full bg-muted/20 pb-20 sm:pb-16">
+    <div className="min-h-full bg-muted/20 pb-20 sm:pb-16 dark:bg-sidebar">
       <main className="mx-auto w-full max-w-7xl px-3 py-5 sm:px-4 sm:py-8 lg:px-6 space-y-6 sm:space-y-8">
         <Skeleton className="h-[420px] w-full rounded-xl" />
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

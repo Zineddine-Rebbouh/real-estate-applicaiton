@@ -436,7 +436,7 @@ export default function ResidencePage() {
   ];
 
   return (
-    <main className="min-h-full bg-muted/30">
+    <main className="min-h-full bg-muted/30 dark:bg-sidebar">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 p-4 sm:p-6 lg:p-8">
         <header>
           {/* <p className="text-sm font-medium text-primary">Tenant dashboard</p> */}

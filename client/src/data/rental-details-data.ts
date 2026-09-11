@@ -8,13 +8,23 @@ export type FeeItem = {
   required: boolean;
 };
 
+export type PointOfInterestCategory =
+  | "school"
+  | "transit"
+  | "grocery"
+  | "restaurant"
+  | "fitness"
+  | "bank"
+  | "hotel"
+  | "shop";
+
 export type PointOfInterest = {
   id: string;
   name: string;
-  category: "hotel" | "restaurant" | "bank" | "school" | "shop" | "fitness";
+  category: PointOfInterestCategory;
   distance: string;
   walkTime: string;
-  coords: { x: number; y: number }; // relative map percentage (0-100)
+  coords: { x: number; y: number; lat?: number; lng?: number }; // relative map percentage (0-100) and optional geo
 };
 
 export type ReviewItem = {
@@ -127,20 +137,275 @@ const DEFAULT_HOST: HostProfile = {
   verified: true,
 };
 
-const SAMPLE_POIS: PointOfInterest[] = [
-  { id: "poi-1", name: "Grand Monopol Hotel", category: "hotel", distance: "280m", walkTime: "3 min walk", coords: { x: 35, y: 32 } },
-  { id: "poi-2", name: "Bistro La Rive Riverfront", category: "restaurant", distance: "190m", walkTime: "2 min walk", coords: { x: 39, y: 36 } },
-  { id: "poi-3", name: "Santander Central Bank Branch", category: "bank", distance: "340m", walkTime: "4 min walk", coords: { x: 41, y: 30 } },
-  { id: "poi-4", name: "International Bilingual Academy", category: "school", distance: "620m", walkTime: "8 min walk", coords: { x: 45, y: 40 } },
-  { id: "poi-5", name: "Organic Market & Gourmet Deli", category: "shop", distance: "210m", walkTime: "3 min walk", coords: { x: 36, y: 38 } },
-  { id: "poi-6", name: "Fitness First Platinum Club", category: "fitness", distance: "450m", walkTime: "6 min walk", coords: { x: 43, y: 28 } },
-  { id: "poi-7", name: "The Bridge Boutique Suites", category: "hotel", distance: "510m", walkTime: "6 min walk", coords: { x: 32, y: 28 } },
-  { id: "poi-8", name: "Trattoria Pasta Fresca", category: "restaurant", distance: "310m", walkTime: "4 min walk", coords: { x: 42, y: 37 } },
-  { id: "poi-9", name: "PKO Bank Polski 24/7 ATM", category: "bank", distance: "240m", walkTime: "3 min walk", coords: { x: 37, y: 33 } },
-  { id: "poi-10", name: "Galeria Dominikańska Mall", category: "shop", distance: "680m", walkTime: "9 min walk", coords: { x: 47, y: 35 } },
-  { id: "poi-11", name: "CrossFit Oder Box", category: "fitness", distance: "520m", walkTime: "7 min walk", coords: { x: 34, y: 42 } },
-  { id: "poi-12", name: "Wrocław University Main Campus", category: "school", distance: "750m", walkTime: "10 min walk", coords: { x: 38, y: 22 } },
+export const SAMPLE_POIS: PointOfInterest[] = [
+  {
+    id: "poi-1",
+    name: "Metro Central Transit Station",
+    category: "transit",
+    distance: "280m",
+    walkTime: "3 min walk",
+    coords: { x: 35, y: 32 },
+  },
+  {
+    id: "poi-2",
+    name: "Bistro La Rive Riverfront",
+    category: "restaurant",
+    distance: "190m",
+    walkTime: "2 min walk",
+    coords: { x: 39, y: 36 },
+  },
+  {
+    id: "poi-3",
+    name: "Santander Central Bank & ATM",
+    category: "bank",
+    distance: "340m",
+    walkTime: "4 min walk",
+    coords: { x: 41, y: 30 },
+  },
+  {
+    id: "poi-4",
+    name: "International Bilingual Academy",
+    category: "school",
+    distance: "620m",
+    walkTime: "8 min walk",
+    coords: { x: 45, y: 40 },
+  },
+  {
+    id: "poi-5",
+    name: "Organic Market & Whole Grocer",
+    category: "grocery",
+    distance: "210m",
+    walkTime: "3 min walk",
+    coords: { x: 36, y: 38 },
+  },
+  {
+    id: "poi-6",
+    name: "Fitness First Platinum Club",
+    category: "fitness",
+    distance: "450m",
+    walkTime: "6 min walk",
+    coords: { x: 43, y: 28 },
+  },
+  {
+    id: "poi-7",
+    name: "Union Square Light Rail",
+    category: "transit",
+    distance: "510m",
+    walkTime: "6 min walk",
+    coords: { x: 32, y: 28 },
+  },
+  {
+    id: "poi-8",
+    name: "Trattoria Pasta Fresca",
+    category: "restaurant",
+    distance: "310m",
+    walkTime: "4 min walk",
+    coords: { x: 42, y: 37 },
+  },
+  {
+    id: "poi-9",
+    name: "PKO Bank 24/7 ATM Hub",
+    category: "bank",
+    distance: "240m",
+    walkTime: "3 min walk",
+    coords: { x: 37, y: 33 },
+  },
+  {
+    id: "poi-10",
+    name: "Trader Green Supermarket",
+    category: "grocery",
+    distance: "480m",
+    walkTime: "6 min walk",
+    coords: { x: 47, y: 35 },
+  },
+  {
+    id: "poi-11",
+    name: "CrossFit Oder Wellness Box",
+    category: "fitness",
+    distance: "520m",
+    walkTime: "7 min walk",
+    coords: { x: 34, y: 42 },
+  },
+  {
+    id: "poi-12",
+    name: "St. Jude Preparatory School",
+    category: "school",
+    distance: "750m",
+    walkTime: "10 min walk",
+    coords: { x: 38, y: 22 },
+  },
 ];
+
+export function generateNearbyPOIs(property: {
+  id?: string;
+  name?: string;
+  city?: string;
+  address?: string;
+  coords?: { lat: number; lng: number };
+}): PointOfInterest[] {
+  const city = property.city || "Metropolitan";
+  const baseLat = property.coords?.lat || 51.1079;
+  const baseLng = property.coords?.lng || 17.0385;
+
+  return [
+    {
+      id: "poi-school-1",
+      name: `${city} International Academy`,
+      category: "school",
+      distance: "420m",
+      walkTime: "5 min walk",
+      coords: {
+        x: 42,
+        y: 28,
+        lat: baseLat + 0.0031,
+        lng: baseLng - 0.0022,
+      },
+    },
+    {
+      id: "poi-school-2",
+      name: `St. Jude Preparatory School`,
+      category: "school",
+      distance: "680m",
+      walkTime: "8 min walk",
+      coords: {
+        x: 36,
+        y: 22,
+        lat: baseLat + 0.0052,
+        lng: baseLng + 0.0035,
+      },
+    },
+    {
+      id: "poi-transit-1",
+      name: `${city} Central Metro Station`,
+      category: "transit",
+      distance: "230m",
+      walkTime: "3 min walk",
+      coords: {
+        x: 46,
+        y: 36,
+        lat: baseLat - 0.0018,
+        lng: baseLng + 0.0019,
+      },
+    },
+    {
+      id: "poi-transit-2",
+      name: `City Line Rapid Transit Hub`,
+      category: "transit",
+      distance: "510m",
+      walkTime: "6 min walk",
+      coords: {
+        x: 33,
+        y: 44,
+        lat: baseLat - 0.0039,
+        lng: baseLng - 0.0041,
+      },
+    },
+    {
+      id: "poi-grocery-1",
+      name: `Whole Foods Market & Deli`,
+      category: "grocery",
+      distance: "310m",
+      walkTime: "4 min walk",
+      coords: {
+        x: 52,
+        y: 33,
+        lat: baseLat + 0.0021,
+        lng: baseLng + 0.0027,
+      },
+    },
+    {
+      id: "poi-grocery-2",
+      name: `Green Earth Organic Grocer`,
+      category: "grocery",
+      distance: "590m",
+      walkTime: "7 min walk",
+      coords: {
+        x: 39,
+        y: 48,
+        lat: baseLat - 0.0042,
+        lng: baseLng + 0.0012,
+      },
+    },
+    {
+      id: "poi-restaurant-1",
+      name: `Bistro La Rive Artisanal Kitchen`,
+      category: "restaurant",
+      distance: "180m",
+      walkTime: "2 min walk",
+      coords: {
+        x: 48,
+        y: 42,
+        lat: baseLat - 0.0012,
+        lng: baseLng - 0.0015,
+      },
+    },
+    {
+      id: "poi-restaurant-2",
+      name: `Caffè Bella Vista & Bakery`,
+      category: "restaurant",
+      distance: "340m",
+      walkTime: "4 min walk",
+      coords: {
+        x: 55,
+        y: 38,
+        lat: baseLat + 0.0015,
+        lng: baseLng + 0.0038,
+      },
+    },
+    {
+      id: "poi-fitness-1",
+      name: `Equinox Fitness & Spa Club`,
+      category: "fitness",
+      distance: "410m",
+      walkTime: "5 min walk",
+      coords: {
+        x: 35,
+        y: 35,
+        lat: baseLat + 0.0028,
+        lng: baseLng - 0.0034,
+      },
+    },
+    {
+      id: "poi-fitness-2",
+      name: `District Yoga & Pilates Studio`,
+      category: "fitness",
+      distance: "620m",
+      walkTime: "8 min walk",
+      coords: {
+        x: 58,
+        y: 45,
+        lat: baseLat - 0.0048,
+        lng: baseLng + 0.0042,
+      },
+    },
+    {
+      id: "poi-bank-1",
+      name: `Chase Premier Financial Center`,
+      category: "bank",
+      distance: "290m",
+      walkTime: "4 min walk",
+      coords: {
+        x: 43,
+        y: 31,
+        lat: baseLat + 0.0019,
+        lng: baseLng - 0.0018,
+      },
+    },
+    {
+      id: "poi-bank-2",
+      name: `24/7 Multi-Bank Express ATM`,
+      category: "bank",
+      distance: "160m",
+      walkTime: "2 min walk",
+      coords: {
+        x: 47,
+        y: 46,
+        lat: baseLat - 0.0009,
+        lng: baseLng + 0.0011,
+      },
+    },
+  ];
+}
 
 const SAMPLE_REVIEWS: ReviewItem[] = [
   {
@@ -149,7 +414,8 @@ const SAMPLE_REVIEWS: ReviewItem[] = [
     authorAvatar: "/landing-i2.png",
     rating: 5,
     date: "August 2026",
-    comment: "Lived here for 14 months and it has been absolute perfection. The triple-glazed windows completely isolate street noise, and the radiant floor heating during winter is fantastic. The building management team responds within minutes to any request.",
+    comment:
+      "Lived here for 14 months and it has been absolute perfection. The triple-glazed windows completely isolate street noise, and the radiant floor heating during winter is fantastic. The building management team responds within minutes to any request.",
     stayDuration: "Rented 1 year, 2 months",
     verifiedTenant: true,
   },
@@ -159,7 +425,8 @@ const SAMPLE_REVIEWS: ReviewItem[] = [
     authorAvatar: "/landing-i5.png",
     rating: 5,
     date: "July 2026",
-    comment: "The morning light in the living room and balcony is breathtaking. The kitchen appliances are top-notch Bosch and Siemens, and the underground parking spot with EV charging made owning a Tesla effortless. Highly recommended!",
+    comment:
+      "The morning light in the living room and balcony is breathtaking. The kitchen appliances are top-notch Bosch and Siemens, and the underground parking spot with EV charging made owning a Tesla effortless. Highly recommended!",
     stayDuration: "Rented 8 months",
     verifiedTenant: true,
   },
@@ -169,7 +436,8 @@ const SAMPLE_REVIEWS: ReviewItem[] = [
     authorAvatar: "/landing-i4.png",
     rating: 4.8,
     date: "June 2026",
-    comment: "Outstanding location right next to the river promenade. Lots of cozy coffee shops and boutique bakeries within a 3-minute stroll. Move-in process with Karolina was seamless and transparent.",
+    comment:
+      "Outstanding location right next to the river promenade. Lots of cozy coffee shops and boutique bakeries within a 3-minute stroll. Move-in process with Karolina was seamless and transparent.",
     stayDuration: "Rented 6 months",
     verifiedTenant: true,
   },
@@ -179,7 +447,8 @@ const SAMPLE_REVIEWS: ReviewItem[] = [
     authorAvatar: "/landing-i7.png",
     rating: 4.9,
     date: "May 2026",
-    comment: "High-speed 1Gbps fiber internet was ready on day one which was essential for my remote software engineering job. Sound isolation between neighbors is 10/10.",
+    comment:
+      "High-speed 1Gbps fiber internet was ready on day one which was essential for my remote software engineering job. Sound isolation between neighbors is 10/10.",
     stayDuration: "Rented 11 months",
     verifiedTenant: true,
   },
@@ -198,7 +467,9 @@ export function getRentalDetailById(id: string): RentalDetail {
 
   const detailedGallery = uniqueUrls.slice(0, 8).map((url, idx) => ({
     url,
-    caption: COMMON_GALLERY_COLLECTION[idx]?.caption || `${base.title} - Interior view ${idx + 1}`,
+    caption:
+      COMMON_GALLERY_COLLECTION[idx]?.caption ||
+      `${base.title} - Interior view ${idx + 1}`,
     tag: COMMON_GALLERY_COLLECTION[idx]?.tag || "Residence",
   }));
 
@@ -239,21 +510,24 @@ export function getRentalDetailById(id: string): RentalDetail {
           name: "Refundable Security Deposit",
           amount: `$${base.price.toLocaleString()}`,
           frequency: "one-time",
-          description: "Held in escrow; fully refundable upon lease expiration pursuant to standard checkout inspection",
+          description:
+            "Held in escrow; fully refundable upon lease expiration pursuant to standard checkout inspection",
           required: true,
         },
         {
           name: "Application & Credit Screening Fee",
           amount: "$50",
           frequency: "one-time",
-          description: "Covers third-party digital credit and tenant verification background check",
+          description:
+            "Covers third-party digital credit and tenant verification background check",
           required: true,
         },
         {
           name: "Estimated Utilities & Community Maintenance",
           amount: "~$180",
           frequency: "/ month",
-          description: "Includes water, high-speed heating, trash disposal, elevator upkeep, and hallway cleaning",
+          description:
+            "Includes water, high-speed heating, trash disposal, elevator upkeep, and hallway cleaning",
           required: false,
         },
         {
@@ -269,14 +543,18 @@ export function getRentalDetailById(id: string): RentalDetail {
           name: "Pet Deposit (Refundable)",
           amount: base.petFriendly ? "$300" : "N/A",
           frequency: "one-time",
-          description: base.petFriendly ? "Refundable deposit per registered animal" : "Pets not allowed in this unit",
+          description: base.petFriendly
+            ? "Refundable deposit per registered animal"
+            : "Pets not allowed in this unit",
           required: base.petFriendly,
         },
         {
           name: "Monthly Pet Rent",
           amount: base.petFriendly ? "$35" : "N/A",
           frequency: "/ month per pet",
-          description: base.petFriendly ? "Applies to registered cats and dogs under 25kg" : "Pets not allowed",
+          description: base.petFriendly
+            ? "Applies to registered cats and dogs under 25kg"
+            : "Pets not allowed",
           required: base.petFriendly,
         },
       ],
@@ -285,21 +563,25 @@ export function getRentalDetailById(id: string): RentalDetail {
           name: "Designated Garage Space",
           amount: base.parkingIncluded ? "$0 (Included)" : "$120",
           frequency: "/ month",
-          description: base.parkingIncluded ? "1 dedicated underground heated parking space included with lease" : "Optional allocated garage space with remote gate fob",
+          description: base.parkingIncluded
+            ? "1 dedicated underground heated parking space included with lease"
+            : "Optional allocated garage space with remote gate fob",
           required: false,
         },
         {
           name: "EV Charging Station Access",
           amount: "$30 + usage",
           frequency: "/ month",
-          description: "22kW Level 2 charger access at the resident's parking stall",
+          description:
+            "22kW Level 2 charger access at the resident's parking stall",
           required: false,
         },
         {
           name: "Guest Parking Pass",
           amount: "$0",
           frequency: "as needed",
-          description: "Up to 5 complimentary overnight guest passes per calendar month",
+          description:
+            "Up to 5 complimentary overnight guest passes per calendar month",
           required: false,
         },
       ],
@@ -324,7 +606,9 @@ export function getRentalDetailById(id: string): RentalDetail {
       },
       parkingPolicy: {
         included: base.parkingIncluded,
-        type: base.parkingIncluded ? "Dedicated Underground Garage Stall" : "Optional Resident Garage Stall",
+        type: base.parkingIncluded
+          ? "Dedicated Underground Garage Stall"
+          : "Optional Resident Garage Stall",
         summary: base.parkingIncluded
           ? "One reserved underground heated parking spot is included in the lease price."
           : "Underground parking stall available for an optional monthly fee of $120.",

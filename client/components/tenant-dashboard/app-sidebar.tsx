@@ -10,6 +10,7 @@ import {
   CreditCardIcon,
   Building2Icon,
   CompassIcon,
+  EyeIcon,
   InboxIcon,
   MapIcon,
   WrenchIcon,
@@ -97,6 +98,12 @@ const managerNavItems = [
     title: "Properties",
     href: "/manager/properties",
     icon: Building2Icon,
+    badge: null,
+  },
+  {
+    title: "Preview Listings",
+    href: "/manager/browse",
+    icon: EyeIcon,
     badge: null,
   },
   {

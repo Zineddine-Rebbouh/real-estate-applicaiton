@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useMemo, useRef, useState } from "react";
 import {
   MinusIcon,
   PlusIcon,
@@ -29,6 +30,7 @@ interface InteractiveMapProps {
   hoveredPropertyId: string | null;
   onSelectProperty: (property: RentalProperty) => void;
   onHoverProperty: (id: string | null) => void;
+  onDeselectProperty?: () => void;
   className?: string;
 }
 
@@ -62,6 +64,7 @@ function CustomInteractiveMap({
   hoveredPropertyId,
   onSelectProperty,
   onHoverProperty,
+  onDeselectProperty,
   className = "",
 }: InteractiveMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -71,15 +74,12 @@ function CustomInteractiveMap({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [hasMovedMap, setHasMovedMap] = useState(false);
   const [searchAsMove, setSearchAsMove] = useState(true);
-  const [popupProperty, setPopupProperty] = useState<RentalProperty | null>(null);
 
-  // Sync popup when property is selected from outside
-  useEffect(() => {
-    if (selectedPropertyId) {
-      const match = properties.find((p) => p.id === selectedPropertyId);
-      if (match) setPopupProperty(match);
-    }
-  }, [selectedPropertyId, properties]);
+  // Popup is derived from the selection: X clears the selection so the card
+  // stays hidden until the next marker click.
+  const popupProperty = selectedPropertyId
+    ? (properties.find((p) => p.id === selectedPropertyId) ?? null)
+    : null;
 
   // Pan handlers
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -187,7 +187,7 @@ function CustomInteractiveMap({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      className={`relative h-full w-full overflow-hidden select-none bg-[#e8ecef] dark:bg-[#141824] cursor-grab active:cursor-grabbing ${className}`}
+      className={`relative h-full w-full overflow-hidden select-none bg-[#e8ecef] dark:bg-sidebar cursor-grab active:cursor-grabbing ${className}`}
     >
       {/* Floating "Search as I move the map" / "Search this area" Button */}
       <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 map-control">
@@ -448,7 +448,6 @@ function CustomInteractiveMap({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setPopupProperty(property);
                     onSelectProperty(property);
                   }}
                   onMouseEnter={() => onHoverProperty(property.id)}
@@ -493,7 +492,9 @@ function CustomInteractiveMap({
               />
               <button
                 type="button"
-                onClick={() => setPopupProperty(null)}
+                onClick={() => {
+                  onDeselectProperty?.();
+                }}
                 className="absolute top-1.5 right-1.5 size-6 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
               >
                 <XIcon className="size-3.5" />
@@ -515,13 +516,12 @@ function CustomInteractiveMap({
                   {formatPriceValue(popupProperty.price)}
                   <span className="text-[10px] font-normal text-muted-foreground">/mo</span>
                 </span>
-                <button
-                  type="button"
-                  onClick={() => onSelectProperty(popupProperty)}
+                <Link
+                  href={`/tenant/rentals/${popupProperty.id}`}
                   className="rounded-md bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary hover:bg-primary/20 transition-colors"
                 >
                   View Listing
-                </button>
+                </Link>
               </div>
             </div>
           </div>

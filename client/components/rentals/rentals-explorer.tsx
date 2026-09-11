@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TopFilterBar, ViewMode } from "@/components/rentals/top-filter-bar";
 import { FilterSidebar } from "@/components/rentals/filter-sidebar";
 import { InteractiveMap } from "@/components/rentals/interactive-map";
@@ -18,6 +18,8 @@ import {
   toPropertyQuery,
 } from "@/lib/listings";
 import { useGetPropertiesQuery } from "@/state/api";
+import { requestLocationOncePerSession } from "@/hooks/use-geolocation";
+import { SearchPreferencesOnboarding } from "@/components/tenant-dashboard/search-preferences-onboarding";
 
 interface RentalsExplorerProps {
   isDashboard?: boolean;
@@ -68,9 +70,30 @@ export function RentalsExplorer({ isDashboard = false }: RentalsExplorerProps) {
     setSelectedPropertyId(property.id);
   };
 
+  const handleDeselectProperty = () => {
+    setSelectedPropertyId(null);
+  };
+
   const handleHoverProperty = (id: string | null) => {
     setHoveredPropertyId(id);
   };
+
+  // Ephemeral geolocation prefill — once per tab session, no server writes.
+  // Asks the browser for location (hooks/use-geolocation.ts gates the prompt
+  // with a sessionStorage flag), reverse-geocodes to a city, and prefills the
+  // search field only if the user hasn't already typed a location. The
+  // resolved city is session-only (FilterState.locationQuery) and never
+  // persisted — there is no preferredLatitude/preferredLongitude in the schema.
+  const geolocationStarted = useRef(false);
+  useEffect(() => {
+    if (geolocationStarted.current) return;
+    geolocationStarted.current = true;
+    requestLocationOncePerSession((city) => {
+      setFilters((prev) =>
+        prev.locationQuery.trim() ? prev : { ...prev, locationQuery: city },
+      );
+    });
+  }, []);
 
   return (
     <div
@@ -116,6 +139,7 @@ export function RentalsExplorer({ isDashboard = false }: RentalsExplorerProps) {
             hoveredPropertyId={hoveredPropertyId}
             onSelectProperty={handleSelectProperty}
             onHoverProperty={handleHoverProperty}
+            onDeselectProperty={handleDeselectProperty}
           />
         </div>
 
@@ -159,6 +183,11 @@ export function RentalsExplorer({ isDashboard = false }: RentalsExplorerProps) {
           sortBy={sortBy}
           onSortChange={setSortBy}
         />
+
+        {/* One-time search-preference onboarding popup (skippable, centered
+            modal). Save applies the preferences to FilterState so the explore
+            page behind the popup is already filtered once it closes. */}
+        <SearchPreferencesOnboarding onApplyPreferences={handleFilterChange} />
       </main>
     </div>
   );

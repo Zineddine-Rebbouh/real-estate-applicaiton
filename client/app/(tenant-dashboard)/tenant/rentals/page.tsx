@@ -186,9 +186,9 @@ export default function BrowseRentalsPage() {
   const activeCityName = filters.locationQuery.trim() || "all areas";
 
   return (
-    <div className="min-h-full bg-muted/30 pb-16">
+    <div className="min-h-full bg-muted/30 pb-16 dark:bg-sidebar">
       {/* 1. Page Header matching Overview page typography */}
-      <header className="border-b border-border/60 bg-background/50 backdrop-blur-xs">
+      <header className="border-b border-border/60 bg-background/50 backdrop-blur-xs dark:bg-sidebar/50">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 py-8 sm:px-4 lg:px-6">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
