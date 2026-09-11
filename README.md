@@ -9,9 +9,21 @@ Habitat is a real-estate rental web app: a marketing landing page paired with a 
   <img alt="Frontend" src="https://img.shields.io/badge/frontend-Next.js%2016-black" />
   <img alt="Backend" src="https://img.shields.io/badge/backend-Express%205%20%7C%20Prisma%207-green" />
   <img alt="Database" src="https://img.shields.io/badge/database-PostgreSQL-blue" />
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-green" />
 </p>
 
 🔗 **Live demo:** [real-estate-applicaiton.vercel.app](https://real-estate-applicaiton.vercel.app)
+
+> **Try it without signing up** — all seeded accounts use password `Habitat2026!`:
+> | Role | Email | Shows |
+> |---|---|---|
+> | Portfolio manager (12 properties) | `eleanor.vance@habitat-properties.com` | queues, inquiries, volume |
+> | Mid-tier manager (6 properties) | `david.chen@pacificliving.io` | balanced portfolio |
+> | Active resident | `aaravpatel.1@example.com` | residence, lease PDF, invoices |
+> | Applicant (2 pending) | `keanureeves.29@example.com` | applications list |
+> | Fresh tenant (empty states) | `freshtenantdemo.60@example.com` | empty dashboards |
+>
+> Full matrix + manager invite codes: [`server/prisma/seedData/README-credentials.md`](./server/prisma/seedData/README-credentials.md). Local seed: `cd server && npm run seed`.
 
 ---
 
@@ -34,6 +46,7 @@ Habitat is a real-estate rental web app: a marketing landing page paired with a 
 Habitat targets renters/tenants first, with a working manager side alongside it. Both dashboards are wired to a live REST API — no mock data in the request path.
 
 **Where things stand today:**
+
 - The frontend is a fully designed tenant + manager experience running on **live RTK Query data**: browse/search listings, property detail, favorites (persisted), applications (submit/withdraw), residence, billing, and payment methods.
 - The backend implements **13 route groups (~44 endpoints)**: auth, properties, manager, applications, favorites, tenant, reviews, leases (signed PDF agreements/receipts), uploads, payment-methods, maintenance, tours, and messages — backed by PostgreSQL via Prisma 7.
 - Seeding is schema-safe (`npm run seed`, upsert-with-skip) and Docker Compose boots the full stack (db + api + web) with migrations + seed.
@@ -54,10 +67,25 @@ Habitat targets renters/tenants first, with a working manager side alongside it.
 | Image uploads | ✅ Live | Multer (10×5MB, image-only) straight to Cloudinary; returns `secure_url`s for `photoUrls`; upload rate-limited |
 | Live map | ✅ Partial | Google Maps where keys set, graceful SVG fallback otherwise; POI toggles currently empty |
 | Real payments | 🔜 Not started | Manual invoicing only — no payment gateway integrated |
+| Feature                               | Status         | Notes                                                                                                                                           |
+| ------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Landing page                          | ✅ UI complete | Navbar, hero, featured listing, property grid & filters, discover section, gallery, how-it-works, CTA, footer                                   |
+| Authentication                        | ✅ Live        | Signup / login / logout / session / silent refresh, httpOnly cookies (`Path: /`), rate-limited; manager signup gated by single-use invite code  |
+| Tenant dashboard                      | ✅ Live        | Overview, explore, rentals + detail, applications (submit/withdraw), residence, billing, payment-methods, favorites — all RTK Query             |
+| Browse & filter listings              | ✅ Live        | `useGetPropertiesQuery`; filter vocabulary (`FilterState`, `INITIAL_FILTERS`) still type-imported from `src/data/rentals-data`                  |
+| Listing detail                        | ✅ Live        | Server component fetching `/api/properties/[id]` + live reviews/tour/message sections; has `loading.tsx`                                        |
+| Favorites                             | ✅ Live        | Heart toggles in cards/gallery persist via `addFavorite`/`removeFavorite` (optimistic)                                                          |
+| Applications                          | ✅ Live        | Tenant submit/withdraw + manager approve/deny (approval mints the lease, overlap-checked)                                                       |
+| Residence / Billing / Payment methods | ✅ Live        | Current lease, invoices + pay flow, PDF statements/receipts, brand/last4 method references (no PANs)                                            |
+| Manager dashboard                     | ✅ Live        | Overview, properties CRUD, applications, leases + manual invoicing, inquiries (tours/messages), maintenance queue                               |
+| Image uploads                         | ✅ Live        | Multer (10×5MB, image-only) straight to Cloudinary; returns `secure_url`s for `photoUrls`; upload rate-limited                                  |
+| Live map                              | ✅ Live        | Google Maps when API keys set with interactive POI pins, graceful SVG fallback otherwise; schools, transit, grocery, dining toggles fully wired |
+| Real payments                         | 🔜 Not started | Manual invoicing only — no payment gateway integrated                                                                                           |
 
 ## Tech Stack
 
 **Frontend** (`client/`)
+
 - Next.js 16 (App Router) + React 19 + TypeScript
 - Tailwind CSS v4, shadcn (`base-nova`), Radix-alternative `@base-ui/react`, `lucide-react`
 - Redux Toolkit + RTK Query (full API slice with automatic 401 refresh-and-retry)
@@ -65,6 +93,7 @@ Habitat targets renters/tenants first, with a working manager side alongside it.
 - Framer Motion, `next-themes`, Sonner (toasts), Google Maps (with SVG fallback when keys are absent)
 
 **Backend** (`server/`, Express + Prisma)
+
 - Express 5, Helmet, Morgan, CORS, cookie-based sessions
 - Prisma 7 + PostgreSQL (via `pg` and the Prisma Pg adapter)
 - JWT access/refresh tokens (httpOnly cookies, `Secure` in prod, `SameSite: lax`), bcrypt password hashing
@@ -131,6 +160,7 @@ cd real-estate-applicaiton
 ```
 
 **Backend**
+
 ```bash
 cd server
 cp .env.example .env   # fill in your own values, see below
@@ -141,6 +171,7 @@ npm run dev             # runs on http://localhost:3002
 ```
 
 **Frontend**
+
 ```bash
 cd client
 cp .env.example .env.local   # or: NEXT_PUBLIC_API_BASE_URL=http://localhost:3002
@@ -149,14 +180,17 @@ npm run dev                  # runs on http://localhost:3000
 ```
 
 **Full stack (Docker)**
+
 ```bash
 docker compose up --build   # postgres + api (migrate + seed) + web
 ```
+
 > Replace the `JWT_*_SECRET` placeholders in `compose.yml` before any non-local use.
 
 ## Environment Variables
 
 **`server/.env`**
+
 ```
 DATABASE_URL="postgresql://postgres:password@localhost:5432/real_estate?schema=public"
 CLIENT_URL="http://localhost:3000"
@@ -171,6 +205,7 @@ CLOUDINARY_FOLDER="real-estate/listings"
 ```
 
 **`client/.env.local`**
+
 ```
 NEXT_PUBLIC_API_BASE_URL="http://localhost:3002"
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
@@ -189,4 +224,4 @@ What's left, ordered by dependency:
 
 ## License
 
-No license has been set for this repository yet, all rights reserved by default until one is added.
+MIT — see [LICENSE](./LICENSE).
