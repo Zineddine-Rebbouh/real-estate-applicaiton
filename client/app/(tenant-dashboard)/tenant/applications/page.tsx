@@ -44,6 +44,7 @@ import {
   useWithdrawApplicationMutation,
   type TenantApplication,
 } from "@/state/api";
+import { ApplicationTimeline } from "@/components/tenant-dashboard/application-timeline";
 
 export type ApplicationStatus =
   | "Pending"
@@ -277,7 +278,7 @@ export default function ApplicationsPage() {
   };
 
   return (
-    <main className="min-h-full bg-muted/30">
+    <main className="min-h-full bg-muted/30 dark:bg-sidebar">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-4 sm:p-6 lg:p-8">
         {/* Page Header */}
         <header className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
@@ -293,7 +294,12 @@ export default function ApplicationsPage() {
 
           <Button
             nativeButton={false}
-            render={<Link href="/tenant/explore" className="flex items-center gap-1.5" />}
+            render={
+              <Link
+                href="/tenant/explore"
+                className="flex items-center gap-1.5"
+              />
+            }
             size="sm"
             className="w-fit"
           >
@@ -597,6 +603,18 @@ export default function ApplicationsPage() {
                         </div>
                       </div>
                     </section>
+                  </div>
+
+                  {/* Visual 4-Stage Application Progress Timeline */}
+                  <div className="border-t border-border/70 bg-muted/15 p-4">
+                    <ApplicationTimeline
+                      status={application.status}
+                      appliedDate={application.appliedOn}
+                      leaseId={application.leaseId}
+                      startDate={application.startDate}
+                      endDate={application.endDate}
+                      propertyName={application.property}
+                    />
                   </div>
 
                   {/* Actions Footer */}
