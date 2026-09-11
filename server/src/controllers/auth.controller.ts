@@ -16,6 +16,23 @@ import type { AuthenticatedRequest } from "../middleware/authenticate.js";
 
 const invalidCredentials = "Invalid email or password";
 
+// Tenant profile columns surfaced by GET /api/auth/me — the search-preference
+// onboarding reads onboardingCompletedAt here to decide whether to show again.
+const tenantPreferenceSelect = {
+  phoneNumber: true,
+  minBudget: true,
+  maxBudget: true,
+  desiredBeds: true,
+  desiredBaths: true,
+  householdSize: true,
+  hasPets: true,
+  petType: true,
+  needsParking: true,
+  moveInTimeline: true,
+  preferredCity: true,
+  onboardingCompletedAt: true,
+} as const;
+
 type PublicUser = {
   id: string;
   email: string;
@@ -221,16 +238,23 @@ export async function refresh(req: Request, res: Response) {
 
 export async function me(req: Request, res: Response) {
   const authUser = (req as AuthenticatedRequest).user;
-  const profile =
-    authUser.role === "MANAGER"
-      ? await prisma.manager.findUnique({
-          where: { userId: authUser.id },
-          select: { phoneNumber: true },
-        })
-      : await prisma.tenant.findUnique({
-          where: { userId: authUser.id },
-          select: { phoneNumber: true },
-        });
+  if (authUser.role === "TENANT") {
+    const profile = await prisma.tenant.findUnique({
+      where: { userId: authUser.id },
+      select: tenantPreferenceSelect,
+    });
+    return res.json({
+      user: {
+        ...toPublicUser(authUser),
+        ...(profile ?? {}),
+        phoneNumber: profile?.phoneNumber ?? null,
+      },
+    });
+  }
+  const profile = await prisma.manager.findUnique({
+    where: { userId: authUser.id },
+    select: { phoneNumber: true },
+  });
   return res.json({
     user: {
       ...toPublicUser(authUser),

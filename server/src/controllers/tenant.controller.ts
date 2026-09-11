@@ -2,6 +2,8 @@ import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import type { AuthenticatedRequest } from "../middleware/authenticate.js";
 import { getOrCreateTenant } from "../middleware/authorize.js";
+import type { Prisma } from "@prisma/client";
+import { updateTenantPreferencesSchema } from "../validators/tenant-preferences.schema.js";
 
 const leaseWithProperty = {
   property: true,
@@ -195,5 +197,71 @@ export async function getTenantPayments(req: Request, res: Response) {
   } catch (error) {
     console.error("Error fetching tenant payments:", error);
     return res.status(500).json({ error: "Failed to fetch payments" });
+  }
+}
+
+// PATCH /api/tenant/me/preferences — save the tenant's search preferences
+// (onboarding step). Partial body; fields may be set to null to clear them.
+// Skipping onboarding submits { onboardingCompletedAt: <ISO-8601 now> }.
+export async function updateTenantPreferences(req: Request, res: Response) {
+  const user = (req as AuthenticatedRequest).user;
+  const tenant = await getOrCreateTenant(user.id);
+
+  const parsed = updateTenantPreferencesSchema.safeParse(req.body);
+  if (!parsed.success)
+    return res.status(400).json({ error: "Invalid request" });
+
+  const {
+    minBudget,
+    maxBudget,
+    desiredBeds,
+    desiredBaths,
+    householdSize,
+    hasPets,
+    petType,
+    needsParking,
+    moveInTimeline,
+    preferredCity,
+    onboardingCompletedAt,
+  } = parsed.data;
+
+  const data: Prisma.TenantUpdateInput = {};
+  if (minBudget !== undefined) data.minBudget = minBudget;
+  if (maxBudget !== undefined) data.maxBudget = maxBudget;
+  if (desiredBeds !== undefined) data.desiredBeds = desiredBeds;
+  if (desiredBaths !== undefined) data.desiredBaths = desiredBaths;
+  if (householdSize !== undefined) data.householdSize = householdSize;
+  if (hasPets !== undefined) data.hasPets = hasPets;
+  if (petType !== undefined) data.petType = petType;
+  if (needsParking !== undefined) data.needsParking = needsParking;
+  if (moveInTimeline !== undefined) data.moveInTimeline = moveInTimeline;
+  if (preferredCity !== undefined) data.preferredCity = preferredCity;
+  if (onboardingCompletedAt !== undefined)
+    data.onboardingCompletedAt =
+      onboardingCompletedAt === null ? null : new Date(onboardingCompletedAt);
+
+  try {
+    const updated = await prisma.tenant.update({
+      where: { id: tenant.id },
+      data,
+      select: {
+        id: true,
+        minBudget: true,
+        maxBudget: true,
+        desiredBeds: true,
+        desiredBaths: true,
+        householdSize: true,
+        hasPets: true,
+        petType: true,
+        needsParking: true,
+        moveInTimeline: true,
+        preferredCity: true,
+        onboardingCompletedAt: true,
+      },
+    });
+    return res.json({ tenant: updated });
+  } catch (error) {
+    console.error("Error updating tenant preferences:", error);
+    return res.status(500).json({ error: "Failed to update preferences" });
   }
 }

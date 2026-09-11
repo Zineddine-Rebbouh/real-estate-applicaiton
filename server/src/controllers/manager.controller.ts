@@ -2,7 +2,16 @@ import type { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import type { AuthenticatedRequest } from "../middleware/authenticate.js";
 import { getOrCreateManager } from "../middleware/authorize.js";
+import { withReviewStats } from "./property.controller.js";
 import type { ApplicationStatus, PaymentStatus } from "@prisma/client";
+
+function getIdParam(req: Request): string {
+  return Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+}
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+}
 
 export async function getManagerProperties(req: Request, res: Response) {
   try {
@@ -45,6 +54,45 @@ export async function getManagerProperties(req: Request, res: Response) {
   } catch (error) {
     console.error("Error fetching manager properties:", error);
     return res.status(500).json({ error: "Failed to fetch manager properties" });
+  }
+}
+
+// GET /api/manager/properties/:id — owned-only preview. 404 when missing or
+// malformed, 403 when the property belongs to another manager.
+export async function getManagerPropertyById(req: Request, res: Response) {
+  try {
+    const id = getIdParam(req);
+    if (!isUuid(id)) {
+      return res.status(404).json({ error: "Property not found" });
+    }
+    const user = (req as AuthenticatedRequest).user;
+    const manager = await getOrCreateManager(user.id);
+
+    const property = await prisma.property.findUnique({
+      where: { id },
+      include: {
+        manager: {
+          select: {
+            id: true,
+            phoneNumber: true,
+            user: { select: { name: true, email: true } },
+          },
+        },
+      },
+    });
+
+    if (!property) {
+      return res.status(404).json({ error: "Property not found" });
+    }
+    if (property.managerId !== manager.id) {
+      return res.status(403).json({ error: "Forbidden: You do not own this property" });
+    }
+
+    const [withStats] = await withReviewStats([property]);
+    return res.json({ property: withStats });
+  } catch (error) {
+    console.error("Error fetching manager property:", error);
+    return res.status(500).json({ error: "Failed to fetch property" });
   }
 }
 

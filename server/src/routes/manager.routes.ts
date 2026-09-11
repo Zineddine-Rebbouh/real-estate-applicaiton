@@ -3,6 +3,7 @@ import {
   createLeasePayment,
   getManagerApplications,
   getManagerProperties,
+  getManagerPropertyById,
 } from "../controllers/manager.controller.js";
 import { getManagerMaintenanceRequests } from "../controllers/maintenance.controller.js";
 import {
@@ -17,6 +18,7 @@ const router = Router();
 router.use(authenticate, authorize("MANAGER"));
 
 router.get("/properties", getManagerProperties);
+router.get("/properties/:id", getManagerPropertyById);
 router.get("/applications", getManagerApplications);
 router.get("/maintenance", getManagerMaintenanceRequests);
 router.get("/tours", getManagerTourRequests);
