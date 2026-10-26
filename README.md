@@ -14,16 +14,6 @@ Habitat is a real-estate rental web app: a marketing landing page paired with a 
 
 🔗 **Live demo:** [real-estate-applicaiton.vercel.app](https://real-estate-applicaiton.vercel.app)
 
-> **Try it without signing up** — all seeded accounts use password `Habitat2026!`:
-> | Role | Email | Shows |
-> |---|---|---|
-> | Portfolio manager (12 properties) | `eleanor.vance@habitat-properties.com` | queues, inquiries, volume |
-> | Mid-tier manager (6 properties) | `david.chen@pacificliving.io` | balanced portfolio |
-> | Active resident | `aaravpatel.1@example.com` | residence, lease PDF, invoices |
-> | Applicant (2 pending) | `keanureeves.29@example.com` | applications list |
-> | Fresh tenant (empty states) | `freshtenantdemo.60@example.com` | empty dashboards |
->
-> Full matrix + manager invite codes: [`server/prisma/seedData/README-credentials.md`](./server/prisma/seedData/README-credentials.md). Local seed: `cd server && npm run seed`.
 
 ---
 
